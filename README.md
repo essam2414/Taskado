@@ -12,8 +12,6 @@ This application was generated using JHipster 8.7.3 for the team project 2024-20
    - Essam S. eus328@student.bham.ac.uk
    - Abdullahi A. axa2087@student.bham.ac.uk
 
-3. Modify [gdpr-policy.component.html](src/main/webapp/app/gdpr-policy/gdpr-policy.component.html) to add your team number (replace X) and team members to the contact section.
-
 # Required software
 
 To run the code from this repository requires at least:
