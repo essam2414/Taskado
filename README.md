@@ -10,9 +10,13 @@ TODO:
 
 2. Add your name below:
 
-   - Alice S. example@student.bham.ac.uk
-   - Bob S. example@student.bham.ac.uk
-   - <!-- this is a comment: delete this (and Alice and Bob), add your name and email  -->
+   - Diba M. dxm376@student.bham.ac.uk
+   - Liba M. lxm613@student.bham.ac.uk
+   - Omar E. oke308@student.bham.ac.uk
+   - Ziad M. zxd351@student.bham.ac.uk
+   - Anas K. akk323@student.bham.ac.uk
+   - Essam S. eus328@student.bham.ac.uk
+   - Abdullahi A. axa2087@student.bham.ac.uk
 
 3. Modify [gdpr-policy.component.html](src/main/webapp/app/gdpr-policy/gdpr-policy.component.html) to add your team number (replace X) and team members to the contact section.
 
