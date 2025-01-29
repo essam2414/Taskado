@@ -1,0 +1,7 @@
+entity Task {
+  title String required,
+  description Text,
+  dueDate Instant required,
+  priority Integer,
+  completed Boolean
+}
