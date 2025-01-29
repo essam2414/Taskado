@@ -1,0 +1,4 @@
+// Duplicate this file and rename it to match your entity (e.g., task.jdl, event.jdl).
+// Add your JDL code inside the new file.
+// Save the file inside the /jdl/ folder.
+// Commit & push your file in a separate branch.
