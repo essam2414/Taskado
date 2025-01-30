@@ -1,0 +1,6 @@
+entity HabitTracker {
+    name String required,
+    repeatFrequency String required,
+    startDate Instant required,
+    streak Integer,
+}
