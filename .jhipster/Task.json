@@ -1,0 +1,33 @@
+{
+  "annotations": {
+    "changelogDate": "20250131213444"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "title",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "dueDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "priority",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "completed",
+      "fieldType": "Boolean"
+    }
+  ],
+  "name": "Task",
+  "relationships": [],
+  "searchEngine": "no"
+}
