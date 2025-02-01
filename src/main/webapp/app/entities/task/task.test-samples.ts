@@ -3,31 +3,30 @@ import dayjs from 'dayjs/esm';
 import { ITask, NewTask } from './task.model';
 
 export const sampleWithRequiredData: ITask = {
-  id: 7584,
-  title: 'illiterate apologise',
-  dueDate: dayjs('2025-01-31T18:57'),
+  id: 31842,
+  title: 'ornate',
+  dueDate: dayjs('2025-01-30T21:38'),
 };
 
 export const sampleWithPartialData: ITask = {
-  id: 23710,
-  title: 'qua',
-  dueDate: dayjs('2025-01-31T16:25'),
-  priority: 1855,
-  completed: false,
+  id: 3485,
+  title: 'athwart',
+  dueDate: dayjs('2025-01-31T08:03'),
+  priority: 15144,
 };
 
 export const sampleWithFullData: ITask = {
-  id: 25556,
-  title: 'jubilantly',
-  description: 'inasmuch circa jittery',
-  dueDate: dayjs('2025-01-31T15:24'),
-  priority: 9719,
-  completed: false,
+  id: 5910,
+  title: 'cheerfully failing',
+  description: 'given not',
+  dueDate: dayjs('2025-01-31T05:27'),
+  priority: 15854,
+  completed: true,
 };
 
 export const sampleWithNewData: NewTask = {
-  title: 'hmph pish notarize',
-  dueDate: dayjs('2025-01-30T22:08'),
+  title: 'tame',
+  dueDate: dayjs('2025-01-31T10:24'),
   id: null,
 };
 

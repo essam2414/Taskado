@@ -3,33 +3,33 @@ import dayjs from 'dayjs/esm';
 import { IHabit, NewHabit } from './habit.model';
 
 export const sampleWithRequiredData: IHabit = {
-  id: 21328,
-  name: 'inwardly',
-  repeatFrequency: 'than squid',
-  startDate: dayjs('2025-02-01T06:05'),
+  id: 15535,
+  name: 'mild inasmuch',
+  repeatFrequency: 'boastfully total meanwhile',
+  startDate: dayjs('2025-01-31T20:52'),
 };
 
 export const sampleWithPartialData: IHabit = {
-  id: 11779,
-  name: 'yowza duh depute',
-  repeatFrequency: 'gosh where nor',
-  startDate: dayjs('2025-02-01T11:30'),
-  completionRate: 19817.3,
+  id: 21879,
+  name: 'supposing exterior',
+  repeatFrequency: 'indeed crumble rarely',
+  startDate: dayjs('2025-02-01T12:25'),
+  streak: 21023,
 };
 
 export const sampleWithFullData: IHabit = {
-  id: 25010,
-  name: 'cash tired yet',
-  repeatFrequency: 'yin',
-  startDate: dayjs('2025-01-31T15:59'),
-  streak: 31795,
-  completionRate: 17010.38,
+  id: 28046,
+  name: 'analogy',
+  repeatFrequency: 'release fast commandeer',
+  startDate: dayjs('2025-02-01T12:36'),
+  streak: 2113,
+  completionRate: 1335,
 };
 
 export const sampleWithNewData: NewHabit = {
-  name: 'consequently cross inwardly',
-  repeatFrequency: 'ack',
-  startDate: dayjs('2025-02-01T02:52'),
+  name: 'than understanding',
+  repeatFrequency: 'agreeable incidentally',
+  startDate: dayjs('2025-02-01T00:41'),
   id: null,
 };
 

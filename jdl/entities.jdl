@@ -8,7 +8,18 @@ entity Task {
   description String,
   dueDate Instant required,
   priority Integer,
-  completed Boolean
+  completed Boolean,
+
+}
+
+entity Event {
+  title String required,
+  description String,
+  eventDate Instant required,
+  startTime Instant required,
+  endTime Instant required,
+  location String,
+  reminder Boolean
 }
 
 entity Habit {
@@ -22,4 +33,5 @@ entity Habit {
 relationship ManyToOne {
   Task{user} to User
   Habit{user} to User
+  Event{user} to User
 }
