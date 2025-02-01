@@ -49,10 +49,10 @@ describe('Habit Management Update Component', () => {
   describe('ngOnInit', () => {
     it('Should call User query and add missing value', () => {
       const habit: IHabit = { id: 456 };
-      const user: IUser = { id: 28073 };
+      const user: IUser = { id: 6471 };
       habit.user = user;
 
-      const userCollection: IUser[] = [{ id: 3161 }];
+      const userCollection: IUser[] = [{ id: 14645 }];
       jest.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
       const additionalUsers = [user];
       const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
@@ -71,7 +71,7 @@ describe('Habit Management Update Component', () => {
 
     it('Should update editForm', () => {
       const habit: IHabit = { id: 456 };
-      const user: IUser = { id: 10590 };
+      const user: IUser = { id: 25246 };
       habit.user = user;
 
       activatedRoute.data = of({ habit });
