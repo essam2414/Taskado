@@ -1,0 +1,16 @@
+entity User {
+  fullName String required,
+  email String required
+}
+
+entity Task {
+  title String required,
+  description String,
+  dueDate Instant required,
+  priority Integer,
+  completed Boolean
+}
+
+relationship ManyToOne {
+  Task{user} to User
+}

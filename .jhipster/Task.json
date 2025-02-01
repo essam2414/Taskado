@@ -31,9 +31,8 @@
   "relationships": [
     {
       "otherEntityName": "user",
-      "otherEntityRelationshipName": "tasks",
       "relationshipName": "user",
-      "relationshipSide": "right",
+      "relationshipSide": "left",
       "relationshipType": "many-to-one"
     }
   ],

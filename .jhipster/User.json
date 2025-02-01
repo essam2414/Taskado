@@ -17,14 +17,6 @@
     }
   ],
   "name": "User",
-  "relationships": [
-    {
-      "otherEntityName": "task",
-      "otherEntityRelationshipName": "user",
-      "relationshipName": "tasks",
-      "relationshipSide": "left",
-      "relationshipType": "one-to-many"
-    }
-  ],
+  "relationships": [],
   "searchEngine": "no"
 }
