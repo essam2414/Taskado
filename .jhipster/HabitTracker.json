@@ -1,0 +1,30 @@
+{
+  "annotations": {
+    "changelogDate": "20250131213755"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "repeatFrequency",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "startDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "streak",
+      "fieldType": "Integer"
+    }
+  ],
+  "name": "HabitTracker",
+  "relationships": [],
+  "searchEngine": "no"
+}
