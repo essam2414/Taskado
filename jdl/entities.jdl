@@ -11,6 +11,15 @@ entity Task {
   completed Boolean
 }
 
+entity Habit {
+    name String required,
+    repeatFrequency String required,
+    startDate Instant required,
+    streak Integer,
+    completionRate Float
+}
+
 relationship ManyToOne {
   Task{user} to User
+  Habit{user} to User
 }
