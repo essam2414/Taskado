@@ -28,6 +28,14 @@
     }
   ],
   "name": "Task",
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "tasks",
+      "relationshipName": "user",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
   "searchEngine": "no"
 }

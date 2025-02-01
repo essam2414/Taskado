@@ -35,6 +35,10 @@
           <dd>
             <span>{{ taskRef.completed }}</span>
           </dd>
+          <dt><span>User</span></dt>
+          <dd>
+            <span>{{ taskRef.user?.id }}</span>
+          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

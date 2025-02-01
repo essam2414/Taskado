@@ -25,6 +25,7 @@ describe('Task Form Service', () => {
             dueDate: expect.any(Object),
             priority: expect.any(Object),
             completed: expect.any(Object),
+            user: expect.any(Object),
           }),
         );
       });
@@ -40,6 +41,7 @@ describe('Task Form Service', () => {
             dueDate: expect.any(Object),
             priority: expect.any(Object),
             completed: expect.any(Object),
+            user: expect.any(Object),
           }),
         );
       });

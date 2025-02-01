@@ -1,6 +1,7 @@
 package bham.team.repository;
 
 import bham.team.domain.Task;
+import java.util.List;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +10,7 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface TaskRepository extends JpaRepository<Task, Long> {}
+public interface TaskRepository extends JpaRepository<Task, Long> {
+    @Query("select task from Task task where task.user.login = ?#{authentication.name}")
+    List<Task> findByUserIsCurrentUser();
+}

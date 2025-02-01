@@ -36,6 +36,7 @@ type TaskFormGroupContent = {
   dueDate: FormControl<TaskFormRawValue['dueDate']>;
   priority: FormControl<TaskFormRawValue['priority']>;
   completed: FormControl<TaskFormRawValue['completed']>;
+  user: FormControl<TaskFormRawValue['user']>;
 };
 
 export type TaskFormGroup = FormGroup<TaskFormGroupContent>;
@@ -64,6 +65,7 @@ export class TaskFormService {
       }),
       priority: new FormControl(taskRawValue.priority),
       completed: new FormControl(taskRawValue.completed),
+      user: new FormControl(taskRawValue.user),
     });
   }
 
