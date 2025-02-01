@@ -1,0 +1,25 @@
+entity User {
+  fullName String required,
+  email String required
+}
+
+entity Task {
+  title String required,
+  description String,
+  dueDate Instant required,
+  priority Integer,
+  completed Boolean
+}
+
+entity Habit {
+    name String required,
+    repeatFrequency String required,
+    startDate Instant required,
+    streak Integer,
+    completionRate Float
+}
+
+relationship ManyToOne {
+  Task{user} to User
+  Habit{user} to User
+}

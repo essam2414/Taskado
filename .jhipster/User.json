@@ -1,0 +1,22 @@
+{
+  "annotations": {
+    "changelogDate": "20250201125830"
+  },
+  "applications": "*",
+  "entityTableName": "jhi_user",
+  "fields": [
+    {
+      "fieldName": "fullName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "email",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "User",
+  "relationships": [],
+  "searchEngine": "no"
+}
