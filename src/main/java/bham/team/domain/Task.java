@@ -1,6 +1,5 @@
 package bham.team.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -43,7 +42,6 @@ public class Task implements Serializable {
     private Boolean completed;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "tasks" }, allowSetters = true)
     private User user;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

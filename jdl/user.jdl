@@ -1,4 +1,0 @@
-entity User {
-  fullName String required,
-  email String required
-}

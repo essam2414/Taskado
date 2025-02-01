@@ -5,7 +5,3 @@ entity Task {
   priority Integer,
   completed Boolean
 }
-
-relationship OneToMany {
-  User{tasks} to Task{user}
-}
