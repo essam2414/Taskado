@@ -1,0 +1,19 @@
+entity PomodoroSession {
+  Start Instant required,
+  end Instant,
+  duration Integer,
+  type PomodoroType required,
+  Paused Boolean,
+  Observations String
+}
+
+enum PomodoroType {
+  Standard,
+  Meditation,
+  Study,
+  Physical
+}
+
+relationship ManyToOne {
+  PomodoroSession{user} to User
+}
