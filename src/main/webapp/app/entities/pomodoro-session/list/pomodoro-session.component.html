@@ -1,0 +1,140 @@
+<div>
+  <h2 id="page-heading" data-cy="PomodoroSessionHeading">
+    <span>Pomodoro Sessions</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-pomodoro-session"
+        [routerLink]="['/pomodoro-session/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span>Create a new Pomodoro Session</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (pomodoroSessions?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Pomodoro Sessions found</span>
+    </div>
+  }
+
+  @if (pomodoroSessions && pomodoroSessions.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="start">
+              <div class="d-flex">
+                <span>Start</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="end">
+              <div class="d-flex">
+                <span>End</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="duration">
+              <div class="d-flex">
+                <span>Duration</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="type">
+              <div class="d-flex">
+                <span>Type</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="paused">
+              <div class="d-flex">
+                <span>Paused</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="observations">
+              <div class="d-flex">
+                <span>Observations</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (pomodoroSession of pomodoroSessions; track trackId(pomodoroSession)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/pomodoro-session', pomodoroSession.id, 'view']">{{ pomodoroSession.id }}</a>
+              </td>
+              <td>{{ pomodoroSession.start | formatMediumDatetime }}</td>
+              <td>{{ pomodoroSession.end | formatMediumDatetime }}</td>
+              <td>{{ pomodoroSession.duration }}</td>
+              <td>
+                {{
+                  { null: '', Standard: 'Standard', Meditation: 'Meditation', Study: 'Study', Physical: 'Physical' }[
+                    pomodoroSession.type ?? 'null'
+                  ]
+                }}
+              </td>
+              <td>{{ pomodoroSession.paused }}</td>
+              <td>{{ pomodoroSession.observations }}</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/pomodoro-session', pomodoroSession.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/pomodoro-session', pomodoroSession.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(pomodoroSession)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
