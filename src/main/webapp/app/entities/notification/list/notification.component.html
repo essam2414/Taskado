@@ -133,6 +133,12 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="user.id">
+              <div class="d-flex">
+                <span>User</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -161,6 +167,9 @@
               <td>{{ notification.isRecurring }}</td>
               <td>{{ notification.recurrencePattern }}</td>
               <td>{{ { null: '', EMAIL: 'EMAIL', SMS: 'SMS', PUSH: 'PUSH' }[notification.sentVia ?? 'null'] }}</td>
+              <td>
+                {{ notification.user?.id }}
+              </td>
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/notification', notification.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

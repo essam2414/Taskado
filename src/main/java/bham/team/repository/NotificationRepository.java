@@ -1,6 +1,7 @@
 package bham.team.repository;
 
 import bham.team.domain.Notification;
+import java.util.List;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
@@ -9,4 +10,7 @@ import org.springframework.stereotype.Repository;
  */
 @SuppressWarnings("unused")
 @Repository
-public interface NotificationRepository extends JpaRepository<Notification, Long> {}
+public interface NotificationRepository extends JpaRepository<Notification, Long> {
+    @Query("select notification from Notification notification where notification.user.login = ?#{authentication.name}")
+    List<Notification> findByUserIsCurrentUser();
+}

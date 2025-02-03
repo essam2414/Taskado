@@ -73,6 +73,10 @@
           <dd>
             <span>{{ { null: '', EMAIL: 'EMAIL', SMS: 'SMS', PUSH: 'PUSH' }[notificationRef.sentVia ?? 'null'] }}</span>
           </dd>
+          <dt><span>User</span></dt>
+          <dd>
+            <span>{{ notificationRef.user?.id }}</span>
+          </dd>
         </dl>
 
         <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

@@ -2,11 +2,13 @@ import { Component, OnInit, inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { finalize, map } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { IUser } from 'app/entities/user/user.model';
+import { UserService } from 'app/entities/user/service/user.service';
 import { NotificationType } from 'app/entities/enumerations/notification-type.model';
 import { Priority } from 'app/entities/enumerations/priority.model';
 import { NotificationStatus } from 'app/entities/enumerations/notification-status.model';
@@ -29,12 +31,17 @@ export class NotificationUpdateComponent implements OnInit {
   notificationStatusValues = Object.keys(NotificationStatus);
   notificationChannelValues = Object.keys(NotificationChannel);
 
+  usersSharedCollection: IUser[] = [];
+
   protected notificationService = inject(NotificationService);
   protected notificationFormService = inject(NotificationFormService);
+  protected userService = inject(UserService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: NotificationFormGroup = this.notificationFormService.createNotificationFormGroup();
+
+  compareUser = (o1: IUser | null, o2: IUser | null): boolean => this.userService.compareUser(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ notification }) => {
@@ -42,6 +49,8 @@ export class NotificationUpdateComponent implements OnInit {
       if (notification) {
         this.updateForm(notification);
       }
+
+      this.loadRelationshipsOptions();
     });
   }
 
@@ -81,5 +90,15 @@ export class NotificationUpdateComponent implements OnInit {
   protected updateForm(notification: INotification): void {
     this.notification = notification;
     this.notificationFormService.resetForm(this.editForm, notification);
+
+    this.usersSharedCollection = this.userService.addUserToCollectionIfMissing<IUser>(this.usersSharedCollection, notification.user);
+  }
+
+  protected loadRelationshipsOptions(): void {
+    this.userService
+      .query()
+      .pipe(map((res: HttpResponse<IUser[]>) => res.body ?? []))
+      .pipe(map((users: IUser[]) => this.userService.addUserToCollectionIfMissing<IUser>(users, this.notification?.user)))
+      .subscribe((users: IUser[]) => (this.usersSharedCollection = users));
   }
 }

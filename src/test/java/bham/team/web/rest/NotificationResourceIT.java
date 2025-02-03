@@ -14,6 +14,7 @@ import bham.team.domain.enumeration.NotificationStatus;
 import bham.team.domain.enumeration.NotificationType;
 import bham.team.domain.enumeration.Priority;
 import bham.team.repository.NotificationRepository;
+import bham.team.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
@@ -88,6 +89,9 @@ class NotificationResourceIT {
 
     @Autowired
     private NotificationRepository notificationRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private EntityManager em;

@@ -33,6 +33,7 @@ describe('Notification Form Service', () => {
             isRecurring: expect.any(Object),
             recurrencePattern: expect.any(Object),
             sentVia: expect.any(Object),
+            user: expect.any(Object),
           }),
         );
       });
@@ -56,6 +57,7 @@ describe('Notification Form Service', () => {
             isRecurring: expect.any(Object),
             recurrencePattern: expect.any(Object),
             sentVia: expect.any(Object),
+            user: expect.any(Object),
           }),
         );
       });

@@ -375,6 +375,8 @@ class EventResourceIT {
         Event partialUpdatedEvent = new Event();
         partialUpdatedEvent.setId(event.getId());
 
+        partialUpdatedEvent.endTime(UPDATED_END_TIME);
+
         restEventMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedEvent.getId())

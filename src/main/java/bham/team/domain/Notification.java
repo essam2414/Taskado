@@ -79,6 +79,9 @@ public class Notification implements Serializable {
     @Column(name = "sent_via", nullable = false)
     private NotificationChannel sentVia;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -261,6 +264,19 @@ public class Notification implements Serializable {
 
     public void setSentVia(NotificationChannel sentVia) {
         this.sentVia = sentVia;
+    }
+
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Notification user(User user) {
+        this.setUser(user);
+        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

@@ -45,6 +45,7 @@ type NotificationFormGroupContent = {
   isRecurring: FormControl<NotificationFormRawValue['isRecurring']>;
   recurrencePattern: FormControl<NotificationFormRawValue['recurrencePattern']>;
   sentVia: FormControl<NotificationFormRawValue['sentVia']>;
+  user: FormControl<NotificationFormRawValue['user']>;
 };
 
 export type NotificationFormGroup = FormGroup<NotificationFormGroupContent>;
@@ -93,6 +94,7 @@ export class NotificationFormService {
       sentVia: new FormControl(notificationRawValue.sentVia, {
         validators: [Validators.required],
       }),
+      user: new FormControl(notificationRawValue.user),
     });
   }
 

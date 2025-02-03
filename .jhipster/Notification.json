@@ -70,6 +70,13 @@
     }
   ],
   "name": "Notification",
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityName": "user",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
   "searchEngine": "no"
 }
