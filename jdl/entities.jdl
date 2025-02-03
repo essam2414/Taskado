@@ -7,9 +7,10 @@ entity Task {
   title String required,
   description String,
   dueDate Instant required,
-  priority Integer,
+  priority Priority,
   completed Boolean,
-
+  createdAt Instant,
+  updatedAt Instant
 }
 
 entity Event {
