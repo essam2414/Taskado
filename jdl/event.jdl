@@ -1,0 +1,9 @@
+entity Event {
+  title String required,
+  description String,
+  eventDate Instant required,
+  startTime Instant required,
+  endTime Instant required,
+  location String,
+  reminder Boolean  // If true, send a reminder to notifications
+}

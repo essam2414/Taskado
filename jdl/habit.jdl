@@ -1,0 +1,7 @@
+entity Habit {
+    name String required,
+    repeatFrequency String required,
+    startDate Instant required,
+    streak Integer,
+    completionRate Float
+}

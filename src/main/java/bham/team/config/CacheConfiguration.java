@@ -50,6 +50,9 @@ public class CacheConfiguration {
             createCache(cm, bham.team.domain.User.class.getName());
             createCache(cm, bham.team.domain.Authority.class.getName());
             createCache(cm, bham.team.domain.User.class.getName() + ".authorities");
+            createCache(cm, bham.team.domain.Task.class.getName());
+            createCache(cm, bham.team.domain.Habit.class.getName());
+            createCache(cm, bham.team.domain.Event.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }
