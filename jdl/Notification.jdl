@@ -1,6 +1,0 @@
-entity Notification {
-    message String required, // Notifications text 
-    notificationType String required. // e,g., "Reminder", "Deadline", "System Update" 
-    timestamp Instant required, // Time when the notifications was created 
-    linkedEntityType String, // "Task", "Event", or "HabitTracker" e.g.
-}

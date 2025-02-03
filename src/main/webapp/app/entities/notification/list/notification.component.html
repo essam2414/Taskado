@@ -1,0 +1,188 @@
+<div>
+  <h2 id="page-heading" data-cy="NotificationHeading">
+    <span>Notifications</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-notification"
+        [routerLink]="['/notification/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span>Create a new Notification</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (notifications?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Notifications found</span>
+    </div>
+  }
+
+  @if (notifications && notifications.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="message">
+              <div class="d-flex">
+                <span>Message</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="notificationType">
+              <div class="d-flex">
+                <span>Notification Type</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="timestamp">
+              <div class="d-flex">
+                <span>Timestamp</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="linkedEntityType">
+              <div class="d-flex">
+                <span>Linked Entity Type</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="read">
+              <div class="d-flex">
+                <span>Read</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="priority">
+              <div class="d-flex">
+                <span>Priority</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="status">
+              <div class="d-flex">
+                <span>Status</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="expirationDate">
+              <div class="d-flex">
+                <span>Expiration Date</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="actionURL">
+              <div class="d-flex">
+                <span>Action URL</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="icon">
+              <div class="d-flex">
+                <span>Icon</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="isRecurring">
+              <div class="d-flex">
+                <span>Is Recurring</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="recurrencePattern">
+              <div class="d-flex">
+                <span>Recurrence Pattern</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="sentVia">
+              <div class="d-flex">
+                <span>Sent Via</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (notification of notifications; track trackId(notification)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/notification', notification.id, 'view']">{{ notification.id }}</a>
+              </td>
+              <td>{{ notification.message }}</td>
+              <td>
+                {{
+                  { null: '', REMINDER: 'REMINDER', DEADLINE: 'DEADLINE', SYSTEM_UPDATE: 'SYSTEM_UPDATE' }[
+                    notification.notificationType ?? 'null'
+                  ]
+                }}
+              </td>
+              <td>{{ notification.timestamp | formatMediumDatetime }}</td>
+              <td>{{ notification.linkedEntityType }}</td>
+              <td>{{ notification.read }}</td>
+              <td>{{ { null: '', LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' }[notification.priority ?? 'null'] }}</td>
+              <td>{{ { null: '', SENT: 'SENT', PENDING: 'PENDING', FAILED: 'FAILED' }[notification.status ?? 'null'] }}</td>
+              <td>{{ notification.expirationDate | formatMediumDatetime }}</td>
+              <td>{{ notification.actionURL }}</td>
+              <td>{{ notification.icon }}</td>
+              <td>{{ notification.isRecurring }}</td>
+              <td>{{ notification.recurrencePattern }}</td>
+              <td>{{ { null: '', EMAIL: 'EMAIL', SMS: 'SMS', PUSH: 'PUSH' }[notification.sentVia ?? 'null'] }}</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/notification', notification.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a [routerLink]="['/notification', notification.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(notification)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

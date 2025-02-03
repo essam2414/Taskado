@@ -1,0 +1,75 @@
+{
+  "annotations": {
+    "changelogDate": "20250203140952"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "message",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "notificationType",
+      "fieldType": "NotificationType",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "REMINDER,DEADLINE,SYSTEM_UPDATE"
+    },
+    {
+      "fieldName": "timestamp",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "linkedEntityType",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "read",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "priority",
+      "fieldType": "Priority",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "LOW,MEDIUM,HIGH,CRITICAL"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "NotificationStatus",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "SENT,PENDING,FAILED"
+    },
+    {
+      "fieldName": "expirationDate",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "actionURL",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "icon",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "isRecurring",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "recurrencePattern",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "sentVia",
+      "fieldType": "NotificationChannel",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "EMAIL,SMS,PUSH"
+    }
+  ],
+  "name": "Notification",
+  "relationships": [],
+  "searchEngine": "no"
+}
