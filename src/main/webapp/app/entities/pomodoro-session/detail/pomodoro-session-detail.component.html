@@ -1,0 +1,58 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (pomodoroSession(); as pomodoroSessionRef) {
+      <div>
+        <h2 data-cy="pomodoroSessionDetailsHeading"><span>Pomodoro Session</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ pomodoroSessionRef.id }}</span>
+          </dd>
+          <dt><span>Start</span></dt>
+          <dd>
+            <span>{{ pomodoroSessionRef.start | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>End</span></dt>
+          <dd>
+            <span>{{ pomodoroSessionRef.end | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Duration</span></dt>
+          <dd>
+            <span>{{ pomodoroSessionRef.duration }}</span>
+          </dd>
+          <dt><span>Type</span></dt>
+          <dd>
+            <span>{{
+              { null: '', Standard: 'Standard', Meditation: 'Meditation', Study: 'Study', Physical: 'Physical' }[
+                pomodoroSessionRef.type ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span>Paused</span></dt>
+          <dd>
+            <span>{{ pomodoroSessionRef.paused }}</span>
+          </dd>
+          <dt><span>Observations</span></dt>
+          <dd>
+            <span>{{ pomodoroSessionRef.observations }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/pomodoro-session', pomodoroSessionRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>
