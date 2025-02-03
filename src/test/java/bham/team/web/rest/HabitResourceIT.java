@@ -343,6 +343,8 @@ class HabitResourceIT {
         Habit partialUpdatedHabit = new Habit();
         partialUpdatedHabit.setId(habit.getId());
 
+        partialUpdatedHabit.repeatFrequency(UPDATED_REPEAT_FREQUENCY).completionRate(UPDATED_COMPLETION_RATE);
+
         restHabitMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedHabit.getId())

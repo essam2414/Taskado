@@ -1,0 +1,251 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-notification-heading" data-cy="NotificationCreateUpdateHeading">Create or edit a Notification</h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let messageRef = editForm.get('message')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_message">Message</label>
+          <input type="text" class="form-control" name="message" id="field_message" data-cy="message" formControlName="message" />
+          @if (messageRef.invalid && (messageRef.dirty || messageRef.touched)) {
+            <div>
+              @if (editForm.get('message')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let notificationTypeRef = editForm.get('notificationType')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_notificationType">Notification Type</label>
+          <select
+            class="form-control"
+            name="notificationType"
+            formControlName="notificationType"
+            id="field_notificationType"
+            data-cy="notificationType"
+          >
+            <option [ngValue]="null"></option>
+            @for (notificationType of notificationTypeValues; track $index) {
+              <option [value]="notificationType">
+                {{ { null: '', REMINDER: 'REMINDER', DEADLINE: 'DEADLINE', SYSTEM_UPDATE: 'SYSTEM_UPDATE' }[notificationType] }}
+              </option>
+            }
+          </select>
+          @if (notificationTypeRef.invalid && (notificationTypeRef.dirty || notificationTypeRef.touched)) {
+            <div>
+              @if (editForm.get('notificationType')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let timestampRef = editForm.get('timestamp')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_timestamp">Timestamp</label>
+          <div class="d-flex">
+            <input
+              id="field_timestamp"
+              data-cy="timestamp"
+              type="datetime-local"
+              class="form-control"
+              name="timestamp"
+              formControlName="timestamp"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (timestampRef.invalid && (timestampRef.dirty || timestampRef.touched)) {
+            <div>
+              @if (editForm.get('timestamp')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('timestamp')?.errors?.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_linkedEntityType">Linked Entity Type</label>
+          <input
+            type="text"
+            class="form-control"
+            name="linkedEntityType"
+            id="field_linkedEntityType"
+            data-cy="linkedEntityType"
+            formControlName="linkedEntityType"
+          />
+        </div>
+
+        @let readRef = editForm.get('read')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_read">Read</label>
+          <input type="checkbox" class="form-check" name="read" id="field_read" data-cy="read" formControlName="read" />
+          @if (readRef.invalid && (readRef.dirty || readRef.touched)) {
+            <div>
+              @if (editForm.get('read')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let priorityRef = editForm.get('priority')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_priority">Priority</label>
+          <select class="form-control" name="priority" formControlName="priority" id="field_priority" data-cy="priority">
+            <option [ngValue]="null"></option>
+            @for (priority of priorityValues; track $index) {
+              <option [value]="priority">
+                {{ { null: '', LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' }[priority] }}
+              </option>
+            }
+          </select>
+          @if (priorityRef.invalid && (priorityRef.dirty || priorityRef.touched)) {
+            <div>
+              @if (editForm.get('priority')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let statusRef = editForm.get('status')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_status">Status</label>
+          <select class="form-control" name="status" formControlName="status" id="field_status" data-cy="status">
+            <option [ngValue]="null"></option>
+            @for (notificationStatus of notificationStatusValues; track $index) {
+              <option [value]="notificationStatus">
+                {{ { null: '', SENT: 'SENT', PENDING: 'PENDING', FAILED: 'FAILED' }[notificationStatus] }}
+              </option>
+            }
+          </select>
+          @if (statusRef.invalid && (statusRef.dirty || statusRef.touched)) {
+            <div>
+              @if (editForm.get('status')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_expirationDate">Expiration Date</label>
+          <div class="d-flex">
+            <input
+              id="field_expirationDate"
+              data-cy="expirationDate"
+              type="datetime-local"
+              class="form-control"
+              name="expirationDate"
+              formControlName="expirationDate"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_actionURL">Action URL</label>
+          <input type="text" class="form-control" name="actionURL" id="field_actionURL" data-cy="actionURL" formControlName="actionURL" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_icon">Icon</label>
+          <input type="text" class="form-control" name="icon" id="field_icon" data-cy="icon" formControlName="icon" />
+        </div>
+
+        @let isRecurringRef = editForm.get('isRecurring')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_isRecurring">Is Recurring</label>
+          <input
+            type="checkbox"
+            class="form-check"
+            name="isRecurring"
+            id="field_isRecurring"
+            data-cy="isRecurring"
+            formControlName="isRecurring"
+          />
+          @if (isRecurringRef.invalid && (isRecurringRef.dirty || isRecurringRef.touched)) {
+            <div>
+              @if (editForm.get('isRecurring')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_recurrencePattern">Recurrence Pattern</label>
+          <input
+            type="text"
+            class="form-control"
+            name="recurrencePattern"
+            id="field_recurrencePattern"
+            data-cy="recurrencePattern"
+            formControlName="recurrencePattern"
+          />
+        </div>
+
+        @let sentViaRef = editForm.get('sentVia')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_sentVia">Sent Via</label>
+          <select class="form-control" name="sentVia" formControlName="sentVia" id="field_sentVia" data-cy="sentVia">
+            <option [ngValue]="null"></option>
+            @for (notificationChannel of notificationChannelValues; track $index) {
+              <option [value]="notificationChannel">
+                {{ { null: '', EMAIL: 'EMAIL', SMS: 'SMS', PUSH: 'PUSH' }[notificationChannel] }}
+              </option>
+            }
+          </select>
+          @if (sentViaRef.invalid && (sentViaRef.dirty || sentViaRef.touched)) {
+            <div>
+              @if (editForm.get('sentVia')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_user">User</label>
+          <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user" [compareWith]="compareUser">
+            <option [ngValue]="null"></option>
+            @for (userOption of usersSharedCollection; track $index) {
+              <option [ngValue]="userOption">{{ userOption.id }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

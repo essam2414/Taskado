@@ -30,8 +30,50 @@ entity Habit {
     completionRate Float
 }
 
+enum NotificationType {
+  REMINDER,
+  DEADLINE,
+  SYSTEM_UPDATE
+}
+
+enum Priority {
+  LOW,
+  MEDIUM,
+  HIGH,
+  CRITICAL
+}
+
+enum NotificationStatus {
+  SENT,
+  PENDING,
+  FAILED
+}
+
+enum NotificationChannel {
+  EMAIL,
+  SMS,
+  PUSH
+}
+
+entity Notification {
+  message String required,
+  notificationType NotificationType required,
+  timestamp Instant required,
+  linkedEntityType String,
+  read Boolean required,
+  priority Priority required,
+  status NotificationStatus required,
+  expirationDate Instant,
+  actionURL String,
+  icon String,
+  isRecurring Boolean required,
+  recurrencePattern String,
+  sentVia NotificationChannel required
+}
+
 relationship ManyToOne {
   Task{user} to User
   Habit{user} to User
   Event{user} to User
+  Notification{user} to User
 }
