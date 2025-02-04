@@ -4,13 +4,13 @@ This application was generated using JHipster 8.7.3 for the team project 2024-20
 
 # Team 45
 
-   - Diba M. dxm376@student.bham.ac.uk
-   - Liba M. lxm613@student.bham.ac.uk
-   - Omar E. oke308@student.bham.ac.uk
-   - Ziad M. zxd351@student.bham.ac.uk
-   - Anas K. akk323@student.bham.ac.uk
-   - Essam S. eus328@student.bham.ac.uk
-   - Abdullahi A. axa2087@student.bham.ac.uk
+- Diba M. dxm376@student.bham.ac.uk
+- Liba M. lxm613@student.bham.ac.uk
+- Omar E. oke308@student.bham.ac.uk
+- Ziad M. zxd351@student.bham.ac.uk
+- Anas K. akk323@student.bham.ac.uk
+- Essam S. eus328@student.bham.ac.uk
+- Abdullahi A. axa2087@student.bham.ac.uk
 
 # Required software
 
