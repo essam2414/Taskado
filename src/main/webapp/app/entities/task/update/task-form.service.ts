@@ -19,15 +19,17 @@ type TaskFormGroupInput = ITask | PartialWithRequiredKeyOf<NewTask>;
 /**
  * Type that converts some properties for forms.
  */
-type FormValueOf<T extends ITask | NewTask> = Omit<T, 'dueDate'> & {
+type FormValueOf<T extends ITask | NewTask> = Omit<T, 'dueDate' | 'createdAt' | 'updatedAt'> & {
   dueDate?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 };
 
 type TaskFormRawValue = FormValueOf<ITask>;
 
 type NewTaskFormRawValue = FormValueOf<NewTask>;
 
-type TaskFormDefaults = Pick<NewTask, 'id' | 'dueDate' | 'completed'>;
+type TaskFormDefaults = Pick<NewTask, 'id' | 'dueDate' | 'completed' | 'createdAt' | 'updatedAt'>;
 
 type TaskFormGroupContent = {
   id: FormControl<TaskFormRawValue['id'] | NewTask['id']>;
@@ -35,7 +37,10 @@ type TaskFormGroupContent = {
   description: FormControl<TaskFormRawValue['description']>;
   dueDate: FormControl<TaskFormRawValue['dueDate']>;
   priority: FormControl<TaskFormRawValue['priority']>;
+  category: FormControl<TaskFormRawValue['category']>;
   completed: FormControl<TaskFormRawValue['completed']>;
+  createdAt: FormControl<TaskFormRawValue['createdAt']>;
+  updatedAt: FormControl<TaskFormRawValue['updatedAt']>;
   user: FormControl<TaskFormRawValue['user']>;
 };
 
@@ -64,7 +69,10 @@ export class TaskFormService {
         validators: [Validators.required],
       }),
       priority: new FormControl(taskRawValue.priority),
+      category: new FormControl(taskRawValue.category),
       completed: new FormControl(taskRawValue.completed),
+      createdAt: new FormControl(taskRawValue.createdAt),
+      updatedAt: new FormControl(taskRawValue.updatedAt),
       user: new FormControl(taskRawValue.user),
     });
   }
@@ -90,6 +98,8 @@ export class TaskFormService {
       id: null,
       dueDate: currentTime,
       completed: false,
+      createdAt: currentTime,
+      updatedAt: currentTime,
     };
   }
 
@@ -97,6 +107,8 @@ export class TaskFormService {
     return {
       ...rawTask,
       dueDate: dayjs(rawTask.dueDate, DATE_TIME_FORMAT),
+      createdAt: dayjs(rawTask.createdAt, DATE_TIME_FORMAT),
+      updatedAt: dayjs(rawTask.updatedAt, DATE_TIME_FORMAT),
     };
   }
 
@@ -106,6 +118,8 @@ export class TaskFormService {
     return {
       ...task,
       dueDate: task.dueDate ? task.dueDate.format(DATE_TIME_FORMAT) : undefined,
+      createdAt: task.createdAt ? task.createdAt.format(DATE_TIME_FORMAT) : undefined,
+      updatedAt: task.updatedAt ? task.updatedAt.format(DATE_TIME_FORMAT) : undefined,
     };
   }
 }

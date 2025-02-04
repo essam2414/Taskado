@@ -9,6 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import bham.team.IntegrationTest;
 import bham.team.domain.Task;
+import bham.team.domain.enumeration.Priority;
+import bham.team.domain.enumeration.TaskCategory;
 import bham.team.repository.TaskRepository;
 import bham.team.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,11 +46,20 @@ class TaskResourceIT {
     private static final Instant DEFAULT_DUE_DATE = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_DUE_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final Integer DEFAULT_PRIORITY = 1;
-    private static final Integer UPDATED_PRIORITY = 2;
+    private static final Priority DEFAULT_PRIORITY = Priority.LOW;
+    private static final Priority UPDATED_PRIORITY = Priority.MEDIUM;
+
+    private static final TaskCategory DEFAULT_CATEGORY = TaskCategory.WORK;
+    private static final TaskCategory UPDATED_CATEGORY = TaskCategory.PERSONAL;
 
     private static final Boolean DEFAULT_COMPLETED = false;
     private static final Boolean UPDATED_COMPLETED = true;
+
+    private static final Instant DEFAULT_CREATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final Instant DEFAULT_UPDATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_UPDATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final String ENTITY_API_URL = "/api/tasks";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -87,7 +98,10 @@ class TaskResourceIT {
             .description(DEFAULT_DESCRIPTION)
             .dueDate(DEFAULT_DUE_DATE)
             .priority(DEFAULT_PRIORITY)
-            .completed(DEFAULT_COMPLETED);
+            .category(DEFAULT_CATEGORY)
+            .completed(DEFAULT_COMPLETED)
+            .createdAt(DEFAULT_CREATED_AT)
+            .updatedAt(DEFAULT_UPDATED_AT);
     }
 
     /**
@@ -102,7 +116,10 @@ class TaskResourceIT {
             .description(UPDATED_DESCRIPTION)
             .dueDate(UPDATED_DUE_DATE)
             .priority(UPDATED_PRIORITY)
-            .completed(UPDATED_COMPLETED);
+            .category(UPDATED_CATEGORY)
+            .completed(UPDATED_COMPLETED)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT);
     }
 
     @BeforeEach
@@ -204,8 +221,11 @@ class TaskResourceIT {
             .andExpect(jsonPath("$.[*].title").value(hasItem(DEFAULT_TITLE)))
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
             .andExpect(jsonPath("$.[*].dueDate").value(hasItem(DEFAULT_DUE_DATE.toString())))
-            .andExpect(jsonPath("$.[*].priority").value(hasItem(DEFAULT_PRIORITY)))
-            .andExpect(jsonPath("$.[*].completed").value(hasItem(DEFAULT_COMPLETED.booleanValue())));
+            .andExpect(jsonPath("$.[*].priority").value(hasItem(DEFAULT_PRIORITY.toString())))
+            .andExpect(jsonPath("$.[*].category").value(hasItem(DEFAULT_CATEGORY.toString())))
+            .andExpect(jsonPath("$.[*].completed").value(hasItem(DEFAULT_COMPLETED.booleanValue())))
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())));
     }
 
     @Test
@@ -223,8 +243,11 @@ class TaskResourceIT {
             .andExpect(jsonPath("$.title").value(DEFAULT_TITLE))
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
             .andExpect(jsonPath("$.dueDate").value(DEFAULT_DUE_DATE.toString()))
-            .andExpect(jsonPath("$.priority").value(DEFAULT_PRIORITY))
-            .andExpect(jsonPath("$.completed").value(DEFAULT_COMPLETED.booleanValue()));
+            .andExpect(jsonPath("$.priority").value(DEFAULT_PRIORITY.toString()))
+            .andExpect(jsonPath("$.category").value(DEFAULT_CATEGORY.toString()))
+            .andExpect(jsonPath("$.completed").value(DEFAULT_COMPLETED.booleanValue()))
+            .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
+            .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()));
     }
 
     @Test
@@ -251,7 +274,10 @@ class TaskResourceIT {
             .description(UPDATED_DESCRIPTION)
             .dueDate(UPDATED_DUE_DATE)
             .priority(UPDATED_PRIORITY)
-            .completed(UPDATED_COMPLETED);
+            .category(UPDATED_CATEGORY)
+            .completed(UPDATED_COMPLETED)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT);
 
         restTaskMockMvc
             .perform(
@@ -327,7 +353,7 @@ class TaskResourceIT {
         Task partialUpdatedTask = new Task();
         partialUpdatedTask.setId(task.getId());
 
-        partialUpdatedTask.description(UPDATED_DESCRIPTION).completed(UPDATED_COMPLETED);
+        partialUpdatedTask.category(UPDATED_CATEGORY).createdAt(UPDATED_CREATED_AT).updatedAt(UPDATED_UPDATED_AT);
 
         restTaskMockMvc
             .perform(
@@ -360,7 +386,10 @@ class TaskResourceIT {
             .description(UPDATED_DESCRIPTION)
             .dueDate(UPDATED_DUE_DATE)
             .priority(UPDATED_PRIORITY)
-            .completed(UPDATED_COMPLETED);
+            .category(UPDATED_CATEGORY)
+            .completed(UPDATED_COMPLETED)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT);
 
         restTaskMockMvc
             .perform(

@@ -1,11 +1,11 @@
-id;title;description;due_date;priority;completed
-1;ugh dead boring;jealous;2025-01-31T06:00:20;27972;false
-2;aching favorable supposing;unethically yippee only;2025-01-31T15:28:44;4486;true
-3;octave duh shrill;incidentally safely aside;2025-01-31T07:48:12;12663;true
-4;annually;um oof;2025-01-31T01:46:45;14233;false
-5;scratch;whether;2025-01-31T16:37:27;5430;true
-6;wherever rival;convince;2025-01-31T08:39:46;20370;true
-7;hold;which blah knowingly;2025-01-31T19:02:02;14884;true
-8;while lest;major;2025-01-31T06:27:33;13746;true
-9;concrete chromakey;absent eek;2025-01-31T11:31:57;8922;true
-10;duffel;boohoo;2025-01-31T02:45:17;16903;false
+id;title;description;due_date;priority;category;completed;created_at;updated_at
+1;ugh dead boring;jealous;2025-01-31T06:00:20;CRITICAL;EDUCATION;false;2025-01-31T03:14:23;2025-01-31T07:22:17
+2;representation excited hard-to-find;tightly spork foolishly;2025-01-31T13:43:27;CRITICAL;HEALTH;true;2025-01-31T17:12:51;2025-01-31T04:33:35
+3;though;shrill recompense fisherman;2025-01-31T14:14:30;LOW;HEALTH;true;2025-01-31T06:01:13;2025-01-31T14:08:14
+4;aircraft;ouch low;2025-01-31T17:00:06;MEDIUM;PERSONAL;true;2025-01-31T20:36:30;2025-01-31T01:46:45
+5;versus to;quirkily than;2025-01-31T00:32:10;LOW;PERSONAL;true;2025-01-31T17:26:04;2025-01-31T15:23:32
+6;convince;onto ah;2025-01-31T05:07:27;MEDIUM;EDUCATION;false;2025-01-30T23:31:50;2025-01-31T15:11:32
+7;scaffold;litter while lest;2025-01-30T22:24:23;CRITICAL;WORK;false;2025-01-31T16:35:33;2025-01-31T05:41:30
+8;uniform yawningly enormously;assist first upwardly;2025-01-31T09:37:03;MEDIUM;WORK;false;2025-01-30T22:17:48;2025-01-31T10:03:51
+9;er;since unlike;2025-01-31T05:43:03;HIGH;OTHER;false;2025-01-31T14:10:43;2025-01-31T09:19:45
+10;abnegate tabulate gadzooks;safeguard sign upside-down;2025-01-31T18:07:32;LOW;HEALTH;true;2025-01-31T00:23:58;2025-01-31T17:51:42

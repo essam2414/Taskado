@@ -10,6 +10,8 @@ import { RestTask, TaskService } from './task.service';
 const requireRestSample: RestTask = {
   ...sampleWithRequiredData,
   dueDate: sampleWithRequiredData.dueDate?.toJSON(),
+  createdAt: sampleWithRequiredData.createdAt?.toJSON(),
+  updatedAt: sampleWithRequiredData.updatedAt?.toJSON(),
 };
 
 describe('Task Service', () => {

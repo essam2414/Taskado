@@ -29,11 +29,27 @@
           </dd>
           <dt><span>Priority</span></dt>
           <dd>
-            <span>{{ taskRef.priority }}</span>
+            <span>{{ { null: '', LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' }[taskRef.priority ?? 'null'] }}</span>
+          </dd>
+          <dt><span>Category</span></dt>
+          <dd>
+            <span>{{
+              { null: '', WORK: 'WORK', PERSONAL: 'PERSONAL', HEALTH: 'HEALTH', EDUCATION: 'EDUCATION', OTHER: 'OTHER' }[
+                taskRef.category ?? 'null'
+              ]
+            }}</span>
           </dd>
           <dt><span>Completed</span></dt>
           <dd>
             <span>{{ taskRef.completed }}</span>
+          </dd>
+          <dt><span>Created At</span></dt>
+          <dd>
+            <span>{{ taskRef.createdAt | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Updated At</span></dt>
+          <dd>
+            <span>{{ taskRef.updatedAt | formatMediumDatetime }}</span>
           </dd>
           <dt><span>User</span></dt>
           <dd>

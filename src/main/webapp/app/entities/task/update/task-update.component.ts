@@ -9,8 +9,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IUser } from 'app/entities/user/user.model';
 import { UserService } from 'app/entities/user/service/user.service';
-import { ITask } from '../task.model';
+import { Priority } from 'app/entities/enumerations/priority.model';
+import { TaskCategory } from 'app/entities/enumerations/task-category.model';
 import { TaskService } from '../service/task.service';
+import { ITask } from '../task.model';
 import { TaskFormGroup, TaskFormService } from './task-form.service';
 
 @Component({
@@ -22,6 +24,8 @@ import { TaskFormGroup, TaskFormService } from './task-form.service';
 export class TaskUpdateComponent implements OnInit {
   isSaving = false;
   task: ITask | null = null;
+  priorityValues = Object.keys(Priority);
+  taskCategoryValues = Object.keys(TaskCategory);
 
   usersSharedCollection: IUser[] = [];
 
