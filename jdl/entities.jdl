@@ -7,9 +7,19 @@ entity Task {
   title String required,
   description String,
   dueDate Instant required,
-  priority Integer,
+  priority Priority,
+  category TaskCategory,
   completed Boolean,
+  createdAt Instant,
+  updatedAt Instant
+}
 
+enum TaskCategory {
+  WORK,
+  PERSONAL,
+  HEALTH,
+  EDUCATION,
+  OTHER
 }
 
 entity Event {
