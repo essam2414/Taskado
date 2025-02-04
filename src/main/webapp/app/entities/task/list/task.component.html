@@ -70,9 +70,30 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="category">
+              <div class="d-flex">
+                <span>Category</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col" jhiSortBy="completed">
               <div class="d-flex">
                 <span>Completed</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="createdAt">
+              <div class="d-flex">
+                <span>Created At</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="updatedAt">
+              <div class="d-flex">
+                <span>Updated At</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
@@ -95,8 +116,17 @@
               <td>{{ task.title }}</td>
               <td>{{ task.description }}</td>
               <td>{{ task.dueDate | formatMediumDatetime }}</td>
-              <td>{{ task.priority }}</td>
+              <td>{{ { null: '', LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' }[task.priority ?? 'null'] }}</td>
+              <td>
+                {{
+                  { null: '', WORK: 'WORK', PERSONAL: 'PERSONAL', HEALTH: 'HEALTH', EDUCATION: 'EDUCATION', OTHER: 'OTHER' }[
+                    task.category ?? 'null'
+                  ]
+                }}
+              </td>
               <td>{{ task.completed }}</td>
+              <td>{{ task.createdAt | formatMediumDatetime }}</td>
+              <td>{{ task.updatedAt | formatMediumDatetime }}</td>
               <td>
                 {{ task.user?.id }}
               </td>

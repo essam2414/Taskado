@@ -31,6 +31,11 @@ const routes: Routes = [
     data: { pageTitle: 'PomodoroSessions' },
     loadChildren: () => import('./pomodoro-session/pomodoro-session.routes'),
   },
+  {
+    path: 'goal',
+    data: { pageTitle: 'Goals' },
+    loadChildren: () => import('./goal/goal.routes'),
+  },
   /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
 ];
 

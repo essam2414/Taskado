@@ -1,5 +1,7 @@
 package bham.team.domain;
 
+import bham.team.domain.enumeration.Priority;
+import bham.team.domain.enumeration.TaskCategory;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -35,11 +37,22 @@ public class Task implements Serializable {
     @Column(name = "due_date", nullable = false)
     private Instant dueDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "priority")
-    private Integer priority;
+    private Priority priority;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category")
+    private TaskCategory category;
 
     @Column(name = "completed")
     private Boolean completed;
+
+    @Column(name = "created_at")
+    private Instant createdAt;
+
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
@@ -98,17 +111,30 @@ public class Task implements Serializable {
         this.dueDate = dueDate;
     }
 
-    public Integer getPriority() {
+    public Priority getPriority() {
         return this.priority;
     }
 
-    public Task priority(Integer priority) {
+    public Task priority(Priority priority) {
         this.setPriority(priority);
         return this;
     }
 
-    public void setPriority(Integer priority) {
+    public void setPriority(Priority priority) {
         this.priority = priority;
+    }
+
+    public TaskCategory getCategory() {
+        return this.category;
+    }
+
+    public Task category(TaskCategory category) {
+        this.setCategory(category);
+        return this;
+    }
+
+    public void setCategory(TaskCategory category) {
+        this.category = category;
     }
 
     public Boolean getCompleted() {
@@ -122,6 +148,32 @@ public class Task implements Serializable {
 
     public void setCompleted(Boolean completed) {
         this.completed = completed;
+    }
+
+    public Instant getCreatedAt() {
+        return this.createdAt;
+    }
+
+    public Task createdAt(Instant createdAt) {
+        this.setCreatedAt(createdAt);
+        return this;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return this.updatedAt;
+    }
+
+    public Task updatedAt(Instant updatedAt) {
+        this.setUpdatedAt(updatedAt);
+        return this;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public User getUser() {
@@ -164,8 +216,11 @@ public class Task implements Serializable {
             ", title='" + getTitle() + "'" +
             ", description='" + getDescription() + "'" +
             ", dueDate='" + getDueDate() + "'" +
-            ", priority=" + getPriority() +
+            ", priority='" + getPriority() + "'" +
+            ", category='" + getCategory() + "'" +
             ", completed='" + getCompleted() + "'" +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
             "}";
     }
 }

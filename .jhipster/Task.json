@@ -20,11 +20,25 @@
     },
     {
       "fieldName": "priority",
-      "fieldType": "Integer"
+      "fieldType": "Priority",
+      "fieldValues": "LOW,MEDIUM,HIGH,CRITICAL"
+    },
+    {
+      "fieldName": "category",
+      "fieldType": "TaskCategory",
+      "fieldValues": "WORK,PERSONAL,HEALTH,EDUCATION,OTHER"
     },
     {
       "fieldName": "completed",
       "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "createdAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "updatedAt",
+      "fieldType": "Instant"
     }
   ],
   "name": "Task",

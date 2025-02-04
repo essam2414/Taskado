@@ -11,8 +11,10 @@ import { ITask, NewTask } from '../task.model';
 
 export type PartialUpdateTask = Partial<ITask> & Pick<ITask, 'id'>;
 
-type RestOf<T extends ITask | NewTask> = Omit<T, 'dueDate'> & {
+type RestOf<T extends ITask | NewTask> = Omit<T, 'dueDate' | 'createdAt' | 'updatedAt'> & {
   dueDate?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
 };
 
 export type RestTask = RestOf<ITask>;
@@ -99,6 +101,8 @@ export class TaskService {
     return {
       ...task,
       dueDate: task.dueDate?.toJSON() ?? null,
+      createdAt: task.createdAt?.toJSON() ?? null,
+      updatedAt: task.updatedAt?.toJSON() ?? null,
     };
   }
 
@@ -106,6 +110,8 @@ export class TaskService {
     return {
       ...restTask,
       dueDate: restTask.dueDate ? dayjs(restTask.dueDate) : undefined,
+      createdAt: restTask.createdAt ? dayjs(restTask.createdAt) : undefined,
+      updatedAt: restTask.updatedAt ? dayjs(restTask.updatedAt) : undefined,
     };
   }
 
