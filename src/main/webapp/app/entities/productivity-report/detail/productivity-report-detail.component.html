@@ -1,0 +1,66 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (productivityReport(); as productivityReportRef) {
+      <div>
+        <h2 data-cy="productivityReportDetailsHeading"><span>Productivity Report</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ productivityReportRef.id }}</span>
+          </dd>
+          <dt><span>Tasks Planned</span></dt>
+          <dd>
+            <span>{{ productivityReportRef.tasksPlanned }}</span>
+          </dd>
+          <dt><span>Tasks Completed</span></dt>
+          <dd>
+            <span>{{ productivityReportRef.tasksCompleted }}</span>
+          </dd>
+          <dt><span>Task Avg Completion Time</span></dt>
+          <dd>
+            <span>{{ productivityReportRef.taskAvgCompletionTime }}</span>
+          </dd>
+          <dt><span>Task Efficiency</span></dt>
+          <dd>
+            <span>{{ productivityReportRef.taskEfficiency }}</span>
+          </dd>
+          <dt><span>Pomodoro Success Rate</span></dt>
+          <dd>
+            <span>{{ productivityReportRef.pomodoroSuccessRate }}</span>
+          </dd>
+          <dt><span>Focus Time</span></dt>
+          <dd>
+            <span>{{ productivityReportRef.focusTime }}</span>
+          </dd>
+          <dt><span>Focus Score</span></dt>
+          <dd>
+            <span>{{ productivityReportRef.focusScore }}</span>
+          </dd>
+          <dt><span>Distractions Count</span></dt>
+          <dd>
+            <span>{{ productivityReportRef.distractionsCount }}</span>
+          </dd>
+          <dt><span>Timestamp</span></dt>
+          <dd>
+            <span>{{ productivityReportRef.timestamp | formatMediumDatetime }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/productivity-report', productivityReportRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

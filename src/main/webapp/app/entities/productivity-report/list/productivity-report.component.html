@@ -1,0 +1,158 @@
+<div>
+  <h2 id="page-heading" data-cy="ProductivityReportHeading">
+    <span>Productivity Reports</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-productivity-report"
+        [routerLink]="['/productivity-report/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span>Create a new Productivity Report</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (productivityReports?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Productivity Reports found</span>
+    </div>
+  }
+
+  @if (productivityReports && productivityReports.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="tasksPlanned">
+              <div class="d-flex">
+                <span>Tasks Planned</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="tasksCompleted">
+              <div class="d-flex">
+                <span>Tasks Completed</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="taskAvgCompletionTime">
+              <div class="d-flex">
+                <span>Task Avg Completion Time</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="taskEfficiency">
+              <div class="d-flex">
+                <span>Task Efficiency</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="pomodoroSuccessRate">
+              <div class="d-flex">
+                <span>Pomodoro Success Rate</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="focusTime">
+              <div class="d-flex">
+                <span>Focus Time</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="focusScore">
+              <div class="d-flex">
+                <span>Focus Score</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="distractionsCount">
+              <div class="d-flex">
+                <span>Distractions Count</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="timestamp">
+              <div class="d-flex">
+                <span>Timestamp</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (productivityReport of productivityReports; track trackId(productivityReport)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/productivity-report', productivityReport.id, 'view']">{{ productivityReport.id }}</a>
+              </td>
+              <td>{{ productivityReport.tasksPlanned }}</td>
+              <td>{{ productivityReport.tasksCompleted }}</td>
+              <td>{{ productivityReport.taskAvgCompletionTime }}</td>
+              <td>{{ productivityReport.taskEfficiency }}</td>
+              <td>{{ productivityReport.pomodoroSuccessRate }}</td>
+              <td>{{ productivityReport.focusTime }}</td>
+              <td>{{ productivityReport.focusScore }}</td>
+              <td>{{ productivityReport.distractionsCount }}</td>
+              <td>{{ productivityReport.timestamp | formatMediumDatetime }}</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/productivity-report', productivityReport.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/productivity-report', productivityReport.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(productivityReport)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

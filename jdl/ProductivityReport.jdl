@@ -1,0 +1,11 @@
+entity ProductivityReport {
+  tasksPlanned Integer,
+  tasksCompleted Integer,
+  taskAvgCompletionTime Float,
+  taskEfficiency Float required,
+  pomodoroSuccessRate Float,
+  focusTime Float,
+  focusScore Float required,
+  distractionsCount Integer,
+  timestamp Instant required
+}
