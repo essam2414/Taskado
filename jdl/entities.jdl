@@ -81,9 +81,19 @@ entity Notification {
   sentVia NotificationChannel required
 }
 
+entity Goal {
+  title String required,
+  description String,
+  startDate Instant required,
+  endDate Instant,
+  progress Integer
+
+}
+
 relationship ManyToOne {
   Task{user} to User
   Habit{user} to User
   Event{user} to User
   Notification{user} to User
+  Goal{user} to User
 }
