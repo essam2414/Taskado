@@ -1,0 +1,171 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-productivity-report-heading" data-cy="ProductivityReportCreateUpdateHeading">Create or edit a Productivity Report</h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_tasksPlanned">Tasks Planned</label>
+          <input
+            type="number"
+            class="form-control"
+            name="tasksPlanned"
+            id="field_tasksPlanned"
+            data-cy="tasksPlanned"
+            formControlName="tasksPlanned"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_tasksCompleted">Tasks Completed</label>
+          <input
+            type="number"
+            class="form-control"
+            name="tasksCompleted"
+            id="field_tasksCompleted"
+            data-cy="tasksCompleted"
+            formControlName="tasksCompleted"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_taskAvgCompletionTime">Task Avg Completion Time</label>
+          <input
+            type="number"
+            class="form-control"
+            name="taskAvgCompletionTime"
+            id="field_taskAvgCompletionTime"
+            data-cy="taskAvgCompletionTime"
+            formControlName="taskAvgCompletionTime"
+          />
+        </div>
+
+        @let taskEfficiencyRef = editForm.get('taskEfficiency')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_taskEfficiency">Task Efficiency</label>
+          <input
+            type="number"
+            class="form-control"
+            name="taskEfficiency"
+            id="field_taskEfficiency"
+            data-cy="taskEfficiency"
+            formControlName="taskEfficiency"
+          />
+          @if (taskEfficiencyRef.invalid && (taskEfficiencyRef.dirty || taskEfficiencyRef.touched)) {
+            <div>
+              @if (editForm.get('taskEfficiency')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('taskEfficiency')?.errors?.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_pomodoroSuccessRate">Pomodoro Success Rate</label>
+          <input
+            type="number"
+            class="form-control"
+            name="pomodoroSuccessRate"
+            id="field_pomodoroSuccessRate"
+            data-cy="pomodoroSuccessRate"
+            formControlName="pomodoroSuccessRate"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_focusTime">Focus Time</label>
+          <input type="number" class="form-control" name="focusTime" id="field_focusTime" data-cy="focusTime" formControlName="focusTime" />
+        </div>
+
+        @let focusScoreRef = editForm.get('focusScore')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_focusScore">Focus Score</label>
+          <input
+            type="number"
+            class="form-control"
+            name="focusScore"
+            id="field_focusScore"
+            data-cy="focusScore"
+            formControlName="focusScore"
+          />
+          @if (focusScoreRef.invalid && (focusScoreRef.dirty || focusScoreRef.touched)) {
+            <div>
+              @if (editForm.get('focusScore')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('focusScore')?.errors?.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_distractionsCount">Distractions Count</label>
+          <input
+            type="number"
+            class="form-control"
+            name="distractionsCount"
+            id="field_distractionsCount"
+            data-cy="distractionsCount"
+            formControlName="distractionsCount"
+          />
+        </div>
+
+        @let timestampRef = editForm.get('timestamp')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_timestamp">Timestamp</label>
+          <div class="d-flex">
+            <input
+              id="field_timestamp"
+              data-cy="timestamp"
+              type="datetime-local"
+              class="form-control"
+              name="timestamp"
+              formControlName="timestamp"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (timestampRef.invalid && (timestampRef.dirty || timestampRef.touched)) {
+            <div>
+              @if (editForm.get('timestamp')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('timestamp')?.errors?.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

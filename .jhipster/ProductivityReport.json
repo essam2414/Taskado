@@ -1,0 +1,50 @@
+{
+  "annotations": {
+    "changelogDate": "20250204150624"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "tasksPlanned",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "tasksCompleted",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "taskAvgCompletionTime",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "taskEfficiency",
+      "fieldType": "Float",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "pomodoroSuccessRate",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "focusTime",
+      "fieldType": "Float"
+    },
+    {
+      "fieldName": "focusScore",
+      "fieldType": "Float",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "distractionsCount",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "timestamp",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "ProductivityReport",
+  "relationships": [],
+  "searchEngine": "no"
+}
