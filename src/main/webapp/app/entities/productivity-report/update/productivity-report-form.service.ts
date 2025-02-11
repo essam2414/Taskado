@@ -35,11 +35,12 @@ type ProductivityReportFormGroupContent = {
   tasksCompleted: FormControl<ProductivityReportFormRawValue['tasksCompleted']>;
   taskAvgCompletionTime: FormControl<ProductivityReportFormRawValue['taskAvgCompletionTime']>;
   taskEfficiency: FormControl<ProductivityReportFormRawValue['taskEfficiency']>;
-  pomodoroSuccessRate: FormControl<ProductivityReportFormRawValue['pomodoroSuccessRate']>;
+  pomodoroSessions: FormControl<ProductivityReportFormRawValue['pomodoroSessions']>;
+  distractionsCount: FormControl<ProductivityReportFormRawValue['distractionsCount']>;
   focusTime: FormControl<ProductivityReportFormRawValue['focusTime']>;
   focusScore: FormControl<ProductivityReportFormRawValue['focusScore']>;
-  distractionsCount: FormControl<ProductivityReportFormRawValue['distractionsCount']>;
   timestamp: FormControl<ProductivityReportFormRawValue['timestamp']>;
+  user: FormControl<ProductivityReportFormRawValue['user']>;
 };
 
 export type ProductivityReportFormGroup = FormGroup<ProductivityReportFormGroupContent>;
@@ -62,18 +63,17 @@ export class ProductivityReportFormService {
       tasksPlanned: new FormControl(productivityReportRawValue.tasksPlanned),
       tasksCompleted: new FormControl(productivityReportRawValue.tasksCompleted),
       taskAvgCompletionTime: new FormControl(productivityReportRawValue.taskAvgCompletionTime),
-      taskEfficiency: new FormControl(productivityReportRawValue.taskEfficiency, {
-        validators: [Validators.required],
-      }),
-      pomodoroSuccessRate: new FormControl(productivityReportRawValue.pomodoroSuccessRate),
+      taskEfficiency: new FormControl(productivityReportRawValue.taskEfficiency),
+      pomodoroSessions: new FormControl(productivityReportRawValue.pomodoroSessions),
+      distractionsCount: new FormControl(productivityReportRawValue.distractionsCount),
       focusTime: new FormControl(productivityReportRawValue.focusTime),
       focusScore: new FormControl(productivityReportRawValue.focusScore, {
         validators: [Validators.required],
       }),
-      distractionsCount: new FormControl(productivityReportRawValue.distractionsCount),
       timestamp: new FormControl(productivityReportRawValue.timestamp, {
         validators: [Validators.required],
       }),
+      user: new FormControl(productivityReportRawValue.user),
     });
   }
 

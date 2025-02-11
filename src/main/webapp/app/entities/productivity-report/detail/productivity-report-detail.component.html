@@ -31,9 +31,13 @@
           <dd>
             <span>{{ productivityReportRef.taskEfficiency }}</span>
           </dd>
-          <dt><span>Pomodoro Success Rate</span></dt>
+          <dt><span>Pomodoro Sessions</span></dt>
           <dd>
-            <span>{{ productivityReportRef.pomodoroSuccessRate }}</span>
+            <span>{{ productivityReportRef.pomodoroSessions }}</span>
+          </dd>
+          <dt><span>Distractions Count</span></dt>
+          <dd>
+            <span>{{ productivityReportRef.distractionsCount }}</span>
           </dd>
           <dt><span>Focus Time</span></dt>
           <dd>
@@ -43,13 +47,13 @@
           <dd>
             <span>{{ productivityReportRef.focusScore }}</span>
           </dd>
-          <dt><span>Distractions Count</span></dt>
-          <dd>
-            <span>{{ productivityReportRef.distractionsCount }}</span>
-          </dd>
           <dt><span>Timestamp</span></dt>
           <dd>
             <span>{{ productivityReportRef.timestamp | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>User</span></dt>
+          <dd>
+            <span>{{ productivityReportRef.user?.id }}</span>
           </dd>
         </dl>
 

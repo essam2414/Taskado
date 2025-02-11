@@ -53,12 +53,10 @@ public class ProductivityReportAsserts {
                 assertThat(e.getTaskAvgCompletionTime()).as("check taskAvgCompletionTime").isEqualTo(actual.getTaskAvgCompletionTime())
             )
             .satisfies(e -> assertThat(e.getTaskEfficiency()).as("check taskEfficiency").isEqualTo(actual.getTaskEfficiency()))
-            .satisfies(e ->
-                assertThat(e.getPomodoroSuccessRate()).as("check pomodoroSuccessRate").isEqualTo(actual.getPomodoroSuccessRate())
-            )
+            .satisfies(e -> assertThat(e.getPomodoroSessions()).as("check pomodoroSessions").isEqualTo(actual.getPomodoroSessions()))
+            .satisfies(e -> assertThat(e.getDistractionsCount()).as("check distractionsCount").isEqualTo(actual.getDistractionsCount()))
             .satisfies(e -> assertThat(e.getFocusTime()).as("check focusTime").isEqualTo(actual.getFocusTime()))
             .satisfies(e -> assertThat(e.getFocusScore()).as("check focusScore").isEqualTo(actual.getFocusScore()))
-            .satisfies(e -> assertThat(e.getDistractionsCount()).as("check distractionsCount").isEqualTo(actual.getDistractionsCount()))
             .satisfies(e -> assertThat(e.getTimestamp()).as("check timestamp").isEqualTo(actual.getTimestamp()));
     }
 

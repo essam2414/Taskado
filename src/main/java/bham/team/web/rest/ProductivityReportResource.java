@@ -136,17 +136,17 @@ public class ProductivityReportResource {
                 if (productivityReport.getTaskEfficiency() != null) {
                     existingProductivityReport.setTaskEfficiency(productivityReport.getTaskEfficiency());
                 }
-                if (productivityReport.getPomodoroSuccessRate() != null) {
-                    existingProductivityReport.setPomodoroSuccessRate(productivityReport.getPomodoroSuccessRate());
+                if (productivityReport.getPomodoroSessions() != null) {
+                    existingProductivityReport.setPomodoroSessions(productivityReport.getPomodoroSessions());
+                }
+                if (productivityReport.getDistractionsCount() != null) {
+                    existingProductivityReport.setDistractionsCount(productivityReport.getDistractionsCount());
                 }
                 if (productivityReport.getFocusTime() != null) {
                     existingProductivityReport.setFocusTime(productivityReport.getFocusTime());
                 }
                 if (productivityReport.getFocusScore() != null) {
                     existingProductivityReport.setFocusScore(productivityReport.getFocusScore());
-                }
-                if (productivityReport.getDistractionsCount() != null) {
-                    existingProductivityReport.setDistractionsCount(productivityReport.getDistractionsCount());
                 }
                 if (productivityReport.getTimestamp() != null) {
                     existingProductivityReport.setTimestamp(productivityReport.getTimestamp());

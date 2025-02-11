@@ -18,12 +18,15 @@
     },
     {
       "fieldName": "taskEfficiency",
-      "fieldType": "Float",
-      "fieldValidateRules": ["required"]
+      "fieldType": "Float"
     },
     {
-      "fieldName": "pomodoroSuccessRate",
-      "fieldType": "Float"
+      "fieldName": "pomodoroSessions",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "distractionsCount",
+      "fieldType": "Integer"
     },
     {
       "fieldName": "focusTime",
@@ -35,16 +38,19 @@
       "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "distractionsCount",
-      "fieldType": "Integer"
-    },
-    {
       "fieldName": "timestamp",
       "fieldType": "Instant",
       "fieldValidateRules": ["required"]
     }
   ],
   "name": "ProductivityReport",
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityName": "user",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
   "searchEngine": "no"
 }

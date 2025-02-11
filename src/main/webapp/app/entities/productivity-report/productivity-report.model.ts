@@ -1,4 +1,5 @@
 import dayjs from 'dayjs/esm';
+import { IUser } from 'app/entities/user/user.model';
 
 export interface IProductivityReport {
   id: number;
@@ -6,11 +7,12 @@ export interface IProductivityReport {
   tasksCompleted?: number | null;
   taskAvgCompletionTime?: number | null;
   taskEfficiency?: number | null;
-  pomodoroSuccessRate?: number | null;
+  pomodoroSessions?: number | null;
+  distractionsCount?: number | null;
   focusTime?: number | null;
   focusScore?: number | null;
-  distractionsCount?: number | null;
   timestamp?: dayjs.Dayjs | null;
+  user?: Pick<IUser, 'id'> | null;
 }
 
 export type NewProductivityReport = Omit<IProductivityReport, 'id'> & { id: null };

@@ -1,11 +1,11 @@
 entity ProductivityReport {
   tasksPlanned Integer,
   tasksCompleted Integer,
-  taskAvgCompletionTime Float,
-  taskEfficiency Float required,
-  pomodoroSuccessRate Float,
-  focusTime Float,
-  focusScore Float required,
-  distractionsCount Integer,
-  timestamp Instant required
+  taskAvgCompletionTime Float,   // Average time spend per task
+  taskEfficiency Float,          // Ratio of completed vs planned tasks
+  pomodoroSessions Integer,      // Successful pomodoro sessions
+  distractionsCount Integer,     // Counts recorded distractions
+  focusTime Float,               // Time taken in focus sessions
+  focusScore Float required,     // Score calculated from completed tasks and pomodoro session data
+  timestamp Instant required     // When report generated
 }

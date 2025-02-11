@@ -33,12 +33,14 @@ public class ProductivityReport implements Serializable {
     @Column(name = "task_avg_completion_time")
     private Float taskAvgCompletionTime;
 
-    @NotNull
-    @Column(name = "task_efficiency", nullable = false)
+    @Column(name = "task_efficiency")
     private Float taskEfficiency;
 
-    @Column(name = "pomodoro_success_rate")
-    private Float pomodoroSuccessRate;
+    @Column(name = "pomodoro_sessions")
+    private Integer pomodoroSessions;
+
+    @Column(name = "distractions_count")
+    private Integer distractionsCount;
 
     @Column(name = "focus_time")
     private Float focusTime;
@@ -47,12 +49,12 @@ public class ProductivityReport implements Serializable {
     @Column(name = "focus_score", nullable = false)
     private Float focusScore;
 
-    @Column(name = "distractions_count")
-    private Integer distractionsCount;
-
     @NotNull
     @Column(name = "timestamp", nullable = false)
     private Instant timestamp;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -121,17 +123,30 @@ public class ProductivityReport implements Serializable {
         this.taskEfficiency = taskEfficiency;
     }
 
-    public Float getPomodoroSuccessRate() {
-        return this.pomodoroSuccessRate;
+    public Integer getPomodoroSessions() {
+        return this.pomodoroSessions;
     }
 
-    public ProductivityReport pomodoroSuccessRate(Float pomodoroSuccessRate) {
-        this.setPomodoroSuccessRate(pomodoroSuccessRate);
+    public ProductivityReport pomodoroSessions(Integer pomodoroSessions) {
+        this.setPomodoroSessions(pomodoroSessions);
         return this;
     }
 
-    public void setPomodoroSuccessRate(Float pomodoroSuccessRate) {
-        this.pomodoroSuccessRate = pomodoroSuccessRate;
+    public void setPomodoroSessions(Integer pomodoroSessions) {
+        this.pomodoroSessions = pomodoroSessions;
+    }
+
+    public Integer getDistractionsCount() {
+        return this.distractionsCount;
+    }
+
+    public ProductivityReport distractionsCount(Integer distractionsCount) {
+        this.setDistractionsCount(distractionsCount);
+        return this;
+    }
+
+    public void setDistractionsCount(Integer distractionsCount) {
+        this.distractionsCount = distractionsCount;
     }
 
     public Float getFocusTime() {
@@ -160,19 +175,6 @@ public class ProductivityReport implements Serializable {
         this.focusScore = focusScore;
     }
 
-    public Integer getDistractionsCount() {
-        return this.distractionsCount;
-    }
-
-    public ProductivityReport distractionsCount(Integer distractionsCount) {
-        this.setDistractionsCount(distractionsCount);
-        return this;
-    }
-
-    public void setDistractionsCount(Integer distractionsCount) {
-        this.distractionsCount = distractionsCount;
-    }
-
     public Instant getTimestamp() {
         return this.timestamp;
     }
@@ -184,6 +186,19 @@ public class ProductivityReport implements Serializable {
 
     public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public ProductivityReport user(User user) {
+        this.setUser(user);
+        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -214,10 +229,10 @@ public class ProductivityReport implements Serializable {
             ", tasksCompleted=" + getTasksCompleted() +
             ", taskAvgCompletionTime=" + getTaskAvgCompletionTime() +
             ", taskEfficiency=" + getTaskEfficiency() +
-            ", pomodoroSuccessRate=" + getPomodoroSuccessRate() +
+            ", pomodoroSessions=" + getPomodoroSessions() +
+            ", distractionsCount=" + getDistractionsCount() +
             ", focusTime=" + getFocusTime() +
             ", focusScore=" + getFocusScore() +
-            ", distractionsCount=" + getDistractionsCount() +
             ", timestamp='" + getTimestamp() + "'" +
             "}";
     }

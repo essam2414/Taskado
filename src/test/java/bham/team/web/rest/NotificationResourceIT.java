@@ -498,13 +498,10 @@ class NotificationResourceIT {
         partialUpdatedNotification
             .message(UPDATED_MESSAGE)
             .notificationType(UPDATED_NOTIFICATION_TYPE)
-            .timestamp(UPDATED_TIMESTAMP)
+            .linkedEntityType(UPDATED_LINKED_ENTITY_TYPE)
             .priority(UPDATED_PRIORITY)
-            .status(UPDATED_STATUS)
-            .expirationDate(UPDATED_EXPIRATION_DATE)
             .actionURL(UPDATED_ACTION_URL)
-            .icon(UPDATED_ICON)
-            .recurrencePattern(UPDATED_RECURRENCE_PATTERN);
+            .isRecurring(UPDATED_IS_RECURRING);
 
         restNotificationMockMvc
             .perform(

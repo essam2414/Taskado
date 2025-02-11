@@ -49,7 +49,6 @@
           />
         </div>
 
-        @let taskEfficiencyRef = editForm.get('taskEfficiency')!;
         <div class="mb-3">
           <label class="form-label" for="field_taskEfficiency">Task Efficiency</label>
           <input
@@ -60,27 +59,29 @@
             data-cy="taskEfficiency"
             formControlName="taskEfficiency"
           />
-          @if (taskEfficiencyRef.invalid && (taskEfficiencyRef.dirty || taskEfficiencyRef.touched)) {
-            <div>
-              @if (editForm.get('taskEfficiency')?.errors?.required) {
-                <small class="form-text text-danger">This field is required.</small>
-              }
-              <small class="form-text text-danger" [hidden]="!editForm.get('taskEfficiency')?.errors?.number"
-                >This field should be a number.</small
-              >
-            </div>
-          }
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_pomodoroSuccessRate">Pomodoro Success Rate</label>
+          <label class="form-label" for="field_pomodoroSessions">Pomodoro Sessions</label>
           <input
             type="number"
             class="form-control"
-            name="pomodoroSuccessRate"
-            id="field_pomodoroSuccessRate"
-            data-cy="pomodoroSuccessRate"
-            formControlName="pomodoroSuccessRate"
+            name="pomodoroSessions"
+            id="field_pomodoroSessions"
+            data-cy="pomodoroSessions"
+            formControlName="pomodoroSessions"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_distractionsCount">Distractions Count</label>
+          <input
+            type="number"
+            class="form-control"
+            name="distractionsCount"
+            id="field_distractionsCount"
+            data-cy="distractionsCount"
+            formControlName="distractionsCount"
           />
         </div>
 
@@ -112,18 +113,6 @@
           }
         </div>
 
-        <div class="mb-3">
-          <label class="form-label" for="field_distractionsCount">Distractions Count</label>
-          <input
-            type="number"
-            class="form-control"
-            name="distractionsCount"
-            id="field_distractionsCount"
-            data-cy="distractionsCount"
-            formControlName="distractionsCount"
-          />
-        </div>
-
         @let timestampRef = editForm.get('timestamp')!;
         <div class="mb-3">
           <label class="form-label" for="field_timestamp">Timestamp</label>
@@ -148,6 +137,16 @@
               >
             </div>
           }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_user">User</label>
+          <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user" [compareWith]="compareUser">
+            <option [ngValue]="null"></option>
+            @for (userOption of usersSharedCollection; track $index) {
+              <option [ngValue]="userOption">{{ userOption.id }}</option>
+            }
+          </select>
         </div>
       </div>
 

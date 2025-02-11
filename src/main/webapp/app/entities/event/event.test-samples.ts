@@ -3,40 +3,38 @@ import dayjs from 'dayjs/esm';
 import { IEvent, NewEvent } from './event.model';
 
 export const sampleWithRequiredData: IEvent = {
-  id: 9531,
-  title: 'fortunate thankfully',
-  eventDate: dayjs('2025-02-01T11:53'),
-  startTime: dayjs('2025-02-01T07:13'),
-  endTime: dayjs('2025-01-31T22:35'),
+  id: 28278,
+  title: 'before colligate',
+  eventDate: dayjs('2025-02-01T00:04'),
+  startTime: dayjs('2025-02-01T03:41'),
+  endTime: dayjs('2025-02-01T06:28'),
 };
 
 export const sampleWithPartialData: IEvent = {
-  id: 25123,
-  title: 'confused',
-  description: 'tribe per word',
-  eventDate: dayjs('2025-02-01T02:53'),
-  startTime: dayjs('2025-02-01T00:32'),
-  endTime: dayjs('2025-02-01T05:22'),
-  location: 'afterwards after',
+  id: 15955,
+  title: 'curl within',
+  eventDate: dayjs('2025-01-31T17:32'),
+  startTime: dayjs('2025-02-01T09:29'),
+  endTime: dayjs('2025-02-01T15:15'),
   reminder: true,
 };
 
 export const sampleWithFullData: IEvent = {
-  id: 7697,
-  title: 'swing geez oof',
-  description: 'babyish whoa',
-  eventDate: dayjs('2025-01-31T16:47'),
-  startTime: dayjs('2025-02-01T12:20'),
-  endTime: dayjs('2025-02-01T14:23'),
-  location: 'victoriously intermarry',
+  id: 28962,
+  title: 'regularly delightfully',
+  description: 'velocity',
+  eventDate: dayjs('2025-01-31T17:01'),
+  startTime: dayjs('2025-01-31T18:34'),
+  endTime: dayjs('2025-02-01T02:52'),
+  location: 'sandy by',
   reminder: true,
 };
 
 export const sampleWithNewData: NewEvent = {
-  title: 'tail generously',
-  eventDate: dayjs('2025-02-01T06:46'),
-  startTime: dayjs('2025-01-31T16:18'),
-  endTime: dayjs('2025-01-31T18:23'),
+  title: 'after likewise',
+  eventDate: dayjs('2025-02-01T10:59'),
+  startTime: dayjs('2025-02-01T02:04'),
+  endTime: dayjs('2025-01-31T20:18'),
   id: null,
 };
 
