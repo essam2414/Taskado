@@ -46,17 +46,17 @@ class ProductivityReportResourceIT {
     private static final Float DEFAULT_TASK_EFFICIENCY = 1F;
     private static final Float UPDATED_TASK_EFFICIENCY = 2F;
 
-    private static final Float DEFAULT_POMODORO_SUCCESS_RATE = 1F;
-    private static final Float UPDATED_POMODORO_SUCCESS_RATE = 2F;
+    private static final Integer DEFAULT_POMODORO_SESSIONS = 1;
+    private static final Integer UPDATED_POMODORO_SESSIONS = 2;
+
+    private static final Integer DEFAULT_DISTRACTIONS_COUNT = 1;
+    private static final Integer UPDATED_DISTRACTIONS_COUNT = 2;
 
     private static final Float DEFAULT_FOCUS_TIME = 1F;
     private static final Float UPDATED_FOCUS_TIME = 2F;
 
     private static final Float DEFAULT_FOCUS_SCORE = 1F;
     private static final Float UPDATED_FOCUS_SCORE = 2F;
-
-    private static final Integer DEFAULT_DISTRACTIONS_COUNT = 1;
-    private static final Integer UPDATED_DISTRACTIONS_COUNT = 2;
 
     private static final Instant DEFAULT_TIMESTAMP = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_TIMESTAMP = Instant.now().truncatedTo(ChronoUnit.MILLIS);
@@ -95,10 +95,10 @@ class ProductivityReportResourceIT {
             .tasksCompleted(DEFAULT_TASKS_COMPLETED)
             .taskAvgCompletionTime(DEFAULT_TASK_AVG_COMPLETION_TIME)
             .taskEfficiency(DEFAULT_TASK_EFFICIENCY)
-            .pomodoroSuccessRate(DEFAULT_POMODORO_SUCCESS_RATE)
+            .pomodoroSessions(DEFAULT_POMODORO_SESSIONS)
+            .distractionsCount(DEFAULT_DISTRACTIONS_COUNT)
             .focusTime(DEFAULT_FOCUS_TIME)
             .focusScore(DEFAULT_FOCUS_SCORE)
-            .distractionsCount(DEFAULT_DISTRACTIONS_COUNT)
             .timestamp(DEFAULT_TIMESTAMP);
     }
 
@@ -114,10 +114,10 @@ class ProductivityReportResourceIT {
             .tasksCompleted(UPDATED_TASKS_COMPLETED)
             .taskAvgCompletionTime(UPDATED_TASK_AVG_COMPLETION_TIME)
             .taskEfficiency(UPDATED_TASK_EFFICIENCY)
-            .pomodoroSuccessRate(UPDATED_POMODORO_SUCCESS_RATE)
+            .pomodoroSessions(UPDATED_POMODORO_SESSIONS)
+            .distractionsCount(UPDATED_DISTRACTIONS_COUNT)
             .focusTime(UPDATED_FOCUS_TIME)
             .focusScore(UPDATED_FOCUS_SCORE)
-            .distractionsCount(UPDATED_DISTRACTIONS_COUNT)
             .timestamp(UPDATED_TIMESTAMP);
     }
 
@@ -178,22 +178,6 @@ class ProductivityReportResourceIT {
 
     @Test
     @Transactional
-    void checkTaskEfficiencyIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        // set the field null
-        productivityReport.setTaskEfficiency(null);
-
-        // Create the ProductivityReport, which fails.
-
-        restProductivityReportMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(productivityReport)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
     void checkFocusScoreIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
@@ -240,10 +224,10 @@ class ProductivityReportResourceIT {
             .andExpect(jsonPath("$.[*].tasksCompleted").value(hasItem(DEFAULT_TASKS_COMPLETED)))
             .andExpect(jsonPath("$.[*].taskAvgCompletionTime").value(hasItem(DEFAULT_TASK_AVG_COMPLETION_TIME.doubleValue())))
             .andExpect(jsonPath("$.[*].taskEfficiency").value(hasItem(DEFAULT_TASK_EFFICIENCY.doubleValue())))
-            .andExpect(jsonPath("$.[*].pomodoroSuccessRate").value(hasItem(DEFAULT_POMODORO_SUCCESS_RATE.doubleValue())))
+            .andExpect(jsonPath("$.[*].pomodoroSessions").value(hasItem(DEFAULT_POMODORO_SESSIONS)))
+            .andExpect(jsonPath("$.[*].distractionsCount").value(hasItem(DEFAULT_DISTRACTIONS_COUNT)))
             .andExpect(jsonPath("$.[*].focusTime").value(hasItem(DEFAULT_FOCUS_TIME.doubleValue())))
             .andExpect(jsonPath("$.[*].focusScore").value(hasItem(DEFAULT_FOCUS_SCORE.doubleValue())))
-            .andExpect(jsonPath("$.[*].distractionsCount").value(hasItem(DEFAULT_DISTRACTIONS_COUNT)))
             .andExpect(jsonPath("$.[*].timestamp").value(hasItem(DEFAULT_TIMESTAMP.toString())));
     }
 
@@ -263,10 +247,10 @@ class ProductivityReportResourceIT {
             .andExpect(jsonPath("$.tasksCompleted").value(DEFAULT_TASKS_COMPLETED))
             .andExpect(jsonPath("$.taskAvgCompletionTime").value(DEFAULT_TASK_AVG_COMPLETION_TIME.doubleValue()))
             .andExpect(jsonPath("$.taskEfficiency").value(DEFAULT_TASK_EFFICIENCY.doubleValue()))
-            .andExpect(jsonPath("$.pomodoroSuccessRate").value(DEFAULT_POMODORO_SUCCESS_RATE.doubleValue()))
+            .andExpect(jsonPath("$.pomodoroSessions").value(DEFAULT_POMODORO_SESSIONS))
+            .andExpect(jsonPath("$.distractionsCount").value(DEFAULT_DISTRACTIONS_COUNT))
             .andExpect(jsonPath("$.focusTime").value(DEFAULT_FOCUS_TIME.doubleValue()))
             .andExpect(jsonPath("$.focusScore").value(DEFAULT_FOCUS_SCORE.doubleValue()))
-            .andExpect(jsonPath("$.distractionsCount").value(DEFAULT_DISTRACTIONS_COUNT))
             .andExpect(jsonPath("$.timestamp").value(DEFAULT_TIMESTAMP.toString()));
     }
 
@@ -294,10 +278,10 @@ class ProductivityReportResourceIT {
             .tasksCompleted(UPDATED_TASKS_COMPLETED)
             .taskAvgCompletionTime(UPDATED_TASK_AVG_COMPLETION_TIME)
             .taskEfficiency(UPDATED_TASK_EFFICIENCY)
-            .pomodoroSuccessRate(UPDATED_POMODORO_SUCCESS_RATE)
+            .pomodoroSessions(UPDATED_POMODORO_SESSIONS)
+            .distractionsCount(UPDATED_DISTRACTIONS_COUNT)
             .focusTime(UPDATED_FOCUS_TIME)
             .focusScore(UPDATED_FOCUS_SCORE)
-            .distractionsCount(UPDATED_DISTRACTIONS_COUNT)
             .timestamp(UPDATED_TIMESTAMP);
 
         restProductivityReportMockMvc
@@ -381,8 +365,8 @@ class ProductivityReportResourceIT {
         partialUpdatedProductivityReport
             .tasksPlanned(UPDATED_TASKS_PLANNED)
             .tasksCompleted(UPDATED_TASKS_COMPLETED)
-            .pomodoroSuccessRate(UPDATED_POMODORO_SUCCESS_RATE)
-            .focusScore(UPDATED_FOCUS_SCORE)
+            .pomodoroSessions(UPDATED_POMODORO_SESSIONS)
+            .focusTime(UPDATED_FOCUS_TIME)
             .timestamp(UPDATED_TIMESTAMP);
 
         restProductivityReportMockMvc
@@ -419,10 +403,10 @@ class ProductivityReportResourceIT {
             .tasksCompleted(UPDATED_TASKS_COMPLETED)
             .taskAvgCompletionTime(UPDATED_TASK_AVG_COMPLETION_TIME)
             .taskEfficiency(UPDATED_TASK_EFFICIENCY)
-            .pomodoroSuccessRate(UPDATED_POMODORO_SUCCESS_RATE)
+            .pomodoroSessions(UPDATED_POMODORO_SESSIONS)
+            .distractionsCount(UPDATED_DISTRACTIONS_COUNT)
             .focusTime(UPDATED_FOCUS_TIME)
             .focusScore(UPDATED_FOCUS_SCORE)
-            .distractionsCount(UPDATED_DISTRACTIONS_COUNT)
             .timestamp(UPDATED_TIMESTAMP);
 
         restProductivityReportMockMvc

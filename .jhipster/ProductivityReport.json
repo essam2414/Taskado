@@ -18,12 +18,15 @@
     },
     {
       "fieldName": "taskEfficiency",
-      "fieldType": "Float",
-      "fieldValidateRules": ["required"]
+      "fieldType": "Float"
     },
     {
-      "fieldName": "pomodoroSuccessRate",
-      "fieldType": "Float"
+      "fieldName": "pomodoroSessions",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "distractionsCount",
+      "fieldType": "Integer"
     },
     {
       "fieldName": "focusTime",
@@ -33,10 +36,6 @@
       "fieldName": "focusScore",
       "fieldType": "Float",
       "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "distractionsCount",
-      "fieldType": "Integer"
     },
     {
       "fieldName": "timestamp",

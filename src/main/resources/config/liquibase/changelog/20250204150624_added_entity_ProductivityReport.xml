@@ -24,9 +24,12 @@
                 <constraints nullable="true" />
             </column>
             <column name="task_efficiency" type="${floatType}">
-                <constraints nullable="false" />
+                <constraints nullable="true" />
             </column>
-            <column name="pomodoro_success_rate" type="${floatType}">
+            <column name="pomodoro_sessions" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="distractions_count" type="integer">
                 <constraints nullable="true" />
             </column>
             <column name="focus_time" type="${floatType}">
@@ -34,9 +37,6 @@
             </column>
             <column name="focus_score" type="${floatType}">
                 <constraints nullable="false" />
-            </column>
-            <column name="distractions_count" type="integer">
-                <constraints nullable="true" />
             </column>
             <column name="timestamp" type="${datetimeType}">
                 <constraints nullable="false" />
@@ -67,10 +67,10 @@
             <column name="tasks_completed" type="numeric"/>
             <column name="task_avg_completion_time" type="numeric"/>
             <column name="task_efficiency" type="numeric"/>
-            <column name="pomodoro_success_rate" type="numeric"/>
+            <column name="pomodoro_sessions" type="numeric"/>
+            <column name="distractions_count" type="numeric"/>
             <column name="focus_time" type="numeric"/>
             <column name="focus_score" type="numeric"/>
-            <column name="distractions_count" type="numeric"/>
             <column name="timestamp" type="date"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>

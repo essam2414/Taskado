@@ -33,12 +33,14 @@ public class ProductivityReport implements Serializable {
     @Column(name = "task_avg_completion_time")
     private Float taskAvgCompletionTime;
 
-    @NotNull
-    @Column(name = "task_efficiency", nullable = false)
+    @Column(name = "task_efficiency")
     private Float taskEfficiency;
 
-    @Column(name = "pomodoro_success_rate")
-    private Float pomodoroSuccessRate;
+    @Column(name = "pomodoro_sessions")
+    private Integer pomodoroSessions;
+
+    @Column(name = "distractions_count")
+    private Integer distractionsCount;
 
     @Column(name = "focus_time")
     private Float focusTime;
@@ -46,9 +48,6 @@ public class ProductivityReport implements Serializable {
     @NotNull
     @Column(name = "focus_score", nullable = false)
     private Float focusScore;
-
-    @Column(name = "distractions_count")
-    private Integer distractionsCount;
 
     @NotNull
     @Column(name = "timestamp", nullable = false)
@@ -121,17 +120,30 @@ public class ProductivityReport implements Serializable {
         this.taskEfficiency = taskEfficiency;
     }
 
-    public Float getPomodoroSuccessRate() {
-        return this.pomodoroSuccessRate;
+    public Integer getPomodoroSessions() {
+        return this.pomodoroSessions;
     }
 
-    public ProductivityReport pomodoroSuccessRate(Float pomodoroSuccessRate) {
-        this.setPomodoroSuccessRate(pomodoroSuccessRate);
+    public ProductivityReport pomodoroSessions(Integer pomodoroSessions) {
+        this.setPomodoroSessions(pomodoroSessions);
         return this;
     }
 
-    public void setPomodoroSuccessRate(Float pomodoroSuccessRate) {
-        this.pomodoroSuccessRate = pomodoroSuccessRate;
+    public void setPomodoroSessions(Integer pomodoroSessions) {
+        this.pomodoroSessions = pomodoroSessions;
+    }
+
+    public Integer getDistractionsCount() {
+        return this.distractionsCount;
+    }
+
+    public ProductivityReport distractionsCount(Integer distractionsCount) {
+        this.setDistractionsCount(distractionsCount);
+        return this;
+    }
+
+    public void setDistractionsCount(Integer distractionsCount) {
+        this.distractionsCount = distractionsCount;
     }
 
     public Float getFocusTime() {
@@ -158,19 +170,6 @@ public class ProductivityReport implements Serializable {
 
     public void setFocusScore(Float focusScore) {
         this.focusScore = focusScore;
-    }
-
-    public Integer getDistractionsCount() {
-        return this.distractionsCount;
-    }
-
-    public ProductivityReport distractionsCount(Integer distractionsCount) {
-        this.setDistractionsCount(distractionsCount);
-        return this;
-    }
-
-    public void setDistractionsCount(Integer distractionsCount) {
-        this.distractionsCount = distractionsCount;
     }
 
     public Instant getTimestamp() {
@@ -214,10 +213,10 @@ public class ProductivityReport implements Serializable {
             ", tasksCompleted=" + getTasksCompleted() +
             ", taskAvgCompletionTime=" + getTaskAvgCompletionTime() +
             ", taskEfficiency=" + getTaskEfficiency() +
-            ", pomodoroSuccessRate=" + getPomodoroSuccessRate() +
+            ", pomodoroSessions=" + getPomodoroSessions() +
+            ", distractionsCount=" + getDistractionsCount() +
             ", focusTime=" + getFocusTime() +
             ", focusScore=" + getFocusScore() +
-            ", distractionsCount=" + getDistractionsCount() +
             ", timestamp='" + getTimestamp() + "'" +
             "}";
     }
