@@ -29,6 +29,7 @@ describe('ProductivityReport Form Service', () => {
             focusTime: expect.any(Object),
             focusScore: expect.any(Object),
             timestamp: expect.any(Object),
+            user: expect.any(Object),
           }),
         );
       });
@@ -48,6 +49,7 @@ describe('ProductivityReport Form Service', () => {
             focusTime: expect.any(Object),
             focusScore: expect.any(Object),
             timestamp: expect.any(Object),
+            user: expect.any(Object),
           }),
         );
       });

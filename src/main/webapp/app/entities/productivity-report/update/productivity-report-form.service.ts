@@ -40,6 +40,7 @@ type ProductivityReportFormGroupContent = {
   focusTime: FormControl<ProductivityReportFormRawValue['focusTime']>;
   focusScore: FormControl<ProductivityReportFormRawValue['focusScore']>;
   timestamp: FormControl<ProductivityReportFormRawValue['timestamp']>;
+  user: FormControl<ProductivityReportFormRawValue['user']>;
 };
 
 export type ProductivityReportFormGroup = FormGroup<ProductivityReportFormGroupContent>;
@@ -72,6 +73,7 @@ export class ProductivityReportFormService {
       timestamp: new FormControl(productivityReportRawValue.timestamp, {
         validators: [Validators.required],
       }),
+      user: new FormControl(productivityReportRawValue.user),
     });
   }
 

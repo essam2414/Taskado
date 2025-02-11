@@ -2,11 +2,13 @@ import { Component, OnInit, inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { finalize, map } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { IUser } from 'app/entities/user/user.model';
+import { UserService } from 'app/entities/user/service/user.service';
 import { IProductivityReport } from '../productivity-report.model';
 import { ProductivityReportService } from '../service/productivity-report.service';
 import { ProductivityReportFormGroup, ProductivityReportFormService } from './productivity-report-form.service';
@@ -21,12 +23,17 @@ export class ProductivityReportUpdateComponent implements OnInit {
   isSaving = false;
   productivityReport: IProductivityReport | null = null;
 
+  usersSharedCollection: IUser[] = [];
+
   protected productivityReportService = inject(ProductivityReportService);
   protected productivityReportFormService = inject(ProductivityReportFormService);
+  protected userService = inject(UserService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: ProductivityReportFormGroup = this.productivityReportFormService.createProductivityReportFormGroup();
+
+  compareUser = (o1: IUser | null, o2: IUser | null): boolean => this.userService.compareUser(o1, o2);
 
   ngOnInit(): void {
     this.activatedRoute.data.subscribe(({ productivityReport }) => {
@@ -34,6 +41,8 @@ export class ProductivityReportUpdateComponent implements OnInit {
       if (productivityReport) {
         this.updateForm(productivityReport);
       }
+
+      this.loadRelationshipsOptions();
     });
   }
 
@@ -73,5 +82,15 @@ export class ProductivityReportUpdateComponent implements OnInit {
   protected updateForm(productivityReport: IProductivityReport): void {
     this.productivityReport = productivityReport;
     this.productivityReportFormService.resetForm(this.editForm, productivityReport);
+
+    this.usersSharedCollection = this.userService.addUserToCollectionIfMissing<IUser>(this.usersSharedCollection, productivityReport.user);
+  }
+
+  protected loadRelationshipsOptions(): void {
+    this.userService
+      .query()
+      .pipe(map((res: HttpResponse<IUser[]>) => res.body ?? []))
+      .pipe(map((users: IUser[]) => this.userService.addUserToCollectionIfMissing<IUser>(users, this.productivityReport?.user)))
+      .subscribe((users: IUser[]) => (this.usersSharedCollection = users));
   }
 }

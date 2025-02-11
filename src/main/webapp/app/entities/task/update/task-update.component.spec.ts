@@ -49,10 +49,10 @@ describe('Task Management Update Component', () => {
   describe('ngOnInit', () => {
     it('Should call User query and add missing value', () => {
       const task: ITask = { id: 456 };
-      const user: IUser = { id: 273 };
+      const user: IUser = { id: 24087 };
       task.user = user;
 
-      const userCollection: IUser[] = [{ id: 10915 }];
+      const userCollection: IUser[] = [{ id: 30704 }];
       jest.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
       const additionalUsers = [user];
       const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
@@ -71,7 +71,7 @@ describe('Task Management Update Component', () => {
 
     it('Should update editForm', () => {
       const task: ITask = { id: 456 };
-      const user: IUser = { id: 26224 };
+      const user: IUser = { id: 6614 };
       task.user = user;
 
       activatedRoute.data = of({ task });

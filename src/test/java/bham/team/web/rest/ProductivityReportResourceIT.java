@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import bham.team.IntegrationTest;
 import bham.team.domain.ProductivityReport;
 import bham.team.repository.ProductivityReportRepository;
+import bham.team.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
@@ -72,6 +73,9 @@ class ProductivityReportResourceIT {
 
     @Autowired
     private ProductivityReportRepository productivityReportRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private EntityManager em;
