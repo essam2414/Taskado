@@ -27,6 +27,7 @@
 
     <include file="config/liquibase/changelog/20250204131827_added_entity_Goal.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250204150624_added_entity_ProductivityReport.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250211181401_added_entity_PomodoroSession.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20250131213444_added_entity_constraints_Task.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250201142834_added_entity_constraints_Habit.xml" relativeToChangelogFile="false"/>
