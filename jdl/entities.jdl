@@ -102,6 +102,13 @@ entity ProductivityReport {
   timestamp Instant required     // When report generated
 }
 
+entity PomodoroSession {
+  Start Instant required,
+  Stop Instant,
+  duration Integer,
+  Paused Boolean,
+}
+
 relationship ManyToOne {
   Task{user} to User
   Habit{user} to User
@@ -109,4 +116,5 @@ relationship ManyToOne {
   Notification{user} to User
   Goal{user} to User
   ProductivityReport{user} to User
+  PomodoroSession{user} to User
 }

@@ -40,15 +40,15 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_end">End</label>
+          <label class="form-label" for="field_stop">Stop</label>
           <div class="d-flex">
             <input
-              id="field_end"
-              data-cy="end"
+              id="field_stop"
+              data-cy="stop"
               type="datetime-local"
               class="form-control"
-              name="end"
-              formControlName="end"
+              name="stop"
+              formControlName="stop"
               placeholder="YYYY-MM-DD HH:mm"
             />
           </div>
@@ -59,41 +59,19 @@
           <input type="number" class="form-control" name="duration" id="field_duration" data-cy="duration" formControlName="duration" />
         </div>
 
-        @let typeRef = editForm.get('type')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_type">Type</label>
-          <select class="form-control" name="type" formControlName="type" id="field_type" data-cy="type">
-            <option [ngValue]="null"></option>
-            @for (pomodoroType of pomodoroTypeValues; track $index) {
-              <option [value]="pomodoroType">
-                {{ { null: '', Standard: 'Standard', Meditation: 'Meditation', Study: 'Study', Physical: 'Physical' }[pomodoroType] }}
-              </option>
-            }
-          </select>
-          @if (typeRef.invalid && (typeRef.dirty || typeRef.touched)) {
-            <div>
-              @if (editForm.get('type')?.errors?.required) {
-                <small class="form-text text-danger">This field is required.</small>
-              }
-            </div>
-          }
-        </div>
-
         <div class="mb-3">
           <label class="form-label" for="field_paused">Paused</label>
           <input type="checkbox" class="form-check" name="paused" id="field_paused" data-cy="paused" formControlName="paused" />
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_observations">Observations</label>
-          <input
-            type="text"
-            class="form-control"
-            name="observations"
-            id="field_observations"
-            data-cy="observations"
-            formControlName="observations"
-          />
+          <label class="form-label" for="field_user">User</label>
+          <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user" [compareWith]="compareUser">
+            <option [ngValue]="null"></option>
+            @for (userOption of usersSharedCollection; track $index) {
+              <option [ngValue]="userOption">{{ userOption.id }}</option>
+            }
+          </select>
         </div>
       </div>
 

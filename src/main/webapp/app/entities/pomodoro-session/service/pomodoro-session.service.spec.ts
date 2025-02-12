@@ -10,7 +10,7 @@ import { PomodoroSessionService, RestPomodoroSession } from './pomodoro-session.
 const requireRestSample: RestPomodoroSession = {
   ...sampleWithRequiredData,
   start: sampleWithRequiredData.start?.toJSON(),
-  end: sampleWithRequiredData.end?.toJSON(),
+  stop: sampleWithRequiredData.stop?.toJSON(),
 };
 
 describe('PomodoroSession Service', () => {

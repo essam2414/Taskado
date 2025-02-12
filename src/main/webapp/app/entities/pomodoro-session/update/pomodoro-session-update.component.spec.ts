@@ -4,6 +4,8 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, from, of } from 'rxjs';
 
+import { IUser } from 'app/entities/user/user.model';
+import { UserService } from 'app/entities/user/service/user.service';
 import { PomodoroSessionService } from '../service/pomodoro-session.service';
 import { IPomodoroSession } from '../pomodoro-session.model';
 import { PomodoroSessionFormService } from './pomodoro-session-form.service';
@@ -16,6 +18,7 @@ describe('PomodoroSession Management Update Component', () => {
   let activatedRoute: ActivatedRoute;
   let pomodoroSessionFormService: PomodoroSessionFormService;
   let pomodoroSessionService: PomodoroSessionService;
+  let userService: UserService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -38,17 +41,43 @@ describe('PomodoroSession Management Update Component', () => {
     activatedRoute = TestBed.inject(ActivatedRoute);
     pomodoroSessionFormService = TestBed.inject(PomodoroSessionFormService);
     pomodoroSessionService = TestBed.inject(PomodoroSessionService);
+    userService = TestBed.inject(UserService);
 
     comp = fixture.componentInstance;
   });
 
   describe('ngOnInit', () => {
-    it('Should update editForm', () => {
+    it('Should call User query and add missing value', () => {
       const pomodoroSession: IPomodoroSession = { id: 456 };
+      const user: IUser = { id: 21803 };
+      pomodoroSession.user = user;
+
+      const userCollection: IUser[] = [{ id: 18535 }];
+      jest.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
+      const additionalUsers = [user];
+      const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
+      jest.spyOn(userService, 'addUserToCollectionIfMissing').mockReturnValue(expectedCollection);
 
       activatedRoute.data = of({ pomodoroSession });
       comp.ngOnInit();
 
+      expect(userService.query).toHaveBeenCalled();
+      expect(userService.addUserToCollectionIfMissing).toHaveBeenCalledWith(
+        userCollection,
+        ...additionalUsers.map(expect.objectContaining),
+      );
+      expect(comp.usersSharedCollection).toEqual(expectedCollection);
+    });
+
+    it('Should update editForm', () => {
+      const pomodoroSession: IPomodoroSession = { id: 456 };
+      const user: IUser = { id: 15343 };
+      pomodoroSession.user = user;
+
+      activatedRoute.data = of({ pomodoroSession });
+      comp.ngOnInit();
+
+      expect(comp.usersSharedCollection).toContain(user);
       expect(comp.pomodoroSession).toEqual(pomodoroSession);
     });
   });
@@ -118,6 +147,18 @@ describe('PomodoroSession Management Update Component', () => {
       expect(pomodoroSessionService.update).toHaveBeenCalled();
       expect(comp.isSaving).toEqual(false);
       expect(comp.previousState).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Compare relationships', () => {
+    describe('compareUser', () => {
+      it('Should forward to userService', () => {
+        const entity = { id: 123 };
+        const entity2 = { id: 456 };
+        jest.spyOn(userService, 'compareUser');
+        comp.compareUser(entity, entity2);
+        expect(userService.compareUser).toHaveBeenCalledWith(entity, entity2);
+      });
     });
   });
 });

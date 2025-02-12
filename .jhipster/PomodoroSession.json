@@ -10,7 +10,7 @@
       "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "end",
+      "fieldName": "stop",
       "fieldType": "Instant"
     },
     {
@@ -18,21 +18,18 @@
       "fieldType": "Integer"
     },
     {
-      "fieldName": "type",
-      "fieldType": "PomodoroType",
-      "fieldValidateRules": ["required"],
-      "fieldValues": "Standard,Meditation,Study,Physical"
-    },
-    {
       "fieldName": "paused",
       "fieldType": "Boolean"
-    },
-    {
-      "fieldName": "observations",
-      "fieldType": "String"
     }
   ],
   "name": "PomodoroSession",
-  "relationships": [],
+  "relationships": [
+    {
+      "otherEntityName": "user",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
   "searchEngine": "no"
 }

@@ -343,7 +343,7 @@ class HabitResourceIT {
         Habit partialUpdatedHabit = new Habit();
         partialUpdatedHabit.setId(habit.getId());
 
-        partialUpdatedHabit.startDate(UPDATED_START_DATE);
+        partialUpdatedHabit.name(UPDATED_NAME).startDate(UPDATED_START_DATE).completionRate(UPDATED_COMPLETION_RATE);
 
         restHabitMockMvc
             .perform(

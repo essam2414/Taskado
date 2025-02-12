@@ -367,10 +367,9 @@ class ProductivityReportResourceIT {
         partialUpdatedProductivityReport.setId(productivityReport.getId());
 
         partialUpdatedProductivityReport
-            .tasksPlanned(UPDATED_TASKS_PLANNED)
             .tasksCompleted(UPDATED_TASKS_COMPLETED)
-            .pomodoroSessions(UPDATED_POMODORO_SESSIONS)
             .focusTime(UPDATED_FOCUS_TIME)
+            .focusScore(UPDATED_FOCUS_SCORE)
             .timestamp(UPDATED_TIMESTAMP);
 
         restProductivityReportMockMvc

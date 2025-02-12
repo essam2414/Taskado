@@ -1,6 +1,5 @@
 package bham.team.domain;
 
-import bham.team.domain.enumeration.PomodoroType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -29,22 +28,17 @@ public class PomodoroSession implements Serializable {
     @Column(name = "start", nullable = false)
     private Instant start;
 
-    @Column(name = "jhi_end")
-    private Instant end;
+    @Column(name = "stop")
+    private Instant stop;
 
     @Column(name = "duration")
     private Integer duration;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
-    private PomodoroType type;
-
     @Column(name = "paused")
     private Boolean paused;
 
-    @Column(name = "observations")
-    private String observations;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -74,17 +68,17 @@ public class PomodoroSession implements Serializable {
         this.start = start;
     }
 
-    public Instant getEnd() {
-        return this.end;
+    public Instant getStop() {
+        return this.stop;
     }
 
-    public PomodoroSession end(Instant end) {
-        this.setEnd(end);
+    public PomodoroSession stop(Instant stop) {
+        this.setStop(stop);
         return this;
     }
 
-    public void setEnd(Instant end) {
-        this.end = end;
+    public void setStop(Instant stop) {
+        this.stop = stop;
     }
 
     public Integer getDuration() {
@@ -100,19 +94,6 @@ public class PomodoroSession implements Serializable {
         this.duration = duration;
     }
 
-    public PomodoroType getType() {
-        return this.type;
-    }
-
-    public PomodoroSession type(PomodoroType type) {
-        this.setType(type);
-        return this;
-    }
-
-    public void setType(PomodoroType type) {
-        this.type = type;
-    }
-
     public Boolean getPaused() {
         return this.paused;
     }
@@ -126,17 +107,17 @@ public class PomodoroSession implements Serializable {
         this.paused = paused;
     }
 
-    public String getObservations() {
-        return this.observations;
+    public User getUser() {
+        return this.user;
     }
 
-    public PomodoroSession observations(String observations) {
-        this.setObservations(observations);
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public PomodoroSession user(User user) {
+        this.setUser(user);
         return this;
-    }
-
-    public void setObservations(String observations) {
-        this.observations = observations;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -164,11 +145,9 @@ public class PomodoroSession implements Serializable {
         return "PomodoroSession{" +
             "id=" + getId() +
             ", start='" + getStart() + "'" +
-            ", end='" + getEnd() + "'" +
+            ", stop='" + getStop() + "'" +
             ", duration=" + getDuration() +
-            ", type='" + getType() + "'" +
             ", paused='" + getPaused() + "'" +
-            ", observations='" + getObservations() + "'" +
             "}";
     }
 }

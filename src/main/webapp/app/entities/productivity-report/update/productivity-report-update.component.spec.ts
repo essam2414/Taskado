@@ -49,10 +49,10 @@ describe('ProductivityReport Management Update Component', () => {
   describe('ngOnInit', () => {
     it('Should call User query and add missing value', () => {
       const productivityReport: IProductivityReport = { id: 456 };
-      const user: IUser = { id: 2761 };
+      const user: IUser = { id: 1683 };
       productivityReport.user = user;
 
-      const userCollection: IUser[] = [{ id: 6385 }];
+      const userCollection: IUser[] = [{ id: 7615 }];
       jest.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
       const additionalUsers = [user];
       const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
@@ -71,7 +71,7 @@ describe('ProductivityReport Management Update Component', () => {
 
     it('Should update editForm', () => {
       const productivityReport: IProductivityReport = { id: 456 };
-      const user: IUser = { id: 25391 };
+      const user: IUser = { id: 6469 };
       productivityReport.user = user;
 
       activatedRoute.data = of({ productivityReport });

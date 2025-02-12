@@ -1,18 +1,18 @@
 import { IUser } from './user.model';
 
 export const sampleWithRequiredData: IUser = {
-  id: 8579,
-  login: 'Zz',
+  id: 19038,
+  login: 'O$hR@HU6',
 };
 
 export const sampleWithPartialData: IUser = {
-  id: 28635,
-  login: 'lOES@Y\\@u\\|w\\/Os77mn',
+  id: 4020,
+  login: '$n*@5q1',
 };
 
 export const sampleWithFullData: IUser = {
-  id: 11971,
-  login: 'DP-3',
+  id: 24431,
+  login: 'Tk@l9tm\\ AlZcAF\\#w',
 };
 Object.freeze(sampleWithRequiredData);
 Object.freeze(sampleWithPartialData);
