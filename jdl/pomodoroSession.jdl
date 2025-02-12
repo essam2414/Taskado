@@ -1,16 +1,8 @@
-enum PomodoroType {
-  Standard,
-  Meditation,
-  Study,
-  Physical
-}
 
 entity PomodoroSession {
   Start Instant required,
-  end Instant,
+  Stop Instant,
   duration Integer,
-  type PomodoroType required,
   Paused Boolean,
-  Observations String
 }
 

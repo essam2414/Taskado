@@ -11,9 +11,9 @@ import { IPomodoroSession, NewPomodoroSession } from '../pomodoro-session.model'
 
 export type PartialUpdatePomodoroSession = Partial<IPomodoroSession> & Pick<IPomodoroSession, 'id'>;
 
-type RestOf<T extends IPomodoroSession | NewPomodoroSession> = Omit<T, 'start' | 'end'> & {
+type RestOf<T extends IPomodoroSession | NewPomodoroSession> = Omit<T, 'start' | 'stop'> & {
   start?: string | null;
-  end?: string | null;
+  stop?: string | null;
 };
 
 export type RestPomodoroSession = RestOf<IPomodoroSession>;
@@ -108,7 +108,7 @@ export class PomodoroSessionService {
     return {
       ...pomodoroSession,
       start: pomodoroSession.start?.toJSON() ?? null,
-      end: pomodoroSession.end?.toJSON() ?? null,
+      stop: pomodoroSession.stop?.toJSON() ?? null,
     };
   }
 
@@ -116,7 +116,7 @@ export class PomodoroSessionService {
     return {
       ...restPomodoroSession,
       start: restPomodoroSession.start ? dayjs(restPomodoroSession.start) : undefined,
-      end: restPomodoroSession.end ? dayjs(restPomodoroSession.end) : undefined,
+      stop: restPomodoroSession.stop ? dayjs(restPomodoroSession.stop) : undefined,
     };
   }
 

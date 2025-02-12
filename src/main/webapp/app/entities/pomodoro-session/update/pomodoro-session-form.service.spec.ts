@@ -21,11 +21,10 @@ describe('PomodoroSession Form Service', () => {
           expect.objectContaining({
             id: expect.any(Object),
             start: expect.any(Object),
-            end: expect.any(Object),
+            stop: expect.any(Object),
             duration: expect.any(Object),
-            type: expect.any(Object),
             paused: expect.any(Object),
-            observations: expect.any(Object),
+            user: expect.any(Object),
           }),
         );
       });
@@ -37,11 +36,10 @@ describe('PomodoroSession Form Service', () => {
           expect.objectContaining({
             id: expect.any(Object),
             start: expect.any(Object),
-            end: expect.any(Object),
+            stop: expect.any(Object),
             duration: expect.any(Object),
-            type: expect.any(Object),
             paused: expect.any(Object),
-            observations: expect.any(Object),
+            user: expect.any(Object),
           }),
         );
       });

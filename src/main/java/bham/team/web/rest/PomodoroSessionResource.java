@@ -127,20 +127,14 @@ public class PomodoroSessionResource {
                 if (pomodoroSession.getStart() != null) {
                     existingPomodoroSession.setStart(pomodoroSession.getStart());
                 }
-                if (pomodoroSession.getEnd() != null) {
-                    existingPomodoroSession.setEnd(pomodoroSession.getEnd());
+                if (pomodoroSession.getStop() != null) {
+                    existingPomodoroSession.setStop(pomodoroSession.getStop());
                 }
                 if (pomodoroSession.getDuration() != null) {
                     existingPomodoroSession.setDuration(pomodoroSession.getDuration());
                 }
-                if (pomodoroSession.getType() != null) {
-                    existingPomodoroSession.setType(pomodoroSession.getType());
-                }
                 if (pomodoroSession.getPaused() != null) {
                     existingPomodoroSession.setPaused(pomodoroSession.getPaused());
-                }
-                if (pomodoroSession.getObservations() != null) {
-                    existingPomodoroSession.setObservations(pomodoroSession.getObservations());
                 }
 
                 return existingPomodoroSession;

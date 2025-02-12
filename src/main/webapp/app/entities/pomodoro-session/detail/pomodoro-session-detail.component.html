@@ -19,29 +19,21 @@
           <dd>
             <span>{{ pomodoroSessionRef.start | formatMediumDatetime }}</span>
           </dd>
-          <dt><span>End</span></dt>
+          <dt><span>Stop</span></dt>
           <dd>
-            <span>{{ pomodoroSessionRef.end | formatMediumDatetime }}</span>
+            <span>{{ pomodoroSessionRef.stop | formatMediumDatetime }}</span>
           </dd>
           <dt><span>Duration</span></dt>
           <dd>
             <span>{{ pomodoroSessionRef.duration }}</span>
           </dd>
-          <dt><span>Type</span></dt>
-          <dd>
-            <span>{{
-              { null: '', Standard: 'Standard', Meditation: 'Meditation', Study: 'Study', Physical: 'Physical' }[
-                pomodoroSessionRef.type ?? 'null'
-              ]
-            }}</span>
-          </dd>
           <dt><span>Paused</span></dt>
           <dd>
             <span>{{ pomodoroSessionRef.paused }}</span>
           </dd>
-          <dt><span>Observations</span></dt>
+          <dt><span>User</span></dt>
           <dd>
-            <span>{{ pomodoroSessionRef.observations }}</span>
+            <span>{{ pomodoroSessionRef.user?.id }}</span>
           </dd>
         </dl>
 

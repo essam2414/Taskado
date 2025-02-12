@@ -3,32 +3,32 @@ import dayjs from 'dayjs/esm';
 import { IGoal, NewGoal } from './goal.model';
 
 export const sampleWithRequiredData: IGoal = {
-  id: 1617,
-  title: 'punctually',
-  startDate: dayjs('2025-02-04T02:19'),
+  id: 7689,
+  title: 'instead',
+  startDate: dayjs('2025-02-04T00:17'),
 };
 
 export const sampleWithPartialData: IGoal = {
-  id: 28329,
-  title: 'graffiti pension',
-  description: 'before meh',
-  startDate: dayjs('2025-02-03T13:54'),
-  endDate: dayjs('2025-02-03T18:11'),
-  progress: 1615,
+  id: 16504,
+  title: 'poetry although why',
+  description: 'worst deform solidly',
+  startDate: dayjs('2025-02-03T23:51'),
+  endDate: dayjs('2025-02-04T07:45'),
+  progress: 14828,
 };
 
 export const sampleWithFullData: IGoal = {
-  id: 11281,
-  title: 'hose',
-  description: 'lecture inside both',
-  startDate: dayjs('2025-02-04T02:32'),
-  endDate: dayjs('2025-02-03T18:54'),
-  progress: 9378,
+  id: 5323,
+  title: 'failing',
+  description: 'until unabashedly seldom',
+  startDate: dayjs('2025-02-04T04:37'),
+  endDate: dayjs('2025-02-04T01:08'),
+  progress: 27191,
 };
 
 export const sampleWithNewData: NewGoal = {
-  title: 'limited store',
-  startDate: dayjs('2025-02-04T00:27'),
+  title: 'busily',
+  startDate: dayjs('2025-02-03T22:20'),
   id: null,
 };
 

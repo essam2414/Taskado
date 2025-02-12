@@ -49,9 +49,9 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="end">
+            <th scope="col" jhiSortBy="stop">
               <div class="d-flex">
-                <span>End</span>
+                <span>Stop</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
@@ -63,13 +63,6 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="type">
-              <div class="d-flex">
-                <span>Type</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
             <th scope="col" jhiSortBy="paused">
               <div class="d-flex">
                 <span>Paused</span>
@@ -77,10 +70,9 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="observations">
+            <th scope="col" jhiSortBy="user.id">
               <div class="d-flex">
-                <span>Observations</span>
-
+                <span>User</span>
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
@@ -94,17 +86,12 @@
                 <a [routerLink]="['/pomodoro-session', pomodoroSession.id, 'view']">{{ pomodoroSession.id }}</a>
               </td>
               <td>{{ pomodoroSession.start | formatMediumDatetime }}</td>
-              <td>{{ pomodoroSession.end | formatMediumDatetime }}</td>
+              <td>{{ pomodoroSession.stop | formatMediumDatetime }}</td>
               <td>{{ pomodoroSession.duration }}</td>
-              <td>
-                {{
-                  { null: '', Standard: 'Standard', Meditation: 'Meditation', Study: 'Study', Physical: 'Physical' }[
-                    pomodoroSession.type ?? 'null'
-                  ]
-                }}
-              </td>
               <td>{{ pomodoroSession.paused }}</td>
-              <td>{{ pomodoroSession.observations }}</td>
+              <td>
+                {{ pomodoroSession.user?.id }}
+              </td>
               <td class="text-end">
                 <div class="btn-group">
                   <a
