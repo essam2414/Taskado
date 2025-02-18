@@ -49,10 +49,10 @@ describe('Event Management Update Component', () => {
   describe('ngOnInit', () => {
     it('Should call User query and add missing value', () => {
       const event: IEvent = { id: 456 };
-      const user: IUser = { id: 28127 };
+      const user: IUser = { id: 20327 };
       event.user = user;
 
-      const userCollection: IUser[] = [{ id: 25568 }];
+      const userCollection: IUser[] = [{ id: 11115 }];
       jest.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
       const additionalUsers = [user];
       const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
@@ -71,7 +71,7 @@ describe('Event Management Update Component', () => {
 
     it('Should update editForm', () => {
       const event: IEvent = { id: 456 };
-      const user: IUser = { id: 28825 };
+      const user: IUser = { id: 17459 };
       event.user = user;
 
       activatedRoute.data = of({ event });

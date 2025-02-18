@@ -1,8 +1,3 @@
-entity User {
-  fullName String required,
-  email String required
-}
-
 entity Task {
   title String required,
   description String,
@@ -110,11 +105,11 @@ entity PomodoroSession {
 }
 
 relationship ManyToOne {
-  Task{user} to User
-  Habit{user} to User
-  Event{user} to User
-  Notification{user} to User
-  Goal{user} to User
-  ProductivityReport{user} to User
-  PomodoroSession{user} to User
+  Task{user} to User with builtInEntity,
+  Habit{user} to User with builtInEntity,
+  Event{user} to User with builtInEntity,
+  Notification{user} to User with builtInEntity,
+  Goal{user} to User with builtInEntity,
+  ProductivityReport{user} to User with builtInEntity,
+  PomodoroSession{user} to User with builtInEntity
 }
