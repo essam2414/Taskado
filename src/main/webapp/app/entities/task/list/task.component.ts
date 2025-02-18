@@ -68,6 +68,15 @@ export class TaskComponent implements OnInit {
       .subscribe();
   }
 
+  toggleCompleted(task: ITask): void {
+    task.completed = !task.completed; // Toggle value
+    this.taskService.update(task).subscribe();
+  }
+
+  viewTask(task: ITask): void {
+    this.router.navigate(['/task', task.id, 'view']);
+  }
+
   load(): void {
     this.queryBackend().subscribe({
       next: (res: EntityArrayResponseType) => {
