@@ -1,20 +1,15 @@
+entity TaskCategory {
+  name String required unique
+}
+
 entity Task {
   title String required,
   description String,
-  dueDate Instant required,
+  dueDate Instant,
   priority Priority,
-  category TaskCategory,
   completed Boolean,
   createdAt Instant,
   updatedAt Instant
-}
-
-enum TaskCategory {
-  WORK,
-  PERSONAL,
-  HEALTH,
-  EDUCATION,
-  OTHER
 }
 
 entity Event {
@@ -105,6 +100,7 @@ entity PomodoroSession {
 }
 
 relationship ManyToOne {
+  Task{category} to TaskCategory,
   Task{user} to User with builtInEntity,
   Habit{user} to User with builtInEntity,
   Event{user} to User with builtInEntity,

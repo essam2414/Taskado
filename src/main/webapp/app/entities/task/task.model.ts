@@ -1,7 +1,7 @@
 import dayjs from 'dayjs/esm';
+import { ITaskCategory } from 'app/entities/task-category/task-category.model';
 import { IUser } from 'app/entities/user/user.model';
 import { Priority } from 'app/entities/enumerations/priority.model';
-import { TaskCategory } from 'app/entities/enumerations/task-category.model';
 
 export interface ITask {
   id: number;
@@ -9,10 +9,10 @@ export interface ITask {
   description?: string | null;
   dueDate?: dayjs.Dayjs | null;
   priority?: keyof typeof Priority | null;
-  category?: keyof typeof TaskCategory | null;
   completed?: boolean | null;
   createdAt?: dayjs.Dayjs | null;
   updatedAt?: dayjs.Dayjs | null;
+  category?: ITaskCategory | null;
   user?: Pick<IUser, 'id'> | null;
 }
 

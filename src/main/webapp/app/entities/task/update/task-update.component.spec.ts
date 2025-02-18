@@ -4,10 +4,12 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, from, of } from 'rxjs';
 
+import { ITaskCategory } from 'app/entities/task-category/task-category.model';
+import { TaskCategoryService } from 'app/entities/task-category/service/task-category.service';
 import { IUser } from 'app/entities/user/user.model';
 import { UserService } from 'app/entities/user/service/user.service';
-import { TaskService } from '../service/task.service';
 import { ITask } from '../task.model';
+import { TaskService } from '../service/task.service';
 import { TaskFormService } from './task-form.service';
 
 import { TaskUpdateComponent } from './task-update.component';
@@ -18,6 +20,7 @@ describe('Task Management Update Component', () => {
   let activatedRoute: ActivatedRoute;
   let taskFormService: TaskFormService;
   let taskService: TaskService;
+  let taskCategoryService: TaskCategoryService;
   let userService: UserService;
 
   beforeEach(() => {
@@ -41,18 +44,41 @@ describe('Task Management Update Component', () => {
     activatedRoute = TestBed.inject(ActivatedRoute);
     taskFormService = TestBed.inject(TaskFormService);
     taskService = TestBed.inject(TaskService);
+    taskCategoryService = TestBed.inject(TaskCategoryService);
     userService = TestBed.inject(UserService);
 
     comp = fixture.componentInstance;
   });
 
   describe('ngOnInit', () => {
+    it('Should call TaskCategory query and add missing value', () => {
+      const task: ITask = { id: 456 };
+      const category: ITaskCategory = { id: 11499 };
+      task.category = category;
+
+      const taskCategoryCollection: ITaskCategory[] = [{ id: 11972 }];
+      jest.spyOn(taskCategoryService, 'query').mockReturnValue(of(new HttpResponse({ body: taskCategoryCollection })));
+      const additionalTaskCategories = [category];
+      const expectedCollection: ITaskCategory[] = [...additionalTaskCategories, ...taskCategoryCollection];
+      jest.spyOn(taskCategoryService, 'addTaskCategoryToCollectionIfMissing').mockReturnValue(expectedCollection);
+
+      activatedRoute.data = of({ task });
+      comp.ngOnInit();
+
+      expect(taskCategoryService.query).toHaveBeenCalled();
+      expect(taskCategoryService.addTaskCategoryToCollectionIfMissing).toHaveBeenCalledWith(
+        taskCategoryCollection,
+        ...additionalTaskCategories.map(expect.objectContaining),
+      );
+      expect(comp.taskCategoriesSharedCollection).toEqual(expectedCollection);
+    });
+
     it('Should call User query and add missing value', () => {
       const task: ITask = { id: 456 };
-      const user: IUser = { id: 19038 };
+      const user: IUser = { id: 13635 };
       task.user = user;
 
-      const userCollection: IUser[] = [{ id: 6026 }];
+      const userCollection: IUser[] = [{ id: 29175 }];
       jest.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
       const additionalUsers = [user];
       const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
@@ -71,12 +97,15 @@ describe('Task Management Update Component', () => {
 
     it('Should update editForm', () => {
       const task: ITask = { id: 456 };
-      const user: IUser = { id: 19075 };
+      const category: ITaskCategory = { id: 3454 };
+      task.category = category;
+      const user: IUser = { id: 32413 };
       task.user = user;
 
       activatedRoute.data = of({ task });
       comp.ngOnInit();
 
+      expect(comp.taskCategoriesSharedCollection).toContain(category);
       expect(comp.usersSharedCollection).toContain(user);
       expect(comp.task).toEqual(task);
     });
@@ -151,6 +180,16 @@ describe('Task Management Update Component', () => {
   });
 
   describe('Compare relationships', () => {
+    describe('compareTaskCategory', () => {
+      it('Should forward to taskCategoryService', () => {
+        const entity = { id: 123 };
+        const entity2 = { id: 456 };
+        jest.spyOn(taskCategoryService, 'compareTaskCategory');
+        comp.compareTaskCategory(entity, entity2);
+        expect(taskCategoryService.compareTaskCategory).toHaveBeenCalledWith(entity, entity2);
+      });
+    });
+
     describe('compareUser', () => {
       it('Should forward to userService', () => {
         const entity = { id: 123 };

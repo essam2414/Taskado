@@ -24,10 +24,10 @@ describe('Task Form Service', () => {
             description: expect.any(Object),
             dueDate: expect.any(Object),
             priority: expect.any(Object),
-            category: expect.any(Object),
             completed: expect.any(Object),
             createdAt: expect.any(Object),
             updatedAt: expect.any(Object),
+            category: expect.any(Object),
             user: expect.any(Object),
           }),
         );
@@ -43,10 +43,10 @@ describe('Task Form Service', () => {
             description: expect.any(Object),
             dueDate: expect.any(Object),
             priority: expect.any(Object),
-            category: expect.any(Object),
             completed: expect.any(Object),
             createdAt: expect.any(Object),
             updatedAt: expect.any(Object),
+            category: expect.any(Object),
             user: expect.any(Object),
           }),
         );

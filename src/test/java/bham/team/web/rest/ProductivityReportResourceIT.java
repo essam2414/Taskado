@@ -367,8 +367,9 @@ class ProductivityReportResourceIT {
         partialUpdatedProductivityReport.setId(productivityReport.getId());
 
         partialUpdatedProductivityReport
-            .tasksCompleted(UPDATED_TASKS_COMPLETED)
-            .focusTime(UPDATED_FOCUS_TIME)
+            .tasksPlanned(UPDATED_TASKS_PLANNED)
+            .taskAvgCompletionTime(UPDATED_TASK_AVG_COMPLETION_TIME)
+            .pomodoroSessions(UPDATED_POMODORO_SESSIONS)
             .focusScore(UPDATED_FOCUS_SCORE)
             .timestamp(UPDATED_TIMESTAMP);
 

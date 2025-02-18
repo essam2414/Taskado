@@ -327,7 +327,7 @@ class GoalResourceIT {
         Goal partialUpdatedGoal = new Goal();
         partialUpdatedGoal.setId(goal.getId());
 
-        partialUpdatedGoal.title(UPDATED_TITLE).description(UPDATED_DESCRIPTION).endDate(UPDATED_END_DATE);
+        partialUpdatedGoal.title(UPDATED_TITLE).startDate(UPDATED_START_DATE).endDate(UPDATED_END_DATE).progress(UPDATED_PROGRESS);
 
         restGoalMockMvc
             .perform(

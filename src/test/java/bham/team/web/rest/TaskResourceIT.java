@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import bham.team.IntegrationTest;
 import bham.team.domain.Task;
 import bham.team.domain.enumeration.Priority;
-import bham.team.domain.enumeration.TaskCategory;
 import bham.team.repository.TaskRepository;
 import bham.team.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,9 +47,6 @@ class TaskResourceIT {
 
     private static final Priority DEFAULT_PRIORITY = Priority.LOW;
     private static final Priority UPDATED_PRIORITY = Priority.MEDIUM;
-
-    private static final TaskCategory DEFAULT_CATEGORY = TaskCategory.WORK;
-    private static final TaskCategory UPDATED_CATEGORY = TaskCategory.PERSONAL;
 
     private static final Boolean DEFAULT_COMPLETED = false;
     private static final Boolean UPDATED_COMPLETED = true;
@@ -98,7 +94,6 @@ class TaskResourceIT {
             .description(DEFAULT_DESCRIPTION)
             .dueDate(DEFAULT_DUE_DATE)
             .priority(DEFAULT_PRIORITY)
-            .category(DEFAULT_CATEGORY)
             .completed(DEFAULT_COMPLETED)
             .createdAt(DEFAULT_CREATED_AT)
             .updatedAt(DEFAULT_UPDATED_AT);
@@ -116,7 +111,6 @@ class TaskResourceIT {
             .description(UPDATED_DESCRIPTION)
             .dueDate(UPDATED_DUE_DATE)
             .priority(UPDATED_PRIORITY)
-            .category(UPDATED_CATEGORY)
             .completed(UPDATED_COMPLETED)
             .createdAt(UPDATED_CREATED_AT)
             .updatedAt(UPDATED_UPDATED_AT);
@@ -192,22 +186,6 @@ class TaskResourceIT {
 
     @Test
     @Transactional
-    void checkDueDateIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        // set the field null
-        task.setDueDate(null);
-
-        // Create the Task, which fails.
-
-        restTaskMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(task)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
     void getAllTasks() throws Exception {
         // Initialize the database
         insertedTask = taskRepository.saveAndFlush(task);
@@ -222,7 +200,6 @@ class TaskResourceIT {
             .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
             .andExpect(jsonPath("$.[*].dueDate").value(hasItem(DEFAULT_DUE_DATE.toString())))
             .andExpect(jsonPath("$.[*].priority").value(hasItem(DEFAULT_PRIORITY.toString())))
-            .andExpect(jsonPath("$.[*].category").value(hasItem(DEFAULT_CATEGORY.toString())))
             .andExpect(jsonPath("$.[*].completed").value(hasItem(DEFAULT_COMPLETED.booleanValue())))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
             .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())));
@@ -244,7 +221,6 @@ class TaskResourceIT {
             .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
             .andExpect(jsonPath("$.dueDate").value(DEFAULT_DUE_DATE.toString()))
             .andExpect(jsonPath("$.priority").value(DEFAULT_PRIORITY.toString()))
-            .andExpect(jsonPath("$.category").value(DEFAULT_CATEGORY.toString()))
             .andExpect(jsonPath("$.completed").value(DEFAULT_COMPLETED.booleanValue()))
             .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
             .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()));
@@ -274,7 +250,6 @@ class TaskResourceIT {
             .description(UPDATED_DESCRIPTION)
             .dueDate(UPDATED_DUE_DATE)
             .priority(UPDATED_PRIORITY)
-            .category(UPDATED_CATEGORY)
             .completed(UPDATED_COMPLETED)
             .createdAt(UPDATED_CREATED_AT)
             .updatedAt(UPDATED_UPDATED_AT);
@@ -353,12 +328,7 @@ class TaskResourceIT {
         Task partialUpdatedTask = new Task();
         partialUpdatedTask.setId(task.getId());
 
-        partialUpdatedTask
-            .title(UPDATED_TITLE)
-            .description(UPDATED_DESCRIPTION)
-            .priority(UPDATED_PRIORITY)
-            .createdAt(UPDATED_CREATED_AT)
-            .updatedAt(UPDATED_UPDATED_AT);
+        partialUpdatedTask.title(UPDATED_TITLE).description(UPDATED_DESCRIPTION).dueDate(UPDATED_DUE_DATE);
 
         restTaskMockMvc
             .perform(
@@ -391,7 +361,6 @@ class TaskResourceIT {
             .description(UPDATED_DESCRIPTION)
             .dueDate(UPDATED_DUE_DATE)
             .priority(UPDATED_PRIORITY)
-            .category(UPDATED_CATEGORY)
             .completed(UPDATED_COMPLETED)
             .createdAt(UPDATED_CREATED_AT)
             .updatedAt(UPDATED_UPDATED_AT);

@@ -49,10 +49,10 @@ describe('Goal Management Update Component', () => {
   describe('ngOnInit', () => {
     it('Should call User query and add missing value', () => {
       const goal: IGoal = { id: 456 };
-      const user: IUser = { id: 4020 };
+      const user: IUser = { id: 13939 };
       goal.user = user;
 
-      const userCollection: IUser[] = [{ id: 2163 }];
+      const userCollection: IUser[] = [{ id: 30062 }];
       jest.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
       const additionalUsers = [user];
       const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
@@ -71,7 +71,7 @@ describe('Goal Management Update Component', () => {
 
     it('Should update editForm', () => {
       const goal: IGoal = { id: 456 };
-      const user: IUser = { id: 12805 };
+      const user: IUser = { id: 29085 };
       goal.user = user;
 
       activatedRoute.data = of({ goal });

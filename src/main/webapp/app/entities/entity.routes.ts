@@ -41,6 +41,11 @@ const routes: Routes = [
     data: { pageTitle: 'ProductivityReports' },
     loadChildren: () => import('./productivity-report/productivity-report.routes'),
   },
+  {
+    path: 'task-category',
+    data: { pageTitle: 'TaskCategories' },
+    loadChildren: () => import('./task-category/task-category.routes'),
+  },
   /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
 ];
 

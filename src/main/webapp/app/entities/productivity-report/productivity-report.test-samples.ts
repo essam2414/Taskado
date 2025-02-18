@@ -3,37 +3,34 @@ import dayjs from 'dayjs/esm';
 import { IProductivityReport, NewProductivityReport } from './productivity-report.model';
 
 export const sampleWithRequiredData: IProductivityReport = {
-  id: 18109,
-  focusScore: 12113.13,
-  timestamp: dayjs('2025-02-03T20:08'),
+  id: 4708,
+  focusScore: 9705.37,
+  timestamp: dayjs('2025-02-03T18:15'),
 };
 
 export const sampleWithPartialData: IProductivityReport = {
-  id: 1985,
-  tasksPlanned: 32321,
-  taskEfficiency: 10921.69,
-  pomodoroSessions: 17828,
-  focusTime: 16361.41,
-  focusScore: 10420.21,
-  timestamp: dayjs('2025-02-04T06:55'),
+  id: 15399,
+  tasksPlanned: 5363,
+  focusScore: 22360.19,
+  timestamp: dayjs('2025-02-04T05:39'),
 };
 
 export const sampleWithFullData: IProductivityReport = {
-  id: 1324,
-  tasksPlanned: 10043,
-  tasksCompleted: 6511,
-  taskAvgCompletionTime: 22784.58,
-  taskEfficiency: 32130.52,
-  pomodoroSessions: 9524,
-  distractionsCount: 5982,
-  focusTime: 19260.77,
-  focusScore: 23941.18,
-  timestamp: dayjs('2025-02-04T03:22'),
+  id: 9203,
+  tasksPlanned: 25898,
+  tasksCompleted: 1626,
+  taskAvgCompletionTime: 32009.99,
+  taskEfficiency: 13193.26,
+  pomodoroSessions: 24249,
+  distractionsCount: 9896,
+  focusTime: 18748.4,
+  focusScore: 17339.2,
+  timestamp: dayjs('2025-02-04T13:44'),
 };
 
 export const sampleWithNewData: NewProductivityReport = {
-  focusScore: 24695.82,
-  timestamp: dayjs('2025-02-04T10:01'),
+  focusScore: 5865.98,
+  timestamp: dayjs('2025-02-04T10:10'),
   id: null,
 };
 

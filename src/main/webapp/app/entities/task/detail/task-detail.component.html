@@ -31,14 +31,6 @@
           <dd>
             <span>{{ { null: '', LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' }[taskRef.priority ?? 'null'] }}</span>
           </dd>
-          <dt><span>Category</span></dt>
-          <dd>
-            <span>{{
-              { null: '', WORK: 'WORK', PERSONAL: 'PERSONAL', HEALTH: 'HEALTH', EDUCATION: 'EDUCATION', OTHER: 'OTHER' }[
-                taskRef.category ?? 'null'
-              ]
-            }}</span>
-          </dd>
           <dt><span>Completed</span></dt>
           <dd>
             <span>{{ taskRef.completed }}</span>
@@ -50,6 +42,14 @@
           <dt><span>Updated At</span></dt>
           <dd>
             <span>{{ taskRef.updatedAt | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Category</span></dt>
+          <dd>
+            @if (task()!.category) {
+              <div>
+                <a [routerLink]="['/task-category', task()!.category?.id, 'view']">{{ taskRef.category?.id }}</a>
+              </div>
+            }
           </dd>
           <dt><span>User</span></dt>
           <dd>

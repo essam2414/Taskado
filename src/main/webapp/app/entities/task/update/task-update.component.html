@@ -38,7 +38,6 @@
           />
         </div>
 
-        @let dueDateRef = editForm.get('dueDate')!;
         <div class="mb-3">
           <label class="form-label" for="field_dueDate">Due Date</label>
           <div class="d-flex">
@@ -52,16 +51,6 @@
               placeholder="YYYY-MM-DD HH:mm"
             />
           </div>
-          @if (dueDateRef.invalid && (dueDateRef.dirty || dueDateRef.touched)) {
-            <div>
-              @if (editForm.get('dueDate')?.errors?.required) {
-                <small class="form-text text-danger">This field is required.</small>
-              }
-              <small class="form-text text-danger" [hidden]="!editForm.get('dueDate')?.errors?.datetimelocal"
-                >This field should be a date and time.</small
-              >
-            </div>
-          }
         </div>
 
         <div class="mb-3">
@@ -71,20 +60,6 @@
             @for (priority of priorityValues; track $index) {
               <option [value]="priority">
                 {{ { null: '', LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' }[priority] }}
-              </option>
-            }
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_category">Category</label>
-          <select class="form-control" name="category" formControlName="category" id="field_category" data-cy="category">
-            <option [ngValue]="null"></option>
-            @for (taskCategory of taskCategoryValues; track $index) {
-              <option [value]="taskCategory">
-                {{
-                  { null: '', WORK: 'WORK', PERSONAL: 'PERSONAL', HEALTH: 'HEALTH', EDUCATION: 'EDUCATION', OTHER: 'OTHER' }[taskCategory]
-                }}
               </option>
             }
           </select>
@@ -123,6 +98,23 @@
               placeholder="YYYY-MM-DD HH:mm"
             />
           </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_category">Category</label>
+          <select
+            class="form-control"
+            id="field_category"
+            data-cy="category"
+            name="category"
+            formControlName="category"
+            [compareWith]="compareTaskCategory"
+          >
+            <option [ngValue]="null"></option>
+            @for (taskCategoryOption of taskCategoriesSharedCollection; track $index) {
+              <option [ngValue]="taskCategoryOption">{{ taskCategoryOption.id }}</option>
+            }
+          </select>
         </div>
 
         <div class="mb-3">

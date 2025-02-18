@@ -496,12 +496,10 @@ class NotificationResourceIT {
         partialUpdatedNotification.setId(notification.getId());
 
         partialUpdatedNotification
-            .message(UPDATED_MESSAGE)
-            .timestamp(UPDATED_TIMESTAMP)
-            .read(UPDATED_READ)
+            .notificationType(UPDATED_NOTIFICATION_TYPE)
+            .status(UPDATED_STATUS)
             .expirationDate(UPDATED_EXPIRATION_DATE)
             .actionURL(UPDATED_ACTION_URL)
-            .icon(UPDATED_ICON)
             .isRecurring(UPDATED_IS_RECURRING)
             .recurrencePattern(UPDATED_RECURRENCE_PATTERN);
 
