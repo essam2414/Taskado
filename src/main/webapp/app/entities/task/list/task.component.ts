@@ -11,11 +11,13 @@ import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigati
 import { ITask } from '../task.model';
 import { EntityArrayResponseType, TaskService } from '../service/task.service';
 import { TaskDeleteDialogComponent } from '../delete/task-delete-dialog.component';
+import dayjs from 'dayjs/esm';
 
 @Component({
   standalone: true,
   selector: 'jhi-task',
   templateUrl: './task.component.html',
+  styleUrls: ['../task.scss'],
   imports: [
     RouterModule,
     FormsModule,
@@ -69,8 +71,18 @@ export class TaskComponent implements OnInit {
   }
 
   toggleCompleted(task: ITask): void {
-    task.completed = !task.completed; // Toggle value
-    this.taskService.update(task).subscribe();
+    task.completed = !task.completed;
+    this.taskService.update(task).subscribe(() => {
+      this.tasks = this.refineData([...(this.tasks ?? [])]);
+    });
+  }
+
+  formatTaskDate(dueDate: dayjs.Dayjs | string | null | undefined): string {
+    if (!dueDate) return '';
+    const date = dayjs(dueDate);
+    const now = dayjs();
+    const isNextYear = date.year() > now.year();
+    return date.format(`D MMMM${isNextYear ? ' YYYY' : ''} HH:mm`);
   }
 
   viewTask(task: ITask): void {
@@ -100,7 +112,9 @@ export class TaskComponent implements OnInit {
 
   protected refineData(data: ITask[]): ITask[] {
     const { predicate, order } = this.sortState();
-    return predicate && order ? data.sort(this.sortService.startSort({ predicate, order })) : data;
+    let sortedData = predicate && order ? data.sort(this.sortService.startSort({ predicate, order })) : data;
+    sortedData = sortedData.sort((a, b) => Number(a.completed) - Number(b.completed));
+    return sortedData;
   }
 
   protected fillComponentAttributesFromResponseBody(data: ITask[] | null): ITask[] {

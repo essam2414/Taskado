@@ -1,0 +1,32 @@
+.task-row {
+  cursor: pointer;
+}
+
+.custom-checkbox {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 1.5px solid gainsboro;
+  background-color: white;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+
+  &:checked {
+    background-color: #007bff;
+    border: 1.5px solid #007bff;
+  }
+
+  &:hover {
+    border-color: #0056b3;
+  }
+}
+
+.task-title {
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.task-description {
+  font-weight: 200;
+  color: #666;
+}

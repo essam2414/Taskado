@@ -5,70 +5,56 @@
 
   <jhi-alert></jhi-alert>
 
-  @if (tasks?.length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span>No Tasks found</span>
-    </div>
-  }
+  <div class="table-responsive table-entities" id="entities">
+    <table class="table table-hover" aria-describedby="page-heading">
+      <tbody>
+        @for (task of tasks; track trackId(task)) {
+          <tr data-cy="entityTable" (click)="viewTask(task)" class="task-row">
+            <td>
+              <div class="form-check">
+                <input
+                  class="form-check-input custom-checkbox"
+                  type="checkbox"
+                  [checked]="task.completed"
+                  (change)="toggleCompleted(task)"
+                  (click)="$event.stopPropagation()"
+                />
+              </div>
+            </td>
 
-  @if (tasks && tasks.length > 0) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table" aria-describedby="page-heading">
-        <tbody>
-          @for (task of tasks; track trackId(task)) {
-            <tr data-cy="entityTable" (click)="viewTask(task)">
-              <td>
-                <input type="checkbox" [checked]="task.completed" (change)="toggleCompleted(task)" />
-              </td>
+            <td class="">
+              <div class="task-title">{{ task.title }}</div>
+              <div class="task-description">{{ task.description }}</div>
+            </td>
 
-              <td class="">
-                <div>{{ task.title }}</div>
-                <div>{{ task.description }}</div>
-              </td>
-
-              <td>{{ task.dueDate | formatMediumDatetime }}</td>
-              <td>{{ { null: '', LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' }[task.priority ?? 'null'] }}</td>
-              <td>
-                @if (task.category) {
-                  <div>
-                    <a [routerLink]="['/task-category', task.category.id, 'view']">{{ task.category.id }}</a>
-                  </div>
-                }
-              </td>
-
-              <td>
-                {{ task.user?.id }}
-              </td>
-
-              <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/task', task.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline">Edit</span>
-                  </a>
-
-                  <button type="submit" (click)="delete(task)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                  </button>
+            <td>{{ formatTaskDate(task.dueDate) }}</td>
+            <td>{{ { null: '', LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' }[task.priority ?? 'null'] }}</td>
+            <td>
+              @if (task.category) {
+                <div>
+                  <a [routerLink]="['/task-category', task.category.id, 'view']">{{ task.category.id }}</a>
                 </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+              }
+            </td>
 
-      <div class="d-flex justify-content-start">
-        <button
-          id="jh-create-entity"
-          data-cy="entityCreateButton"
-          class="btn btn-primary jh-create-entity create-task"
-          [routerLink]="['/task/new']"
-        >
-          <fa-icon icon="plus"></fa-icon>
-          <span>Add task</span>
-        </button>
-      </div>
+            <td>
+              {{ task.user?.id }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="d-flex justify-content-start">
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-task"
+        [routerLink]="['/task/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span>Add task</span>
+      </button>
     </div>
-  }
+  </div>
 </div>
