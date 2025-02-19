@@ -27,6 +27,10 @@ public class TaskCategory implements Serializable {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
+    @NotNull
+    @Column(name = "color", nullable = false)
+    private String color;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -55,6 +59,19 @@ public class TaskCategory implements Serializable {
         this.name = name;
     }
 
+    public String getColor() {
+        return this.color;
+    }
+
+    public TaskCategory color(String color) {
+        this.setColor(color);
+        return this;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -80,6 +97,7 @@ public class TaskCategory implements Serializable {
         return "TaskCategory{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
+            ", color='" + getColor() + "'" +
             "}";
     }
 }

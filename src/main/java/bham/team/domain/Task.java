@@ -49,7 +49,7 @@ public class Task implements Serializable {
     private Instant updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private TaskCategory category;
+    private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
@@ -160,16 +160,16 @@ public class Task implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public TaskCategory getCategory() {
+    public Category getCategory() {
         return this.category;
     }
 
-    public void setCategory(TaskCategory taskCategory) {
-        this.category = taskCategory;
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
-    public Task category(TaskCategory taskCategory) {
-        this.setCategory(taskCategory);
+    public Task category(Category category) {
+        this.setCategory(category);
         return this;
     }
 

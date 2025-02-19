@@ -343,7 +343,7 @@ class HabitResourceIT {
         Habit partialUpdatedHabit = new Habit();
         partialUpdatedHabit.setId(habit.getId());
 
-        partialUpdatedHabit.streak(UPDATED_STREAK);
+        partialUpdatedHabit.repeatFrequency(UPDATED_REPEAT_FREQUENCY);
 
         restHabitMockMvc
             .perform(

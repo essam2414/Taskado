@@ -1,5 +1,6 @@
-entity TaskCategory {
-  name String required unique
+entity Category {
+  name String required unique,
+  color String required
 }
 
 entity Task {

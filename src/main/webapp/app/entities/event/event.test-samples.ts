@@ -3,37 +3,37 @@ import dayjs from 'dayjs/esm';
 import { IEvent, NewEvent } from './event.model';
 
 export const sampleWithRequiredData: IEvent = {
-  id: 26036,
-  title: 'peppery',
-  eventDate: dayjs('2025-01-31T19:28'),
-  startTime: dayjs('2025-01-31T18:57'),
-  endTime: dayjs('2025-01-31T23:31'),
+  id: 31791,
+  title: 'instead hammock',
+  eventDate: dayjs('2025-01-31T22:08'),
+  startTime: dayjs('2025-02-01T15:27'),
+  endTime: dayjs('2025-01-31T16:17'),
 };
 
 export const sampleWithPartialData: IEvent = {
-  id: 8812,
-  title: 'nor frequent guilty',
-  eventDate: dayjs('2025-02-01T16:01'),
-  startTime: dayjs('2025-02-01T04:20'),
-  endTime: dayjs('2025-01-31T17:26'),
+  id: 30007,
+  title: 'at midst',
+  eventDate: dayjs('2025-01-31T16:43'),
+  startTime: dayjs('2025-01-31T19:24'),
+  endTime: dayjs('2025-02-01T01:24'),
 };
 
 export const sampleWithFullData: IEvent = {
-  id: 2818,
-  title: 'over whoever bruised',
-  description: 'finally legal',
-  eventDate: dayjs('2025-02-01T02:25'),
-  startTime: dayjs('2025-02-01T00:34'),
-  endTime: dayjs('2025-02-01T14:34'),
-  location: 'prejudge',
-  reminder: false,
+  id: 9670,
+  title: 'zowie',
+  description: 'as',
+  eventDate: dayjs('2025-01-31T18:25'),
+  startTime: dayjs('2025-01-31T21:57'),
+  endTime: dayjs('2025-01-31T23:59'),
+  location: 'hierarchy',
+  reminder: true,
 };
 
 export const sampleWithNewData: NewEvent = {
-  title: 'potentially dearly',
-  eventDate: dayjs('2025-02-01T07:39'),
-  startTime: dayjs('2025-02-01T12:29'),
-  endTime: dayjs('2025-02-01T01:50'),
+  title: 'synthesise gah minor',
+  eventDate: dayjs('2025-01-31T19:40'),
+  startTime: dayjs('2025-01-31T19:22'),
+  endTime: dayjs('2025-02-01T12:36'),
   id: null,
 };
 

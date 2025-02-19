@@ -35,6 +35,9 @@ class TaskCategoryResourceIT {
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
+    private static final String DEFAULT_COLOR = "AAAAAAAAAA";
+    private static final String UPDATED_COLOR = "BBBBBBBBBB";
+
     private static final String ENTITY_API_URL = "/api/task-categories";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -64,7 +67,7 @@ class TaskCategoryResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static TaskCategory createEntity() {
-        return new TaskCategory().name(DEFAULT_NAME);
+        return new TaskCategory().name(DEFAULT_NAME).color(DEFAULT_COLOR);
     }
 
     /**
@@ -74,7 +77,7 @@ class TaskCategoryResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static TaskCategory createUpdatedEntity() {
-        return new TaskCategory().name(UPDATED_NAME);
+        return new TaskCategory().name(UPDATED_NAME).color(UPDATED_COLOR);
     }
 
     @BeforeEach
@@ -147,6 +150,22 @@ class TaskCategoryResourceIT {
 
     @Test
     @Transactional
+    void checkColorIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        taskCategory.setColor(null);
+
+        // Create the TaskCategory, which fails.
+
+        restTaskCategoryMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(taskCategory)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllTaskCategories() throws Exception {
         // Initialize the database
         insertedTaskCategory = taskCategoryRepository.saveAndFlush(taskCategory);
@@ -157,7 +176,8 @@ class TaskCategoryResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(taskCategory.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)));
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+            .andExpect(jsonPath("$.[*].color").value(hasItem(DEFAULT_COLOR)));
     }
 
     @Test
@@ -172,7 +192,8 @@ class TaskCategoryResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(taskCategory.getId().intValue()))
-            .andExpect(jsonPath("$.name").value(DEFAULT_NAME));
+            .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
+            .andExpect(jsonPath("$.color").value(DEFAULT_COLOR));
     }
 
     @Test
@@ -194,7 +215,7 @@ class TaskCategoryResourceIT {
         TaskCategory updatedTaskCategory = taskCategoryRepository.findById(taskCategory.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedTaskCategory are not directly saved in db
         em.detach(updatedTaskCategory);
-        updatedTaskCategory.name(UPDATED_NAME);
+        updatedTaskCategory.name(UPDATED_NAME).color(UPDATED_COLOR);
 
         restTaskCategoryMockMvc
             .perform(
@@ -305,7 +326,7 @@ class TaskCategoryResourceIT {
         TaskCategory partialUpdatedTaskCategory = new TaskCategory();
         partialUpdatedTaskCategory.setId(taskCategory.getId());
 
-        partialUpdatedTaskCategory.name(UPDATED_NAME);
+        partialUpdatedTaskCategory.name(UPDATED_NAME).color(UPDATED_COLOR);
 
         restTaskCategoryMockMvc
             .perform(

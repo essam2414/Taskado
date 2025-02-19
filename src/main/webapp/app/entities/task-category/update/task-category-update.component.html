@@ -25,6 +25,19 @@
             </div>
           }
         </div>
+
+        @let colorRef = editForm.get('color')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_color">Color</label>
+          <input type="text" class="form-control" name="color" id="field_color" data-cy="color" formControlName="color" />
+          @if (colorRef.invalid && (colorRef.dirty || colorRef.touched)) {
+            <div>
+              @if (editForm.get('color')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
       </div>
 
       <div>

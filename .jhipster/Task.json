@@ -38,7 +38,7 @@
   "name": "Task",
   "relationships": [
     {
-      "otherEntityName": "taskCategory",
+      "otherEntityName": "category",
       "relationshipName": "category",
       "relationshipSide": "left",
       "relationshipType": "many-to-one"

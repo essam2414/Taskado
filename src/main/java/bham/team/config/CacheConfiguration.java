@@ -59,6 +59,7 @@ public class CacheConfiguration {
             createCache(cm, bham.team.domain.Goal.class.getName());
             createCache(cm, bham.team.domain.ProductivityReport.class.getName());
             createCache(cm, bham.team.domain.TaskCategory.class.getName());
+            createCache(cm, bham.team.domain.Category.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

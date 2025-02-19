@@ -3,53 +3,54 @@ import dayjs from 'dayjs/esm';
 import { INotification, NewNotification } from './notification.model';
 
 export const sampleWithRequiredData: INotification = {
-  id: 3934,
-  message: 'why pfft highly',
+  id: 19266,
+  message: 'so instead',
   notificationType: 'SYSTEM_UPDATE',
-  timestamp: dayjs('2025-02-02T23:10'),
-  read: true,
-  priority: 'LOW',
+  timestamp: dayjs('2025-02-03T11:00'),
+  read: false,
+  priority: 'CRITICAL',
   status: 'PENDING',
-  isRecurring: false,
+  isRecurring: true,
   sentVia: 'PUSH',
 };
 
 export const sampleWithPartialData: INotification = {
-  id: 9793,
-  message: 'adventurously tromp into',
+  id: 22007,
+  message: 'enormously rebuff',
   notificationType: 'SYSTEM_UPDATE',
-  timestamp: dayjs('2025-02-03T02:39'),
-  read: false,
-  priority: 'LOW',
-  status: 'PENDING',
-  expirationDate: dayjs('2025-02-03T01:59'),
-  isRecurring: false,
-  sentVia: 'SMS',
-};
-
-export const sampleWithFullData: INotification = {
-  id: 10494,
-  message: 'furthermore now',
-  notificationType: 'SYSTEM_UPDATE',
-  timestamp: dayjs('2025-02-02T23:09'),
-  linkedEntityType: 'when fleck next',
+  timestamp: dayjs('2025-02-03T08:30'),
   read: true,
-  priority: 'CRITICAL',
-  status: 'SENT',
-  expirationDate: dayjs('2025-02-02T18:15'),
-  actionURL: 'leading',
-  icon: 'scaffold',
+  priority: 'HIGH',
+  status: 'PENDING',
+  actionURL: 'palatable duh',
+  icon: 'aw furthermore',
   isRecurring: false,
-  recurrencePattern: 'at confound',
   sentVia: 'EMAIL',
 };
 
-export const sampleWithNewData: NewNotification = {
-  message: 'whose',
-  notificationType: 'SYSTEM_UPDATE',
-  timestamp: dayjs('2025-02-03T04:01'),
+export const sampleWithFullData: INotification = {
+  id: 18273,
+  message: 'rotten',
+  notificationType: 'DEADLINE',
+  timestamp: dayjs('2025-02-02T19:20'),
+  linkedEntityType: 'aside',
   read: true,
-  priority: 'MEDIUM',
+  priority: 'LOW',
+  status: 'SENT',
+  expirationDate: dayjs('2025-02-03T03:04'),
+  actionURL: 'annually lighthearted',
+  icon: 'bah video',
+  isRecurring: false,
+  recurrencePattern: 'satisfy table',
+  sentVia: 'PUSH',
+};
+
+export const sampleWithNewData: NewNotification = {
+  message: 'savour',
+  notificationType: 'SYSTEM_UPDATE',
+  timestamp: dayjs('2025-02-02T17:51'),
+  read: true,
+  priority: 'LOW',
   status: 'SENT',
   isRecurring: true,
   sentVia: 'PUSH',

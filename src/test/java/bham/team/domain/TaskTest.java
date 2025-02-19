@@ -1,6 +1,6 @@
 package bham.team.domain;
 
-import static bham.team.domain.TaskCategoryTestSamples.*;
+import static bham.team.domain.CategoryTestSamples.*;
 import static bham.team.domain.TaskTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,10 +26,10 @@ class TaskTest {
     @Test
     void categoryTest() {
         Task task = getTaskRandomSampleGenerator();
-        TaskCategory taskCategoryBack = getTaskCategoryRandomSampleGenerator();
+        Category categoryBack = getCategoryRandomSampleGenerator();
 
-        task.setCategory(taskCategoryBack);
-        assertThat(task.getCategory()).isEqualTo(taskCategoryBack);
+        task.setCategory(categoryBack);
+        assertThat(task.getCategory()).isEqualTo(categoryBack);
 
         task.category(null);
         assertThat(task.getCategory()).isNull();

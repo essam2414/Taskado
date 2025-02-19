@@ -49,10 +49,10 @@ describe('PomodoroSession Management Update Component', () => {
   describe('ngOnInit', () => {
     it('Should call User query and add missing value', () => {
       const pomodoroSession: IPomodoroSession = { id: 456 };
-      const user: IUser = { id: 27679 };
+      const user: IUser = { id: 20921 };
       pomodoroSession.user = user;
 
-      const userCollection: IUser[] = [{ id: 19852 }];
+      const userCollection: IUser[] = [{ id: 7979 }];
       jest.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
       const additionalUsers = [user];
       const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
@@ -71,7 +71,7 @@ describe('PomodoroSession Management Update Component', () => {
 
     it('Should update editForm', () => {
       const pomodoroSession: IPomodoroSession = { id: 456 };
-      const user: IUser = { id: 29314 };
+      const user: IUser = { id: 3893 };
       pomodoroSession.user = user;
 
       activatedRoute.data = of({ pomodoroSession });

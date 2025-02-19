@@ -14,7 +14,7 @@
                                  baseTableName="task"
                                  constraintName="fk_task__category_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="task_category"
+                                 referencedTableName="category"
                                  />
 
         <addForeignKeyConstraint baseColumnNames="user_id"

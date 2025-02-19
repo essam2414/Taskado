@@ -19,6 +19,7 @@ type TaskCategoryFormDefaults = Pick<NewTaskCategory, 'id'>;
 type TaskCategoryFormGroupContent = {
   id: FormControl<ITaskCategory['id'] | NewTaskCategory['id']>;
   name: FormControl<ITaskCategory['name']>;
+  color: FormControl<ITaskCategory['color']>;
 };
 
 export type TaskCategoryFormGroup = FormGroup<TaskCategoryFormGroupContent>;
@@ -39,6 +40,9 @@ export class TaskCategoryFormService {
         },
       ),
       name: new FormControl(taskCategoryRawValue.name, {
+        validators: [Validators.required],
+      }),
+      color: new FormControl(taskCategoryRawValue.color, {
         validators: [Validators.required],
       }),
     });

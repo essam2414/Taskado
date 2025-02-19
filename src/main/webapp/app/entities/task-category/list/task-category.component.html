@@ -49,6 +49,13 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="color">
+              <div class="d-flex">
+                <span>Color</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -59,6 +66,7 @@
                 <a [routerLink]="['/task-category', taskCategory.id, 'view']">{{ taskCategory.id }}</a>
               </td>
               <td>{{ taskCategory.name }}</td>
+              <td>{{ taskCategory.color }}</td>
               <td class="text-end">
                 <div class="btn-group">
                   <a [routerLink]="['/task-category', taskCategory.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

@@ -8,6 +8,11 @@
       "fieldName": "name",
       "fieldType": "String",
       "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "color",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
     }
   ],
   "name": "TaskCategory",

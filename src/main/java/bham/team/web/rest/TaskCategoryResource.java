@@ -126,6 +126,9 @@ public class TaskCategoryResource {
                 if (taskCategory.getName() != null) {
                     existingTaskCategory.setName(taskCategory.getName());
                 }
+                if (taskCategory.getColor() != null) {
+                    existingTaskCategory.setColor(taskCategory.getColor());
+                }
 
                 return existingTaskCategory;
             })

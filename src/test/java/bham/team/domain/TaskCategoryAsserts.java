@@ -47,7 +47,8 @@ public class TaskCategoryAsserts {
     public static void assertTaskCategoryUpdatableFieldsEquals(TaskCategory expected, TaskCategory actual) {
         assertThat(expected)
             .as("Verify TaskCategory relevant properties")
-            .satisfies(e -> assertThat(e.getName()).as("check name").isEqualTo(actual.getName()));
+            .satisfies(e -> assertThat(e.getName()).as("check name").isEqualTo(actual.getName()))
+            .satisfies(e -> assertThat(e.getColor()).as("check color").isEqualTo(actual.getColor()));
     }
 
     /**

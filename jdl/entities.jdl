@@ -1,5 +1,6 @@
-entity TaskCategory {
-  name String required unique
+entity Category {
+  name String required unique,
+  color String required
 }
 
 entity Task {
@@ -100,7 +101,7 @@ entity PomodoroSession {
 }
 
 relationship ManyToOne {
-  Task{category} to TaskCategory,
+  Task{category} to Category,
   Task{user} to User with builtInEntity,
   Habit{user} to User with builtInEntity,
   Event{user} to User with builtInEntity,
