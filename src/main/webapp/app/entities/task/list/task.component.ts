@@ -82,7 +82,7 @@ export class TaskComponent implements OnInit {
     const date = dayjs(dueDate);
     const now = dayjs();
     const isNextYear = date.year() > now.year();
-    return date.format(`D MMMM${isNextYear ? ' YYYY' : ''} HH:mm`);
+    return date.format(`D MMM${isNextYear ? ' YYYY' : ''} HH:mm`);
   }
 
   viewTask(task: ITask): void {
