@@ -26,7 +26,6 @@
       "Goal",
       "ProductivityReport",
       "PomodoroSession",
-      "TaskCategory",
       "Category"
     ],
     "feignClient": null,

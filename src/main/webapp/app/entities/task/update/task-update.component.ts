@@ -7,8 +7,8 @@ import { finalize, map } from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { ITaskCategory } from 'app/entities/task-category/task-category.model';
-import { TaskCategoryService } from 'app/entities/task-category/service/task-category.service';
+import { ICategory } from 'app/entities/category/category.model';
+import { CategoryService } from 'app/entities/category/service/category.service';
 import { IUser } from 'app/entities/user/user.model';
 import { UserService } from 'app/entities/user/service/user.service';
 import { Priority } from 'app/entities/enumerations/priority.model';
@@ -27,20 +27,19 @@ export class TaskUpdateComponent implements OnInit {
   task: ITask | null = null;
   priorityValues = Object.keys(Priority);
 
-  taskCategoriesSharedCollection: ITaskCategory[] = [];
+  categoriesSharedCollection: ICategory[] = [];
   usersSharedCollection: IUser[] = [];
 
   protected taskService = inject(TaskService);
   protected taskFormService = inject(TaskFormService);
-  protected taskCategoryService = inject(TaskCategoryService);
+  protected categoryService = inject(CategoryService);
   protected userService = inject(UserService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: TaskFormGroup = this.taskFormService.createTaskFormGroup();
 
-  compareTaskCategory = (o1: ITaskCategory | null, o2: ITaskCategory | null): boolean =>
-    this.taskCategoryService.compareTaskCategory(o1, o2);
+  compareCategory = (o1: ICategory | null, o2: ICategory | null): boolean => this.categoryService.compareCategory(o1, o2);
 
   compareUser = (o1: IUser | null, o2: IUser | null): boolean => this.userService.compareUser(o1, o2);
 
@@ -92,23 +91,21 @@ export class TaskUpdateComponent implements OnInit {
     this.task = task;
     this.taskFormService.resetForm(this.editForm, task);
 
-    this.taskCategoriesSharedCollection = this.taskCategoryService.addTaskCategoryToCollectionIfMissing<ITaskCategory>(
-      this.taskCategoriesSharedCollection,
+    this.categoriesSharedCollection = this.categoryService.addCategoryToCollectionIfMissing<ICategory>(
+      this.categoriesSharedCollection,
       task.category,
     );
     this.usersSharedCollection = this.userService.addUserToCollectionIfMissing<IUser>(this.usersSharedCollection, task.user);
   }
 
   protected loadRelationshipsOptions(): void {
-    this.taskCategoryService
+    this.categoryService
       .query()
-      .pipe(map((res: HttpResponse<ITaskCategory[]>) => res.body ?? []))
+      .pipe(map((res: HttpResponse<ICategory[]>) => res.body ?? []))
       .pipe(
-        map((taskCategories: ITaskCategory[]) =>
-          this.taskCategoryService.addTaskCategoryToCollectionIfMissing<ITaskCategory>(taskCategories, this.task?.category),
-        ),
+        map((categories: ICategory[]) => this.categoryService.addCategoryToCollectionIfMissing<ICategory>(categories, this.task?.category)),
       )
-      .subscribe((taskCategories: ITaskCategory[]) => (this.taskCategoriesSharedCollection = taskCategories));
+      .subscribe((categories: ICategory[]) => (this.categoriesSharedCollection = categories));
 
     this.userService
       .query()

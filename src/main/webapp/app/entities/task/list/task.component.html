@@ -40,7 +40,7 @@
             <td>
               @if (task.category) {
                 <div>
-                  <a [routerLink]="['/task-category', task.category.id, 'view']">{{ task.category.id }}</a>
+                  <a [routerLink]="['/category', task.category.id, 'view']">{{ task.category.name }}</a>
                 </div>
               }
             </td>

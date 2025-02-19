@@ -4,8 +4,8 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, from, of } from 'rxjs';
 
-import { ITaskCategory } from 'app/entities/task-category/task-category.model';
-import { TaskCategoryService } from 'app/entities/task-category/service/task-category.service';
+import { ICategory } from 'app/entities/category/category.model';
+import { CategoryService } from 'app/entities/category/service/category.service';
 import { IUser } from 'app/entities/user/user.model';
 import { UserService } from 'app/entities/user/service/user.service';
 import { ITask } from '../task.model';
@@ -20,7 +20,7 @@ describe('Task Management Update Component', () => {
   let activatedRoute: ActivatedRoute;
   let taskFormService: TaskFormService;
   let taskService: TaskService;
-  let taskCategoryService: TaskCategoryService;
+  let categoryService: CategoryService;
   let userService: UserService;
 
   beforeEach(() => {
@@ -44,33 +44,33 @@ describe('Task Management Update Component', () => {
     activatedRoute = TestBed.inject(ActivatedRoute);
     taskFormService = TestBed.inject(TaskFormService);
     taskService = TestBed.inject(TaskService);
-    taskCategoryService = TestBed.inject(TaskCategoryService);
+    categoryService = TestBed.inject(CategoryService);
     userService = TestBed.inject(UserService);
 
     comp = fixture.componentInstance;
   });
 
   describe('ngOnInit', () => {
-    it('Should call TaskCategory query and add missing value', () => {
+    it('Should call Category query and add missing value', () => {
       const task: ITask = { id: 456 };
-      const category: ITaskCategory = { id: 11499 };
+      const category: ICategory = { id: 11499 };
       task.category = category;
 
-      const taskCategoryCollection: ITaskCategory[] = [{ id: 11972 }];
-      jest.spyOn(taskCategoryService, 'query').mockReturnValue(of(new HttpResponse({ body: taskCategoryCollection })));
-      const additionalTaskCategories = [category];
-      const expectedCollection: ITaskCategory[] = [...additionalTaskCategories, ...taskCategoryCollection];
-      jest.spyOn(taskCategoryService, 'addTaskCategoryToCollectionIfMissing').mockReturnValue(expectedCollection);
+      const categoryCollection: ICategory[] = [{ id: 11972 }];
+      jest.spyOn(categoryService, 'query').mockReturnValue(of(new HttpResponse({ body: categoryCollection })));
+      const additionalCategories = [category];
+      const expectedCollection: ICategory[] = [...additionalCategories, ...categoryCollection];
+      jest.spyOn(categoryService, 'addCategoryToCollectionIfMissing').mockReturnValue(expectedCollection);
 
       activatedRoute.data = of({ task });
       comp.ngOnInit();
 
-      expect(taskCategoryService.query).toHaveBeenCalled();
-      expect(taskCategoryService.addTaskCategoryToCollectionIfMissing).toHaveBeenCalledWith(
-        taskCategoryCollection,
-        ...additionalTaskCategories.map(expect.objectContaining),
+      expect(categoryService.query).toHaveBeenCalled();
+      expect(categoryService.addCategoryToCollectionIfMissing).toHaveBeenCalledWith(
+        categoryCollection,
+        ...additionalCategories.map(expect.objectContaining),
       );
-      expect(comp.taskCategoriesSharedCollection).toEqual(expectedCollection);
+      expect(comp.categoriesSharedCollection).toEqual(expectedCollection);
     });
 
     it('Should call User query and add missing value', () => {
@@ -97,7 +97,7 @@ describe('Task Management Update Component', () => {
 
     it('Should update editForm', () => {
       const task: ITask = { id: 456 };
-      const category: ITaskCategory = { id: 3454 };
+      const category: ICategory = { id: 3454 };
       task.category = category;
       const user: IUser = { id: 32413 };
       task.user = user;
@@ -105,7 +105,7 @@ describe('Task Management Update Component', () => {
       activatedRoute.data = of({ task });
       comp.ngOnInit();
 
-      expect(comp.taskCategoriesSharedCollection).toContain(category);
+      expect(comp.categoriesSharedCollection).toContain(category);
       expect(comp.usersSharedCollection).toContain(user);
       expect(comp.task).toEqual(task);
     });
@@ -180,13 +180,13 @@ describe('Task Management Update Component', () => {
   });
 
   describe('Compare relationships', () => {
-    describe('compareTaskCategory', () => {
-      it('Should forward to taskCategoryService', () => {
+    describe('compareCategory', () => {
+      it('Should forward to categoryService', () => {
         const entity = { id: 123 };
         const entity2 = { id: 456 };
-        jest.spyOn(taskCategoryService, 'compareTaskCategory');
-        comp.compareTaskCategory(entity, entity2);
-        expect(taskCategoryService.compareTaskCategory).toHaveBeenCalledWith(entity, entity2);
+        jest.spyOn(categoryService, 'compareCategory');
+        comp.compareCategory(entity, entity2);
+        expect(categoryService.compareCategory).toHaveBeenCalledWith(entity, entity2);
       });
     });
 

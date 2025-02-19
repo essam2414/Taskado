@@ -42,11 +42,6 @@ const routes: Routes = [
     loadChildren: () => import('./productivity-report/productivity-report.routes'),
   },
   {
-    path: 'task-category',
-    data: { pageTitle: 'TaskCategories' },
-    loadChildren: () => import('./task-category/task-category.routes'),
-  },
-  {
     path: 'category',
     data: { pageTitle: 'Categories' },
     loadChildren: () => import('./category/category.routes'),

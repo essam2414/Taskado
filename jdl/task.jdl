@@ -21,6 +21,6 @@ enum TaskPriority {
 }
 
 relationship ManyToOne {
-  Task{category} to TaskCategory  
+  Task{category} to Category  
   Task{user} to User
 }

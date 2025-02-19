@@ -73,11 +73,11 @@
             data-cy="category"
             name="category"
             formControlName="category"
-            [compareWith]="compareTaskCategory"
+            [compareWith]="compareCategory"
           >
             <option [ngValue]="null"></option>
-            @for (taskCategoryOption of taskCategoriesSharedCollection; track $index) {
-              <option [ngValue]="taskCategoryOption">{{ taskCategoryOption.id }}</option>
+            @for (categoryOption of categoriesSharedCollection; track $index) {
+              <option [ngValue]="categoryOption">{{ categoryOption.id }}</option>
             }
           </select>
         </div>
