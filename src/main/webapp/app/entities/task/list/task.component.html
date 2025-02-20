@@ -9,7 +9,13 @@
     <table class="table table-hover" aria-describedby="page-heading">
       <tbody>
         @for (task of tasks; track trackId(task)) {
-          <tr data-cy="entityTable" (click)="viewTask(task)" class="task-row" [ngClass]="{ completed: task.completed }">
+          <tr
+            data-cy="entityTable"
+            [class.completed]="task.completed"
+            [class.non-clickable]="task.completed"
+            (click)="!task.completed && editTask(task)"
+            class="task-row"
+          >
             <td>
               <div class="form-check d-flex gap-4">
                 <input
@@ -39,8 +45,8 @@
 
             <td>
               @if (task.category) {
-                <div>
-                  <a [routerLink]="['/category', task.category.id, 'view']">{{ task.category.name }}</a>
+                <div class="task-category" [ngStyle]="{ 'background-color': task.category.color }">
+                  {{ task.category.name }}
                 </div>
               }
             </td>

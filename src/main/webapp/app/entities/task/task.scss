@@ -6,17 +6,17 @@
   padding: 20px 20px;
 }
 
-.completed td {
-  color: #ddd;
-}
-
-.completed .task-description {
-  color: #ddd;
-}
-
 .completed .task-title {
   text-decoration: line-through;
-  color: #aaa;
+}
+
+.non-clickable {
+  pointer-events: none; /* Disables clicking */
+  opacity: 0.4; /* Fades completed tasks */
+}
+
+.non-clickable .custom-checkbox {
+  pointer-events: auto; /* Allows checkbox clicks */
 }
 
 .custom-checkbox {
@@ -53,6 +53,17 @@
   font-size: 16px;
   font-weight: 200;
   color: #888;
+}
+
+.task-category {
+  display: inline-block;
+  border-radius: 8px;
+  text-align: center;
+  color: white;
+  font-weight: 400;
+  font-size: 12px;
+  padding: 4px 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .task-priority {
