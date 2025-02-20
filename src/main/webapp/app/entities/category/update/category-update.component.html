@@ -26,14 +26,17 @@
           }
         </div>
 
-        @let colorRef = editForm.get('color')!;
         <div class="mb-3">
-          <label class="form-label" for="field_color">Color</label>
-          <select class="form-control" id="field_color" data-cy="categoryColor" name="color" formControlName="color">
-            <option *ngFor="let color of categoryColors" [ngValue]="color.value">
-              {{ color.name }}
-            </option>
-          </select>
+          <label class="form-label">Color</label>
+          <div class="color-dropdown">
+            <div
+              *ngFor="let color of categoryColors"
+              class="color-option"
+              [style.background-color]="color.value"
+              [class.selected]="isSelectedColor(color.value)"
+              (click)="selectColor(color.value)"
+            ></div>
+          </div>
         </div>
       </div>
 
