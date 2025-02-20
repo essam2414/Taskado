@@ -1,13 +1,57 @@
 <div>
-  <h2 id="page-heading" data-cy="TaskHeading">
-    <span>Tasks</span>
+  <h2 id="page-heading" data-cy="TaskHeading">Tasks</h2>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
-        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
-        <span>Refresh list</span>
-      </button>
+  <jhi-alert-error></jhi-alert-error>
 
+  <jhi-alert></jhi-alert>
+
+  <div class="table-responsive table-entities" id="entities">
+    <table class="table table-hover" aria-describedby="page-heading">
+      <tbody>
+        @for (task of tasks; track trackId(task)) {
+          <tr data-cy="entityTable" (click)="viewTask(task)" class="task-row" [ngClass]="{ completed: task.completed }">
+            <td>
+              <div class="form-check d-flex gap-4">
+                <input
+                  class="form-check-input custom-checkbox"
+                  type="checkbox"
+                  [checked]="task.completed"
+                  (change)="toggleCompleted(task)"
+                  (click)="$event.stopPropagation()"
+                  id="task-{{ task.id }}"
+                />
+
+                <label class="form-check-label" for="task-{{ task.id }}">
+                  <div class="task-title">{{ task.title }}</div>
+                  <div class="task-description">{{ task.description }}</div>
+                </label>
+              </div>
+            </td>
+
+            <td class="task-priority">
+              <span class="priority-dot" [ngClass]="task.priority"></span>
+              {{
+                { null: '', LOW: 'Low Priority', MEDIUM: 'Medium Priority', HIGH: 'High Priority', CRITICAL: 'Critical Priority' }[
+                  task.priority ?? 'null'
+                ]
+              }}
+            </td>
+
+            <td>
+              @if (task.category) {
+                <div>
+                  <a [routerLink]="['/category', task.category.id, 'view']">{{ task.category.name }}</a>
+                </div>
+              }
+            </td>
+
+            <td class="task-date">{{ formatTaskDate(task.dueDate) }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="d-flex justify-content-start">
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
@@ -15,143 +59,8 @@
         [routerLink]="['/task/new']"
       >
         <fa-icon icon="plus"></fa-icon>
-        <span>Create a new Task</span>
+        <span>Add task</span>
       </button>
     </div>
-  </h2>
-
-  <jhi-alert-error></jhi-alert-error>
-
-  <jhi-alert></jhi-alert>
-
-  @if (tasks?.length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span>No Tasks found</span>
-    </div>
-  }
-
-  @if (tasks && tasks.length > 0) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
-          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span>ID</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="title">
-              <div class="d-flex">
-                <span>Title</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="description">
-              <div class="d-flex">
-                <span>Description</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="dueDate">
-              <div class="d-flex">
-                <span>Due Date</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="priority">
-              <div class="d-flex">
-                <span>Priority</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="category">
-              <div class="d-flex">
-                <span>Category</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="completed">
-              <div class="d-flex">
-                <span>Completed</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="createdAt">
-              <div class="d-flex">
-                <span>Created At</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="updatedAt">
-              <div class="d-flex">
-                <span>Updated At</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="user.id">
-              <div class="d-flex">
-                <span>User</span>
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (task of tasks; track trackId(task)) {
-            <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/task', task.id, 'view']">{{ task.id }}</a>
-              </td>
-              <td>{{ task.title }}</td>
-              <td>{{ task.description }}</td>
-              <td>{{ task.dueDate | formatMediumDatetime }}</td>
-              <td>{{ { null: '', LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' }[task.priority ?? 'null'] }}</td>
-              <td>
-                {{
-                  { null: '', WORK: 'WORK', PERSONAL: 'PERSONAL', HEALTH: 'HEALTH', EDUCATION: 'EDUCATION', OTHER: 'OTHER' }[
-                    task.category ?? 'null'
-                  ]
-                }}
-              </td>
-              <td>{{ task.completed }}</td>
-              <td>{{ task.createdAt | formatMediumDatetime }}</td>
-              <td>{{ task.updatedAt | formatMediumDatetime }}</td>
-              <td>
-                {{ task.user?.id }}
-              </td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/task', task.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline">View</span>
-                  </a>
-
-                  <a [routerLink]="['/task', task.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline">Edit</span>
-                  </a>
-
-                  <button type="submit" (click)="delete(task)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  }
+  </div>
 </div>

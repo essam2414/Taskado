@@ -133,9 +133,6 @@ public class TaskResource {
                 if (task.getPriority() != null) {
                     existingTask.setPriority(task.getPriority());
                 }
-                if (task.getCategory() != null) {
-                    existingTask.setCategory(task.getCategory());
-                }
                 if (task.getCompleted() != null) {
                     existingTask.setCompleted(task.getCompleted());
                 }

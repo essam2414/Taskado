@@ -3,32 +3,30 @@ import dayjs from 'dayjs/esm';
 import { IGoal, NewGoal } from './goal.model';
 
 export const sampleWithRequiredData: IGoal = {
-  id: 7689,
-  title: 'instead',
-  startDate: dayjs('2025-02-04T00:17'),
+  id: 25605,
+  title: 'yet',
+  startDate: dayjs('2025-02-04T00:24'),
 };
 
 export const sampleWithPartialData: IGoal = {
-  id: 16504,
-  title: 'poetry although why',
-  description: 'worst deform solidly',
-  startDate: dayjs('2025-02-03T23:51'),
-  endDate: dayjs('2025-02-04T07:45'),
-  progress: 14828,
+  id: 15627,
+  title: 'basic throughout',
+  startDate: dayjs('2025-02-04T01:07'),
+  progress: 1497,
 };
 
 export const sampleWithFullData: IGoal = {
-  id: 5323,
-  title: 'failing',
-  description: 'until unabashedly seldom',
-  startDate: dayjs('2025-02-04T04:37'),
-  endDate: dayjs('2025-02-04T01:08'),
-  progress: 27191,
+  id: 29077,
+  title: 'roger writhing revere',
+  description: 'finally',
+  startDate: dayjs('2025-02-04T00:27'),
+  endDate: dayjs('2025-02-04T04:05'),
+  progress: 24698,
 };
 
 export const sampleWithNewData: NewGoal = {
-  title: 'busily',
-  startDate: dayjs('2025-02-03T22:20'),
+  title: 'towards',
+  startDate: dayjs('2025-02-04T08:20'),
   id: null,
 };
 

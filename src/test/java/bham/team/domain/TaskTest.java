@@ -1,5 +1,6 @@
 package bham.team.domain;
 
+import static bham.team.domain.CategoryTestSamples.*;
 import static bham.team.domain.TaskTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,5 +21,17 @@ class TaskTest {
 
         task2 = getTaskSample2();
         assertThat(task1).isNotEqualTo(task2);
+    }
+
+    @Test
+    void categoryTest() {
+        Task task = getTaskRandomSampleGenerator();
+        Category categoryBack = getCategoryRandomSampleGenerator();
+
+        task.setCategory(categoryBack);
+        assertThat(task.getCategory()).isEqualTo(categoryBack);
+
+        task.category(null);
+        assertThat(task.getCategory()).isNull();
     }
 }

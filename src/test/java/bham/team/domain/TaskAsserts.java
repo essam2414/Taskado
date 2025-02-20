@@ -51,7 +51,6 @@ public class TaskAsserts {
             .satisfies(e -> assertThat(e.getDescription()).as("check description").isEqualTo(actual.getDescription()))
             .satisfies(e -> assertThat(e.getDueDate()).as("check dueDate").isEqualTo(actual.getDueDate()))
             .satisfies(e -> assertThat(e.getPriority()).as("check priority").isEqualTo(actual.getPriority()))
-            .satisfies(e -> assertThat(e.getCategory()).as("check category").isEqualTo(actual.getCategory()))
             .satisfies(e -> assertThat(e.getCompleted()).as("check completed").isEqualTo(actual.getCompleted()))
             .satisfies(e -> assertThat(e.getCreatedAt()).as("check createdAt").isEqualTo(actual.getCreatedAt()))
             .satisfies(e -> assertThat(e.getUpdatedAt()).as("check updatedAt").isEqualTo(actual.getUpdatedAt()));
@@ -64,6 +63,8 @@ public class TaskAsserts {
      * @param actual the actual entity
      */
     public static void assertTaskUpdatableRelationshipsEquals(Task expected, Task actual) {
-        // empty method
+        assertThat(expected)
+            .as("Verify Task relationships")
+            .satisfies(e -> assertThat(e.getCategory()).as("check category").isEqualTo(actual.getCategory()));
     }
 }

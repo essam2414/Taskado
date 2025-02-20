@@ -1,7 +1,6 @@
 package bham.team.domain;
 
 import bham.team.domain.enumeration.Priority;
-import bham.team.domain.enumeration.TaskCategory;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -33,17 +32,12 @@ public class Task implements Serializable {
     @Column(name = "description")
     private String description;
 
-    @NotNull
-    @Column(name = "due_date", nullable = false)
+    @Column(name = "due_date")
     private Instant dueDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "priority")
     private Priority priority;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "category")
-    private TaskCategory category;
 
     @Column(name = "completed")
     private Boolean completed;
@@ -53,6 +47,9 @@ public class Task implements Serializable {
 
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
@@ -124,19 +121,6 @@ public class Task implements Serializable {
         this.priority = priority;
     }
 
-    public TaskCategory getCategory() {
-        return this.category;
-    }
-
-    public Task category(TaskCategory category) {
-        this.setCategory(category);
-        return this;
-    }
-
-    public void setCategory(TaskCategory category) {
-        this.category = category;
-    }
-
     public Boolean getCompleted() {
         return this.completed;
     }
@@ -174,6 +158,19 @@ public class Task implements Serializable {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Category getCategory() {
+        return this.category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public Task category(Category category) {
+        this.setCategory(category);
+        return this;
     }
 
     public User getUser() {
@@ -217,7 +214,6 @@ public class Task implements Serializable {
             ", description='" + getDescription() + "'" +
             ", dueDate='" + getDueDate() + "'" +
             ", priority='" + getPriority() + "'" +
-            ", category='" + getCategory() + "'" +
             ", completed='" + getCompleted() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             ", updatedAt='" + getUpdatedAt() + "'" +

@@ -1,11 +1,11 @@
-id;title;description;due_date;priority;category;completed;created_at;updated_at
-1;ugh dead boring;jealous;2025-01-31T06:00:20;CRITICAL;EDUCATION;false;2025-01-31T03:14:23;2025-01-31T07:22:17
-2;representation excited hard-to-find;tightly spork foolishly;2025-01-31T13:43:27;CRITICAL;HEALTH;true;2025-01-31T17:12:51;2025-01-31T04:33:35
-3;though;shrill recompense fisherman;2025-01-31T14:14:30;LOW;HEALTH;true;2025-01-31T06:01:13;2025-01-31T14:08:14
-4;aircraft;ouch low;2025-01-31T17:00:06;MEDIUM;PERSONAL;true;2025-01-31T20:36:30;2025-01-31T01:46:45
-5;versus to;quirkily than;2025-01-31T00:32:10;LOW;PERSONAL;true;2025-01-31T17:26:04;2025-01-31T15:23:32
-6;convince;onto ah;2025-01-31T05:07:27;MEDIUM;EDUCATION;false;2025-01-30T23:31:50;2025-01-31T15:11:32
-7;scaffold;litter while lest;2025-01-30T22:24:23;CRITICAL;WORK;false;2025-01-31T16:35:33;2025-01-31T05:41:30
-8;uniform yawningly enormously;assist first upwardly;2025-01-31T09:37:03;MEDIUM;WORK;false;2025-01-30T22:17:48;2025-01-31T10:03:51
-9;er;since unlike;2025-01-31T05:43:03;HIGH;OTHER;false;2025-01-31T14:10:43;2025-01-31T09:19:45
-10;abnegate tabulate gadzooks;safeguard sign upside-down;2025-01-31T18:07:32;LOW;HEALTH;true;2025-01-31T00:23:58;2025-01-31T17:51:42
+id;title;description;due_date;priority;completed;created_at;updated_at
+1;ugh dead boring;jealous;2025-01-31T06:00:20;CRITICAL;false;2025-01-31T20:32:05;2025-01-31T03:14:23
+2;er puritan;hard-to-find;2025-01-31T20:56:04;CRITICAL;true;2025-01-30T21:34:49;2025-01-31T18:02:21
+3;once silver whereas;and;2025-01-31T13:34:42;HIGH;false;2025-01-31T09:26:29;2025-01-31T17:16:25
+4;democratize ready yowza;for annually;2025-01-31T10:56:29;CRITICAL;false;2025-01-31T02:40:00;2025-01-31T13:16:32
+5;embossing and;pace;2025-01-31T18:33:52;MEDIUM;false;2025-01-31T09:36:23;2025-01-31T06:28:27
+6;bench above kindly;gah;2025-01-30T23:15:55;LOW;true;2025-01-30T22:37:40;2025-01-31T12:59:34
+7;exterior;broadly;2025-01-31T04:30:10;LOW;false;2025-01-31T09:16:38;2025-01-31T16:19:07
+8;litter while lest;major;2025-01-31T06:27:33;MEDIUM;true;2025-01-31T10:56:40;2025-01-31T13:00:30
+9;yawningly enormously blah;first;2025-01-31T07:32:08;LOW;true;2025-01-31T18:53:18;2025-01-31T13:39:47
+10;or;er;2025-01-31T10:51:05;CRITICAL;false;2025-01-31T01:17:50;2025-01-31T11:42:54

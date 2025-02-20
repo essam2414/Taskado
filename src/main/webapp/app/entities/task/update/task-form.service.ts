@@ -37,10 +37,10 @@ type TaskFormGroupContent = {
   description: FormControl<TaskFormRawValue['description']>;
   dueDate: FormControl<TaskFormRawValue['dueDate']>;
   priority: FormControl<TaskFormRawValue['priority']>;
-  category: FormControl<TaskFormRawValue['category']>;
   completed: FormControl<TaskFormRawValue['completed']>;
   createdAt: FormControl<TaskFormRawValue['createdAt']>;
   updatedAt: FormControl<TaskFormRawValue['updatedAt']>;
+  category: FormControl<TaskFormRawValue['category']>;
   user: FormControl<TaskFormRawValue['user']>;
 };
 
@@ -65,14 +65,12 @@ export class TaskFormService {
         validators: [Validators.required],
       }),
       description: new FormControl(taskRawValue.description),
-      dueDate: new FormControl(taskRawValue.dueDate, {
-        validators: [Validators.required],
-      }),
+      dueDate: new FormControl(taskRawValue.dueDate),
       priority: new FormControl(taskRawValue.priority),
-      category: new FormControl(taskRawValue.category),
       completed: new FormControl(taskRawValue.completed),
       createdAt: new FormControl(taskRawValue.createdAt),
       updatedAt: new FormControl(taskRawValue.updatedAt),
+      category: new FormControl(taskRawValue.category),
       user: new FormControl(taskRawValue.user),
     });
   }

@@ -3,28 +3,27 @@ import dayjs from 'dayjs/esm';
 import { IPomodoroSession, NewPomodoroSession } from './pomodoro-session.model';
 
 export const sampleWithRequiredData: IPomodoroSession = {
-  id: 6326,
-  start: dayjs('2025-02-11T01:03'),
+  id: 2135,
+  start: dayjs('2025-02-11T06:41'),
 };
 
 export const sampleWithPartialData: IPomodoroSession = {
-  id: 32009,
-  start: dayjs('2025-02-11T02:38'),
-  stop: dayjs('2025-02-11T14:58'),
-  duration: 1883,
-  paused: true,
+  id: 18407,
+  start: dayjs('2025-02-10T20:42'),
+  stop: dayjs('2025-02-11T06:45'),
+  duration: 2494,
 };
 
 export const sampleWithFullData: IPomodoroSession = {
-  id: 1713,
-  start: dayjs('2025-02-10T20:48'),
-  stop: dayjs('2025-02-11T17:01'),
-  duration: 10404,
-  paused: false,
+  id: 24440,
+  start: dayjs('2025-02-11T08:50'),
+  stop: dayjs('2025-02-11T10:15'),
+  duration: 21041,
+  paused: true,
 };
 
 export const sampleWithNewData: NewPomodoroSession = {
-  start: dayjs('2025-02-10T18:58'),
+  start: dayjs('2025-02-11T01:00'),
   id: null,
 };
 

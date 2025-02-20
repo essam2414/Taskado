@@ -4,10 +4,12 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, from, of } from 'rxjs';
 
+import { ICategory } from 'app/entities/category/category.model';
+import { CategoryService } from 'app/entities/category/service/category.service';
 import { IUser } from 'app/entities/user/user.model';
 import { UserService } from 'app/entities/user/service/user.service';
-import { TaskService } from '../service/task.service';
 import { ITask } from '../task.model';
+import { TaskService } from '../service/task.service';
 import { TaskFormService } from './task-form.service';
 
 import { TaskUpdateComponent } from './task-update.component';
@@ -18,6 +20,7 @@ describe('Task Management Update Component', () => {
   let activatedRoute: ActivatedRoute;
   let taskFormService: TaskFormService;
   let taskService: TaskService;
+  let categoryService: CategoryService;
   let userService: UserService;
 
   beforeEach(() => {
@@ -41,18 +44,41 @@ describe('Task Management Update Component', () => {
     activatedRoute = TestBed.inject(ActivatedRoute);
     taskFormService = TestBed.inject(TaskFormService);
     taskService = TestBed.inject(TaskService);
+    categoryService = TestBed.inject(CategoryService);
     userService = TestBed.inject(UserService);
 
     comp = fixture.componentInstance;
   });
 
   describe('ngOnInit', () => {
+    it('Should call Category query and add missing value', () => {
+      const task: ITask = { id: 456 };
+      const category: ICategory = { id: 11499 };
+      task.category = category;
+
+      const categoryCollection: ICategory[] = [{ id: 11972 }];
+      jest.spyOn(categoryService, 'query').mockReturnValue(of(new HttpResponse({ body: categoryCollection })));
+      const additionalCategories = [category];
+      const expectedCollection: ICategory[] = [...additionalCategories, ...categoryCollection];
+      jest.spyOn(categoryService, 'addCategoryToCollectionIfMissing').mockReturnValue(expectedCollection);
+
+      activatedRoute.data = of({ task });
+      comp.ngOnInit();
+
+      expect(categoryService.query).toHaveBeenCalled();
+      expect(categoryService.addCategoryToCollectionIfMissing).toHaveBeenCalledWith(
+        categoryCollection,
+        ...additionalCategories.map(expect.objectContaining),
+      );
+      expect(comp.categoriesSharedCollection).toEqual(expectedCollection);
+    });
+
     it('Should call User query and add missing value', () => {
       const task: ITask = { id: 456 };
-      const user: IUser = { id: 2689 };
+      const user: IUser = { id: 13635 };
       task.user = user;
 
-      const userCollection: IUser[] = [{ id: 8816 }];
+      const userCollection: IUser[] = [{ id: 29175 }];
       jest.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
       const additionalUsers = [user];
       const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
@@ -71,12 +97,15 @@ describe('Task Management Update Component', () => {
 
     it('Should update editForm', () => {
       const task: ITask = { id: 456 };
-      const user: IUser = { id: 2325 };
+      const category: ICategory = { id: 3454 };
+      task.category = category;
+      const user: IUser = { id: 32413 };
       task.user = user;
 
       activatedRoute.data = of({ task });
       comp.ngOnInit();
 
+      expect(comp.categoriesSharedCollection).toContain(category);
       expect(comp.usersSharedCollection).toContain(user);
       expect(comp.task).toEqual(task);
     });
@@ -151,6 +180,16 @@ describe('Task Management Update Component', () => {
   });
 
   describe('Compare relationships', () => {
+    describe('compareCategory', () => {
+      it('Should forward to categoryService', () => {
+        const entity = { id: 123 };
+        const entity2 = { id: 456 };
+        jest.spyOn(categoryService, 'compareCategory');
+        comp.compareCategory(entity, entity2);
+        expect(categoryService.compareCategory).toHaveBeenCalledWith(entity, entity2);
+      });
+    });
+
     describe('compareUser', () => {
       it('Should forward to userService', () => {
         const entity = { id: 123 };

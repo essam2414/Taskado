@@ -1,18 +1,26 @@
+entity Category {
+  name String required unique,
+  color String required
+}
+
 entity Task {
   title String required,
   description String,
-  dueDate Instant required,
-  priority Priority,
-  category TaskCategory,
+  dueDate Instant,
+  priority TaskPriority,
   completed Boolean,
   createdAt Instant,
   updatedAt Instant
 }
 
-enum TaskCategory {
-  WORK,
-  PERSONAL,
-  HEALTH,
-  EDUCATION,
-  OTHER
+enum TaskPriority {
+  LOW,
+  MEDIUM,
+  HIGH,
+  URGENT
+}
+
+relationship ManyToOne {
+  Task{category} to Category  
+  Task{user} to User
 }

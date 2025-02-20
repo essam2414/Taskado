@@ -15,18 +15,12 @@
     },
     {
       "fieldName": "dueDate",
-      "fieldType": "Instant",
-      "fieldValidateRules": ["required"]
+      "fieldType": "Instant"
     },
     {
       "fieldName": "priority",
       "fieldType": "Priority",
       "fieldValues": "LOW,MEDIUM,HIGH,CRITICAL"
-    },
-    {
-      "fieldName": "category",
-      "fieldType": "TaskCategory",
-      "fieldValues": "WORK,PERSONAL,HEALTH,EDUCATION,OTHER"
     },
     {
       "fieldName": "completed",
@@ -44,10 +38,17 @@
   "name": "Task",
   "relationships": [
     {
+      "otherEntityName": "category",
+      "relationshipName": "category",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
       "otherEntityName": "user",
       "relationshipName": "user",
       "relationshipSide": "left",
-      "relationshipType": "many-to-one"
+      "relationshipType": "many-to-one",
+      "relationshipWithBuiltInEntity": true
     }
   ],
   "searchEngine": "no"

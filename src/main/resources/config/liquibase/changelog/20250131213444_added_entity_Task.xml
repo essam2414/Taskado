@@ -21,12 +21,9 @@
                 <constraints nullable="true" />
             </column>
             <column name="due_date" type="${datetimeType}">
-                <constraints nullable="false" />
-            </column>
-            <column name="priority" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="category" type="varchar(255)">
+            <column name="priority" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
             <column name="completed" type="boolean">
@@ -36,6 +33,9 @@
                 <constraints nullable="true" />
             </column>
             <column name="updated_at" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="category_id" type="bigint">
                 <constraints nullable="true" />
             </column>
             <column name="user_id" type="bigint">
@@ -69,7 +69,6 @@
             <column name="description" type="string"/>
             <column name="due_date" type="date"/>
             <column name="priority" type="string"/>
-            <column name="category" type="string"/>
             <column name="completed" type="boolean"/>
             <column name="created_at" type="date"/>
             <column name="updated_at" type="date"/>

@@ -1,0 +1,87 @@
+.task-row {
+  cursor: pointer;
+}
+
+.task-row td {
+  padding: 20px 20px;
+}
+
+.completed td {
+  color: #ddd;
+}
+
+.completed .task-description {
+  color: #ddd;
+}
+
+.completed .task-title {
+  text-decoration: line-through;
+  color: #aaa;
+}
+
+.custom-checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  border: 1.5px solid gainsboro;
+  background-color: transparent;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+
+  &:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+
+  &:hover {
+    border-color: #0056b3;
+  }
+}
+
+.task-title,
+.task-description {
+  line-height: 1;
+}
+
+.task-title {
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+.task-description {
+  font-size: 16px;
+  font-weight: 200;
+  color: #888;
+}
+
+.task-priority {
+  color: #888;
+  font-weight: 400;
+}
+
+.priority-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.LOW {
+  background-color: #4caf50;
+}
+.MEDIUM {
+  background-color: #ffc107;
+}
+.HIGH {
+  background-color: #ff9800;
+}
+.CRITICAL {
+  background-color: #f44336;
+}
+
+.task-date {
+  text-align: right;
+  color: #888;
+}
