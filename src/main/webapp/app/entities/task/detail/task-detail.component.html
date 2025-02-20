@@ -1,59 +1,46 @@
 <div class="d-flex justify-content-center">
   <div class="col-8">
-    @if (task; as taskRef) {
-      <div>
-        <h2 data-cy="taskDetailsHeading"><span>Task</span></h2>
+    <div *ngIf="task as taskRef">
+      <h2 data-cy="taskDetailsHeading"><span>Task</span></h2>
 
-        <hr />
+      <hr />
 
-        <jhi-alert-error></jhi-alert-error>
+      <jhi-alert-error></jhi-alert-error>
 
-        <jhi-alert></jhi-alert>
+      <jhi-alert></jhi-alert>
 
-        <dl class="row-md jh-entity-details">
-          <dt><span>Title</span></dt>
-          <dd>
-            <span>{{ taskRef.title }}</span>
-          </dd>
-          <dt><span>Description</span></dt>
-          <dd>
-            <span>{{ taskRef.description }}</span>
-          </dd>
-          <dt><span>Due Date</span></dt>
-          <dd>
-            <span>{{ taskRef.dueDate | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span>Priority</span></dt>
-          <dd>
-            <span>{{ { null: '', LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' }[taskRef.priority ?? 'null'] }}</span>
-          </dd>
-          <dt><span>Completed</span></dt>
-          <dd>
-            <span>{{ taskRef.completed }}</span>
-          </dd>
-          <dt><span>Category</span></dt>
-          <dd>
-            @if (task!.category) {
-              <div>
-                <a [routerLink]="['/task-category', task!.category?.id, 'view']">{{ taskRef.category?.id }}</a>
-              </div>
-            }
-          </dd>
-        </dl>
+      <dl class="row-md jh-entity-details">
+        <dt><span>Title</span></dt>
+        <dd>
+          <span>{{ taskRef.title }}</span>
+        </dd>
+        <dt><span>Description</span></dt>
+        <dd>
+          <span>{{ taskRef.description }}</span>
+        </dd>
+        <dt><span>Due Date</span></dt>
+        <dd>
+          <span>{{ taskRef.dueDate | formatMediumDatetime }}</span>
+        </dd>
+        <dt><span>Priority</span></dt>
+        <dd>
+          <span>{{ { null: '', LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' }[taskRef.priority ?? 'null'] }}</span>
+        </dd>
+        <dt><span>Category</span></dt>
+        <dd>
+          <div *ngIf="task?.category">
+            <a [routerLink]="['/category', task.category?.id, 'view']">{{ taskRef.category?.name }}</a>
+          </div>
+        </dd>
+      </dl>
 
-        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
-        </button>
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+      </button>
 
-        <button type="button" [routerLink]="['/task', taskRef.id, 'edit']" class="btn btn-primary">
-          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
-        </button>
-
-        <button type="submit" (click)="delete(task)" class="btn btn-danger" data-cy="entityDeleteButton">
-          <fa-icon icon="times"></fa-icon>
-          <span class="d-none d-md-inline">Delete</span>
-        </button>
-      </div>
-    }
+      <button type="button" [routerLink]="['/task', taskRef.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+      </button>
+    </div>
   </div>
 </div>

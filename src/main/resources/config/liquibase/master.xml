@@ -17,18 +17,13 @@
     <property name="datetimeType" value="datetime" dbms="postgresql"/>
 
     <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
-
     <include file="config/liquibase/changelog/20250131213444_added_entity_Task.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20250201125830_added_entity_User.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250201142834_added_entity_Habit.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250201160503_added_entity_Event.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250203140952_added_entity_Notification.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20250203160421_added_entity_PomodoroSession.xml" relativeToChangelogFile="false"/>
-
     <include file="config/liquibase/changelog/20250204131827_added_entity_Goal.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250204150624_added_entity_ProductivityReport.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250211181401_added_entity_PomodoroSession.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20250218175151_added_entity_TaskCategory.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250219173514_added_entity_Category.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20250131213444_added_entity_constraints_Task.xml" relativeToChangelogFile="false"/>
