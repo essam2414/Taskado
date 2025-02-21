@@ -3,7 +3,7 @@ on: [push, pull_request]
 jobs:
   publish-docker:
     name: Publish Docker
-    if: contains(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/tags/')
+    if: contains(github.ref, 'refs/heads/main') || contains(github.ref, 'refs/heads/mvp') || startsWith(github.ref, 'refs/tags/')
     concurrency: # Ensures only one deploy job runs at a time
       group: deployment
     #runs-on: self-hosted means you need to set up self-hosted runners to run this job
