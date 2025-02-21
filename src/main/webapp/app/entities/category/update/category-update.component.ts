@@ -7,7 +7,7 @@ import { finalize } from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { ICategory } from '../category.model';
+import { ICategory, CATEGORY_COLORS } from '../category.model';
 import { CategoryService } from '../service/category.service';
 import { CategoryFormGroup, CategoryFormService } from './category-form.service';
 
@@ -15,11 +15,13 @@ import { CategoryFormGroup, CategoryFormService } from './category-form.service'
   standalone: true,
   selector: 'jhi-category-update',
   templateUrl: './category-update.component.html',
+  styleUrls: ['../category.scss'],
   imports: [SharedModule, FormsModule, ReactiveFormsModule],
 })
 export class CategoryUpdateComponent implements OnInit {
   isSaving = false;
   category: ICategory | null = null;
+  categoryColors = CATEGORY_COLORS;
 
   protected categoryService = inject(CategoryService);
   protected categoryFormService = inject(CategoryFormService);
@@ -49,6 +51,14 @@ export class CategoryUpdateComponent implements OnInit {
     } else {
       this.subscribeToSaveResponse(this.categoryService.create(category));
     }
+  }
+
+  selectColor(color: string): void {
+    this.editForm.patchValue({ color });
+  }
+
+  isSelectedColor(color: string): boolean {
+    return this.editForm.get('color')?.value === color;
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<ICategory>>): void {

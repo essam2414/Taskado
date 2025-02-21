@@ -28,8 +28,8 @@
         </dd>
         <dt><span>Category</span></dt>
         <dd>
-          <div *ngIf="task?.category">
-            <a [routerLink]="['/category', task.category?.id, 'view']">{{ taskRef.category?.name }}</a>
+          <div *ngIf="taskRef.category">
+            <a [routerLink]="['/category', taskRef.category.id, 'view']">{{ taskRef.category.name }}</a>
           </div>
         </dd>
       </dl>
