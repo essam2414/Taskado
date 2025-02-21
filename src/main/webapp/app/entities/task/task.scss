@@ -72,11 +72,10 @@
 }
 
 .priority-dot {
+  display: inline-block;
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  display: inline-block;
-  margin-right: 10px;
 }
 
 .LOW {
@@ -95,4 +94,77 @@
 .task-date {
   text-align: right;
   color: #888;
+}
+
+.color-box {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 8px;
+}
+
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+}
+
+.select-btn {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 10px 20px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: 0.2s;
+}
+
+.select-btn:hover {
+  border-color: #007bff;
+}
+
+.select-btn fa-icon {
+  margin-left: auto;
+  color: black;
+  font-size: 18px;
+  transition: transform 0.3s;
+}
+
+.select-btn.active i {
+  transform: rotate(180deg);
+}
+
+.options {
+  position: absolute;
+  width: 100%;
+  background: white;
+  margin-top: 4px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+ul.options {
+  margin: 0;
+  padding: 0;
+  list-style: none; /* Removes bullets */
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.option:hover {
+  background: #f2f2f2;
 }

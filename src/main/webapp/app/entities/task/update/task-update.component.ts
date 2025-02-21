@@ -16,16 +16,25 @@ import { TaskService } from '../service/task.service';
 import { ITask } from '../task.model';
 import { TaskFormGroup, TaskFormService } from './task-form.service';
 
+type AllowedPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' | null;
+
 @Component({
   standalone: true,
   selector: 'jhi-task-update',
   templateUrl: './task-update.component.html',
+  styleUrls: ['../task.scss'],
   imports: [SharedModule, FormsModule, ReactiveFormsModule],
 })
 export class TaskUpdateComponent implements OnInit {
   isSaving = false;
   task: ITask | null = null;
+
   priorityValues = Object.keys(Priority);
+  priorityDropdownOpen = false;
+  selectedPriority: AllowedPriority = null;
+
+  categoryDropdownOpen = false;
+  selectedCategory: ICategory | null = null;
 
   categoriesSharedCollection: ICategory[] = [];
   usersSharedCollection: IUser[] = [];
@@ -40,7 +49,6 @@ export class TaskUpdateComponent implements OnInit {
   editForm: TaskFormGroup = this.taskFormService.createTaskFormGroup();
 
   compareCategory = (o1: ICategory | null, o2: ICategory | null): boolean => this.categoryService.compareCategory(o1, o2);
-
   compareUser = (o1: IUser | null, o2: IUser | null): boolean => this.userService.compareUser(o1, o2);
 
   ngOnInit(): void {
@@ -66,6 +74,40 @@ export class TaskUpdateComponent implements OnInit {
     } else {
       this.subscribeToSaveResponse(this.taskService.create(task));
     }
+  }
+
+  togglePriorityDropdown(): void {
+    this.categoryDropdownOpen = false;
+    this.priorityDropdownOpen = !this.priorityDropdownOpen;
+  }
+
+  selectPriority(priority: string | null): void {
+    if (priority === null) {
+      this.selectedPriority = null;
+    } else if (['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].includes(priority)) {
+      this.selectedPriority = priority as AllowedPriority;
+    } else {
+      this.selectedPriority = null;
+      console.warn('Invalid priority value:', priority);
+    }
+
+    this.editForm.controls['priority'].setValue(this.selectedPriority);
+    this.priorityDropdownOpen = false;
+  }
+
+  toggleCategoryDropdown(): void {
+    this.priorityDropdownOpen = false;
+    this.categoryDropdownOpen = !this.categoryDropdownOpen;
+  }
+
+  selectCategory(category: ICategory | null): void {
+    this.selectedCategory = category ?? null;
+    this.editForm.controls['category'].setValue(category);
+    this.categoryDropdownOpen = false;
+  }
+
+  editCategories(): void {
+    window.location.href = '/category';
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<ITask>>): void {
