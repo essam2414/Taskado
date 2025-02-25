@@ -1,13 +1,9 @@
-<jhi-page-ribbon></jhi-page-ribbon>
+<div class="layout" [class.expanded]="!sidebarService.isCollapsed()">
+  <jhi-sidebar></jhi-sidebar>
 
-<div>
-  <router-outlet name="navbar"></router-outlet>
-</div>
-
-<div class="container-fluid">
-  <div class="jh-card">
+  <div class="main-content">
+    <jhi-page-ribbon></jhi-page-ribbon>
     <router-outlet></router-outlet>
+    <jhi-footer></jhi-footer>
   </div>
-
-  <jhi-footer></jhi-footer>
 </div>

@@ -1,0 +1,20 @@
+.layout {
+  display: flex;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.main-content {
+  flex-grow: 1;
+  transition: margin-left 0.3s ease-in-out;
+  padding: 20px;
+}
+
+/* When Sidebar is Expanded */
+.layout.expanded .main-content {
+  margin-left: 300px;
+}
+
+/* When Sidebar is Collapsed */
+.layout.collapsed .main-content {
+  margin-left: 0;
+}

@@ -17,11 +17,6 @@ const routes: Routes = [
     title: 'Team project 2024-2025 app',
   },
   {
-    path: '',
-    loadComponent: () => import('./layouts/navbar/navbar.component'),
-    outlet: 'navbar',
-  },
-  {
     path: 'admin',
     data: {
       authorities: [Authority.ADMIN],
