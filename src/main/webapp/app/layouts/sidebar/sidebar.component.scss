@@ -6,8 +6,10 @@
   width: 300px;
   height: 100vh;
   padding: 16px;
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
 
-  background-color: #f5f7fa;
+  background-color: white;
+
   transition: transform 0.3s ease-in-out;
   z-index: 999;
 }
@@ -128,8 +130,7 @@
 }
 
 .nav-menu a.active {
-  background-color: #d1e7ff;
-  color: #007bff;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 /* Make Home button stand out */
@@ -149,4 +150,8 @@
 
 .nav-menu li {
   margin-bottom: 10px;
+}
+
+.admin-dropdown {
+  margin-bottom: 20px;
 }
