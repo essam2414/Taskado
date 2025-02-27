@@ -7,12 +7,14 @@ import { EMAIL_ALREADY_USED_TYPE, LOGIN_ALREADY_USED_TYPE } from 'app/config/err
 import SharedModule from 'app/shared/shared.module';
 import PasswordStrengthBarComponent from '../password/password-strength-bar/password-strength-bar.component';
 import { RegisterService } from './register.service';
+import { HeaderComponent } from 'app/layouts/header/header.component';
 
 @Component({
   standalone: true,
   selector: 'jhi-register',
-  imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent],
+  imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, HeaderComponent],
   templateUrl: './register.component.html',
+  styleUrls: ['./register.component.scss'],
 })
 export default class RegisterComponent implements AfterViewInit {
   login = viewChild.required<ElementRef>('login');

@@ -33,7 +33,10 @@ export default class MainComponent implements OnInit {
 
     // Change background on landing page
     this.router.events.subscribe(() => {
-      if (this.router.url === '/') {
+      // Add paths that use landing background
+      const landingRoutes = ['/', '/login', '/account/register', '/account/reset/request'];
+
+      if (landingRoutes.includes(this.router.url)) {
         this.renderer.addClass(document.body, 'landing-bg');
       } else {
         this.renderer.removeClass(document.body, 'landing-bg');

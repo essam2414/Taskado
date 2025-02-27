@@ -5,12 +5,14 @@ import { Router, RouterModule } from '@angular/router';
 import SharedModule from 'app/shared/shared.module';
 import { LoginService } from 'app/login/login.service';
 import { AccountService } from 'app/core/auth/account.service';
+import { HeaderComponent } from 'app/layouts/header/header.component';
 
 @Component({
   standalone: true,
   selector: 'jhi-login',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [SharedModule, FormsModule, ReactiveFormsModule, RouterModule, HeaderComponent],
   templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss'],
 })
 export default class LoginComponent implements OnInit, AfterViewInit {
   username = viewChild.required<ElementRef>('username');
