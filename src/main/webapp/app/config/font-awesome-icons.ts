@@ -3,7 +3,6 @@ import {
   faAsterisk,
   faBan,
   faBars,
-  faBell,
   faBook,
   faCalendarAlt,
   faCheck,
@@ -43,15 +42,18 @@ import {
   faBullseye,
   faChartLine,
   faTags,
+  faCog,
+  faTornado,
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
+
+import { faBell } from '@fortawesome/free-regular-svg-icons';
 
 export const fontAwesomeIcons = [
   faArrowLeft,
   faAsterisk,
   faBan,
   faBars,
-  faBell,
   faBook,
   faCalendarAlt,
   faCheck,
@@ -91,5 +93,8 @@ export const fontAwesomeIcons = [
   faBullseye,
   faChartLine,
   faTags,
+  faBell,
+  faCog,
+  faTornado,
   // jhipster-needle-add-icon-import
 ];

@@ -1,19 +1,19 @@
 .layout {
   display: flex;
-  transition: margin-left 0.3s ease-in-out;
+  // transition: margin-left 0.3s ease-in-out;
   min-height: 100vh;
 }
 
 .main-content {
-  flex-grow: 1;
+  flex: 1;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 
   transition: margin-left 0.3s ease-in-out;
-  padding: 20px;
-  padding-top: 60px;
+  padding: 60px;
+  padding-bottom: 0;
 }
 
 /* When Sidebar is Expanded */

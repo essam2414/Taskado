@@ -5,6 +5,9 @@ import { Authority } from 'app/config/authority.constants';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { errorRoute } from './layouts/error/error.route';
 
+import { AccountService } from './core/auth/account.service';
+import { inject } from '@angular/core';
+
 const routes: Routes = [
   {
     path: 'gdpr-policy',
@@ -13,8 +16,13 @@ const routes: Routes = [
   },
   {
     path: '',
-    loadComponent: () => import('./home/home.component'),
+    loadComponent: () => import('./landing-page/landing-page.component'),
     title: 'Team project 2024-2025 app',
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () => import('./home/home.component'),
+    title: 'Taskado | Dashboard',
   },
   {
     path: 'admin',

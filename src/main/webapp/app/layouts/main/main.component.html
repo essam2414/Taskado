@@ -1,5 +1,7 @@
-<div class="layout" [class.expanded]="!sidebarService.isCollapsed()">
-  <jhi-sidebar></jhi-sidebar>
+<div class="layout" [class.expanded]="!sidebarService.isCollapsed() && account() !== null">
+  @if (account() !== null) {
+    <jhi-sidebar></jhi-sidebar>
+  }
 
   <div class="main-content">
     <router-outlet></router-outlet>

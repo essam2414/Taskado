@@ -2,6 +2,92 @@
 @import 'bootstrap/scss/functions';
 @import 'bootswatch/dist/materia/variables';
 @import 'bootstrap/scss/variables';
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+// Color Variables
+$background: #ffffff;
+$landing-bg: radial-gradient(
+  circle,
+  rgba(254, 239, 242, 0.7) 20%,
+  rgba(254, 241, 245, 0.5) 50%,
+  rgba(254, 243, 247, 0.3) 80%,
+  rgba(255, 248, 252, 0.2) 100%
+);
+
+$primary: #564df2;
+$secondary: #ff89a4;
+
+$success: #46c598;
+$warning: #ffa559;
+$error: #ff89a4;
+
+$text-primary: #2c2c38;
+$text-secondary: #6b6b78;
+$text-muted: #a9a9b3;
+$text-accent: #695cff;
+
+body {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  color: $text-primary;
+
+  background-color: $background;
+  overflow-x: hidden;
+}
+
+.landing-bg {
+  background: $landing-bg;
+  backdrop-filter: blur(15px) saturate(180%);
+  -webkit-backdrop-filter: blur(15px) saturate(180%);
+}
+
+h1,
+h2,
+h3 {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 600;
+}
+
+p {
+  color: $text-secondary;
+}
+
+a {
+  color: $text-accent;
+
+  &:hover {
+    color: darken($text-accent, 10%);
+  }
+}
+
+.btn {
+  font-weight: 500;
+  padding: 12px 24px;
+  border-radius: 30px;
+  transition: all 0.3s ease-in-out;
+
+  box-shadow: none;
+  text-transform: none;
+
+  &:hover {
+    color: $primary;
+  }
+}
+
+.btn-primary {
+  padding: 12px 40px;
+  background-color: $primary;
+  color: white;
+  box-shadow:
+    0px 2px 6px rgba(87, 78, 241, 0.2),
+    0px 1px 3px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background-color: darken($primary, 8%);
+    transform: translateY(-2px);
+    color: white;
+  }
+}
 
 /* ==============================================================
 Bootstrap tweaks
@@ -12,7 +98,6 @@ h1,
 h2,
 h3,
 h4 {
-  font-weight: 300;
 }
 
 a:hover {
@@ -48,7 +133,7 @@ Generic styles
 
 .error {
   color: white;
-  background-color: red;
+  background-color: $error;
 }
 
 .pad {
@@ -80,6 +165,9 @@ Generic styles
 .footer {
   border-top: 1px solid rgba(0, 0, 0, 0.125);
   padding-top: 10px;
+  margin-top: 40px;
+  text-align: center;
+  font-size: 14px;
 }
 
 .hand,

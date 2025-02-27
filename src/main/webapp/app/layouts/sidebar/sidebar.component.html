@@ -1,8 +1,4 @@
 <aside class="sidebar" [class.collapsed]="isCollapsed()">
-  <button class="toggle-btn" (click)="toggleSidebar()">
-    <fa-icon icon="bars"></fa-icon>
-  </button>
-
   <div class="sidebar-topbar">
     <div class="sidebar-account" ngbDropdown>
       <a class="user-info dropdown-toggle" ngbDropdownToggle href="javascript:void(0);">
@@ -18,7 +14,7 @@
       <ul class="dropdown-menu" ngbDropdownMenu>
         @if (accountRef !== null) {
           <li>
-            <a routerLink="/account/settings" class="dropdown-item"> <fa-icon icon="wrench"></fa-icon> Settings </a>
+            <a routerLink="/account/settings" class="dropdown-item"> <fa-icon icon="cog"></fa-icon> Settings </a>
           </li>
           <li>
             <a routerLink="/account/password" class="dropdown-item"> <fa-icon icon="lock"></fa-icon> Change Password </a>
@@ -38,8 +34,11 @@
     </div>
 
     <div class="topbar-controls">
-      <a routerLink="/notification">
-        <fa-icon icon="bell"></fa-icon>
+      <a class="notif-btn" routerLink="/notification" routerLinkActive="active">
+        <fa-icon [icon]="['far', 'bell']"></fa-icon>
+      </a>
+      <a class="toggle-btn" (click)="toggleSidebar()">
+        <fa-icon icon="bars"></fa-icon>
       </a>
     </div>
   </div>
@@ -82,7 +81,7 @@
   <div class="nav-menu">
     <ul>
       <li>
-        <a routerLink="/"><fa-icon icon="home"></fa-icon><span>Home</span></a>
+        <a class="home-button" routerLink="/dashboard" routerLinkActive="active"><fa-icon icon="home"></fa-icon><span>Home</span></a>
       </li>
       <li>
         <a routerLink="/task" routerLinkActive="active"><fa-icon icon="tasks"></fa-icon><span>Tasks</span></a>
