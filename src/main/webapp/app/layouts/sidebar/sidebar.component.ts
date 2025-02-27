@@ -1,50 +1,44 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-
-import SharedModule from 'app/shared/shared.module';
+import { SidebarService } from './sidebar.service';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import HasAnyAuthorityDirective from 'app/shared/auth/has-any-authority.directive';
-import { VERSION } from 'app/app.constants';
+
 import { AccountService } from 'app/core/auth/account.service';
 import { LoginService } from 'app/login/login.service';
 import { ProfileService } from 'app/layouts/profiles/profile.service';
-import { EntityNavbarItems } from 'app/entities/entity-navbar-items';
-import NavbarItem from './navbar-item.model';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
+  selector: 'jhi-sidebar',
   standalone: true,
-  selector: 'jhi-navbar',
-  templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.scss',
-  imports: [RouterModule, SharedModule, HasAnyAuthorityDirective],
+  imports: [RouterModule, FontAwesomeModule, NgbDropdownModule, HasAnyAuthorityDirective],
+  templateUrl: './sidebar.component.html',
+  styleUrl: './sidebar.component.scss',
 })
-export default class NavbarComponent implements OnInit {
+export class SidebarComponent implements OnInit {
   inProduction?: boolean;
-  isNavbarCollapsed = signal(true);
   openAPIEnabled?: boolean;
-  version = '';
   account = inject(AccountService).trackCurrentAccount();
-  entitiesNavbarItems: NavbarItem[] = [];
 
+  private readonly sidebarService = inject(SidebarService);
   private readonly loginService = inject(LoginService);
   private readonly profileService = inject(ProfileService);
   private readonly router = inject(Router);
 
-  constructor() {
-    if (VERSION) {
-      this.version = VERSION.toLowerCase().startsWith('v') ? VERSION : `v${VERSION}`;
-    }
-  }
-
   ngOnInit(): void {
-    this.entitiesNavbarItems = EntityNavbarItems;
     this.profileService.getProfileInfo().subscribe(profileInfo => {
       this.inProduction = profileInfo.inProduction;
       this.openAPIEnabled = profileInfo.openAPIEnabled;
     });
   }
 
-  collapseNavbar(): void {
-    this.isNavbarCollapsed.set(true);
+  isCollapsed(): boolean {
+    return this.sidebarService.isCollapsed();
+  }
+
+  toggleSidebar(): void {
+    this.sidebarService.toggleSidebar();
   }
 
   login(): void {
@@ -52,12 +46,7 @@ export default class NavbarComponent implements OnInit {
   }
 
   logout(): void {
-    this.collapseNavbar();
     this.loginService.logout();
     this.router.navigate(['']);
-  }
-
-  toggleNavbar(): void {
-    this.isNavbarCollapsed.update(isNavbarCollapsed => !isNavbarCollapsed);
   }
 }

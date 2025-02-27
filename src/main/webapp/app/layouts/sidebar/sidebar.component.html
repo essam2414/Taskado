@@ -1,0 +1,109 @@
+<aside class="sidebar" [class.collapsed]="isCollapsed()">
+  <div class="sidebar-topbar">
+    <div class="sidebar-account" ngbDropdown>
+      <a class="user-info dropdown-toggle" ngbDropdownToggle href="javascript:void(0);">
+        @let accountRef = account();
+        @if (!accountRef?.imageUrl) {
+          <fa-icon icon="user"></fa-icon>
+          <span>{{ accountRef?.login ?? 'Account' }}</span>
+        } @else {
+          <img [src]="accountRef!.imageUrl" class="profile-image rounded-circle" alt="Avatar" />
+        }
+      </a>
+
+      <ul class="dropdown-menu" ngbDropdownMenu>
+        @if (accountRef !== null) {
+          <li>
+            <a routerLink="/account/settings" class="dropdown-item"> <fa-icon icon="cog"></fa-icon> Settings </a>
+          </li>
+          <li>
+            <a routerLink="/account/password" class="dropdown-item"> <fa-icon icon="lock"></fa-icon> Change Password </a>
+          </li>
+          <li>
+            <a (click)="logout()" class="dropdown-item"> <fa-icon icon="sign-out-alt"></fa-icon> Sign out </a>
+          </li>
+        } @else {
+          <li>
+            <a (click)="login()" class="dropdown-item"> <fa-icon icon="sign-in-alt"></fa-icon> Sign in </a>
+          </li>
+          <li>
+            <a routerLink="/account/register" class="dropdown-item"> <fa-icon icon="user-plus"></fa-icon> Register </a>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div class="topbar-controls">
+      <a class="notif-btn" routerLink="/notification" routerLinkActive="active">
+        <fa-icon [icon]="['far', 'bell']"></fa-icon>
+      </a>
+      <a class="toggle-btn" (click)="toggleSidebar()">
+        <fa-icon icon="bars"></fa-icon>
+      </a>
+    </div>
+  </div>
+
+  <div *jhiHasAnyAuthority="'ROLE_ADMIN'" class="admin-dropdown" ngbDropdown>
+    <a class="user-info dropdown-toggle" ngbDropdownToggle href="javascript:void(0);">
+      <fa-icon icon="users-cog"></fa-icon>
+      <span>Administration</span>
+    </a>
+
+    <ul class="dropdown-menu" ngbDropdownMenu>
+      <li>
+        <a routerLink="/admin/user-management" class="dropdown-item"><fa-icon icon="users"></fa-icon> User Management</a>
+      </li>
+      <li>
+        <a routerLink="/admin/metrics" class="dropdown-item"><fa-icon icon="tachometer-alt"></fa-icon> Metrics</a>
+      </li>
+      <li>
+        <a routerLink="/admin/health" class="dropdown-item"><fa-icon icon="heart"></fa-icon> Health</a>
+      </li>
+      <li>
+        <a routerLink="/admin/configuration" class="dropdown-item"><fa-icon icon="cogs"></fa-icon> Configuration</a>
+      </li>
+      <li>
+        <a routerLink="/admin/logs" class="dropdown-item"><fa-icon icon="tasks"></fa-icon> Logs</a>
+      </li>
+      @if (openAPIEnabled) {
+        <li>
+          <a routerLink="/admin/docs" class="dropdown-item"><fa-icon icon="book"></fa-icon> API</a>
+        </li>
+      }
+      @if (!inProduction) {
+        <li>
+          <a href="./h2-console/" target="_tab" class="dropdown-item"><fa-icon icon="database"></fa-icon> Database</a>
+        </li>
+      }
+    </ul>
+  </div>
+
+  <div class="nav-menu">
+    <ul>
+      <li>
+        <a class="home-button" routerLink="/dashboard" routerLinkActive="active"><fa-icon icon="home"></fa-icon><span>Home</span></a>
+      </li>
+      <li>
+        <a routerLink="/task" routerLinkActive="active"><fa-icon icon="tasks"></fa-icon><span>Tasks</span></a>
+      </li>
+      <li>
+        <a routerLink="/habit" routerLinkActive="active"><fa-icon icon="check-circle"></fa-icon><span>Habits</span></a>
+      </li>
+      <li>
+        <a routerLink="/event" routerLinkActive="active"><fa-icon icon="calendar-alt"></fa-icon><span>Events</span></a>
+      </li>
+      <li>
+        <a routerLink="/pomodoro-session" routerLinkActive="active"><fa-icon icon="clock"></fa-icon><span>Pomodoro</span></a>
+      </li>
+      <li>
+        <a routerLink="/goal" routerLinkActive="active"><fa-icon icon="bullseye"></fa-icon><span>Goals</span></a>
+      </li>
+      <li>
+        <a routerLink="/productivity-report" routerLinkActive="active"><fa-icon icon="chart-line"></fa-icon><span>Reports</span></a>
+      </li>
+      <li>
+        <a routerLink="/category" routerLinkActive="active"><fa-icon icon="tags"></fa-icon><span>Categories</span></a>
+      </li>
+    </ul>
+  </div>
+</aside>
