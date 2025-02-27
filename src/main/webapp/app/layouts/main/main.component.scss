@@ -12,8 +12,9 @@
   justify-content: space-between;
 
   transition: margin-left 0.3s ease-in-out;
-  padding: 60px;
+  padding: clamp(20px, 5vw, 60px);
   padding-bottom: 0;
+  margin-top: 44px;
 }
 
 /* When Sidebar is Expanded */
@@ -21,7 +22,14 @@
   margin-left: 300px;
 }
 
-/* When Sidebar is Collapsed */
+/* sidebar shifts main content */
 .layout.collapsed .main-content {
   margin-left: 0;
+}
+
+/* sidebar goes over main content on mobile */
+@media (max-width: 768px) {
+  .layout.expanded .main-content {
+    margin-left: 0 !important;
+  }
 }

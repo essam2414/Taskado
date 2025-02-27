@@ -10,32 +10,39 @@ $primary: #564df2;
 .auth-container {
   width: 100%;
   max-width: 600px;
+  margin-bottom: 20px;
 
-  padding: 40px;
+  padding: clamp(20px, 5vw, 40px);
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
 .auth-title {
-  margin-bottom: 40px;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  margin-bottom: clamp(20px, 4vw, 40px);
+}
+
+.auth-desc {
+  font-size: clamp(1rem, 3vw, 1.25rem);
 }
 
 .auth-input-group {
-  margin-bottom: 18px;
+  margin-bottom: clamp(12px, 3vw, 18px);
 }
 
 .auth-input-group label {
   display: block;
   margin-bottom: 5px;
+  font-size: clamp(0.8rem, 2.5vw, 1rem);
 }
 
 .auth-input-group input {
   width: 100%;
-  padding: 14px;
+  padding: clamp(10px, 3vw, 14px);
   border: 1px solid #ddd;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
   transition: border 0.2s ease-in-out;
 }
 
@@ -55,8 +62,8 @@ $primary: #564df2;
 .auth-btn {
   margin-top: 10px;
   width: 100%;
-  padding: 14px;
-  font-size: 16px;
+  padding: clamp(10px, 3vw, 14px);
+  font-size: clamp(1rem, 2.5vw, 1.1rem);
   border-radius: 8px;
   background: $primary;
   color: white;
@@ -76,7 +83,7 @@ $primary: #564df2;
   gap: 10px;
 
   margin-top: 16px;
-  font-size: 14px;
+  font-size: clamp(0.8rem, 2vw, 1rem);
 }
 
 .auth-links a {

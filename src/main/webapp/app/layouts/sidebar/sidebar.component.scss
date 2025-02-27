@@ -80,7 +80,7 @@ $sidebar-active: #564df2;
   background: white;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: 6px;
-  padding: 12px;
+  padding: 10px;
 }
 
 .dropdown-menu li {
@@ -106,7 +106,12 @@ $sidebar-active: #564df2;
 }
 
 .dropdown-menu fa-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   width: 12px;
+  height: 12px;
   margin-right: 16px;
   color: inherit;
 }

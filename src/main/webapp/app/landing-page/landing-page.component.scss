@@ -13,16 +13,17 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 12px;
 
   max-width: 750px;
 }
 
 .landing-title {
-  font-size: 70px;
+  font-size: clamp(2rem, 8vw, 4rem);
 }
 
 .landing-subtitle {
-  font-size: 24px;
+  font-size: clamp(1rem, 4vw, 1.5rem);
 }
 
 .landing-buttons {
@@ -32,7 +33,7 @@
 }
 
 .landing-buttons button {
-  font-size: 20px;
+  font-size: clamp(1rem, 3vw, 1.25rem);
 }
 
 .account-options {
@@ -42,7 +43,7 @@
 }
 
 .guest-option a {
-  font-size: 16px;
+  font-size: clamp(0.9rem, 2vw, 1rem);
   color: #b3b3c5;
 
   &:hover {

@@ -3,7 +3,7 @@
 }
 
 .task-row td {
-  padding: 20px 20px;
+  padding: clamp(8px, 3vw, 20px);
 }
 
 .completed .task-title {
@@ -11,17 +11,16 @@
 }
 
 .non-clickable {
-  pointer-events: none; /* Disables clicking */
-  opacity: 0.4; /* Fades completed tasks */
+  pointer-events: none;
 }
 
 .non-clickable .custom-checkbox {
-  pointer-events: auto; /* Allows checkbox clicks */
+  pointer-events: auto;
 }
 
 .custom-checkbox {
-  width: 24px;
-  height: 24px;
+  width: clamp(16px, 3vw, 24px);
+  height: clamp(16px, 3vw, 24px);
   border-radius: 5px;
   border: 1.5px solid gainsboro;
   background-color: transparent;
@@ -44,13 +43,13 @@
 }
 
 .task-title {
-  font-size: 18px;
+  font-size: clamp(1rem, 3vw, 1.25rem);
   font-weight: 400;
   margin-bottom: 8px;
 }
 
 .task-description {
-  font-size: 16px;
+  font-size: clamp(0.875rem, 2vw, 1rem);
   font-weight: 200;
   color: #888;
 }
@@ -69,12 +68,13 @@
 .task-priority {
   color: #888;
   font-weight: 400;
+  font-size: clamp(0.75rem, 2vw, 1rem);
 }
 
 .priority-dot {
   display: inline-block;
-  width: 10px;
-  height: 10px;
+  width: clamp(6px, 1.5vw, 10px);
+  height: clamp(6px, 1.5vw, 10px);
   border-radius: 50%;
 }
 
@@ -94,6 +94,7 @@
 .task-date {
   text-align: right;
   color: #888;
+  font-size: clamp(0.75rem, 2vw, 1rem);
 }
 
 .color-box {
@@ -114,7 +115,7 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  padding: 10px 20px;
+  padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 20px);
   background: white;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -153,7 +154,7 @@
 ul.options {
   margin: 0;
   padding: 0;
-  list-style: none; /* Removes bullets */
+  list-style: none;
 }
 
 .option {
@@ -167,4 +168,8 @@ ul.options {
 
 .option:hover {
   background: #f2f2f2;
+}
+
+.add-btn {
+  margin-bottom: 20px;
 }

@@ -2,7 +2,7 @@
   <div class="d-flex justify-content-center">
     <div class="col-md-8">
       @if (settingsForm.value.login) {
-        <h2>
+        <h2 class="auth-title">
           User settings for [<strong>{{ settingsForm.value.login }}</strong
           >]
         </h2>
@@ -16,7 +16,7 @@
 
       @if (settingsForm.value.login) {
         <form name="form" (ngSubmit)="save()" [formGroup]="settingsForm" novalidate>
-          <div class="mb-3">
+          <div class="auth-input-group">
             <label class="form-label" for="firstName">First Name</label>
             <input
               type="text"
@@ -46,7 +46,7 @@
             }
           </div>
 
-          <div class="mb-3">
+          <div class="auth-input-group">
             <label class="form-label" for="lastName">Last Name</label>
             <input
               type="text"
@@ -76,7 +76,7 @@
             }
           </div>
 
-          <div class="mb-3">
+          <div class="auth-input-group">
             <label class="form-label" for="email">Email</label>
             <input
               type="email"
@@ -110,7 +110,7 @@
             }
           </div>
 
-          <button type="submit" [disabled]="settingsForm.invalid" class="btn btn-primary" data-cy="submit">Save</button>
+          <button type="submit" [disabled]="settingsForm.invalid" class="auth-btn" data-cy="submit">Save</button>
         </form>
       }
     </div>
