@@ -16,6 +16,7 @@ import { EventDeleteDialogComponent } from '../delete/event-delete-dialog.compon
   standalone: true,
   selector: 'jhi-event',
   templateUrl: './event.component.html',
+  styleUrls: ['../event.scss'],
   imports: [
     RouterModule,
     FormsModule,
@@ -28,6 +29,11 @@ import { EventDeleteDialogComponent } from '../delete/event-delete-dialog.compon
   ],
 })
 export class EventComponent implements OnInit {
+  // create a calendar with buttons to switch between months, the days of the week at the top
+  currentDate = new Date();
+  daysInMonth = 0;
+  firstDay = 0;
+  calendarDays: number[] = [];
   subscription: Subscription | null = null;
   events?: IEvent[];
   isLoading = false;
@@ -43,6 +49,16 @@ export class EventComponent implements OnInit {
 
   trackId = (item: IEvent): number => this.eventService.getEventIdentifier(item);
 
+  // generate the calendar for the next month
+  renderCalendar(): void {
+    this.daysInMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0).getDate();
+    this.firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1).getDay();
+
+    // creates an array where the first few elements are empty (padding for first day)
+    // then fills in the numbers 1 to `daysInMonth`
+    this.calendarDays = [...Array(this.firstDay).fill(0), ...Array.from({ length: this.daysInMonth }, (_, i) => i + 1)];
+  }
+
   ngOnInit(): void {
     this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
       .pipe(
@@ -54,6 +70,7 @@ export class EventComponent implements OnInit {
         }),
       )
       .subscribe();
+    this.renderCalendar();
   }
 
   delete(event: IEvent): void {
