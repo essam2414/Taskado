@@ -29,6 +29,7 @@ import { EventDeleteDialogComponent } from '../delete/event-delete-dialog.compon
 })
 export class EventComponent implements OnInit {
   // create a calendar with buttons to switch between months, the days of the week at the top
+  selectedDate: Date | null = null;
   currentDate = new Date();
   daysInMonth = 0;
   firstDay = 0;
@@ -73,8 +74,6 @@ export class EventComponent implements OnInit {
 
   // function to change the month
   changeMonth(step: number): void {
-    // this.currentDate.setMonth(this.currentDate.getMonth() + step);
-    // this.currentDate = new Date(this.currentDate);
     this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + step, 1);
     this.renderCalendar();
   }
@@ -115,6 +114,20 @@ export class EventComponent implements OnInit {
 
   navigateToWithComponentValues(event: SortState): void {
     this.handleNavigation(event);
+  }
+
+  // add selected date functionality
+  // when a user clicks on a date in the calendar a create form is opened
+  selectDate(day: number): void {
+    if (!day) return;
+
+    const month = this.currentDate.getMonth();
+    const year = this.currentDate.getFullYear();
+    this.selectedDate = new Date(year, month, day);
+    // navigate to the create event page to create a new event for selected date
+    this.router.navigate(['/event/new'], {
+      queryParams: { date: this.selectedDate.toISOString() },
+    });
   }
 
   protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
