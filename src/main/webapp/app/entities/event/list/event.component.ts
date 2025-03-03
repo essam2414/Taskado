@@ -81,15 +81,24 @@ export class EventComponent implements OnInit {
   ngOnInit(): void {
     this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
       .pipe(
-        tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
-        tap(() => {
+        tap(([params, data]) => {
+          this.fillComponentAttributeFromRoute(params, data);
+
+          // Check for 'date' query parameter and set it as selected date if available
+          if (params.has('date')) {
+            this.selectedDate = new Date(params.get('date')!); // Set selected date from query params
+          } else {
+            this.selectedDate = new Date(); // Default to today's date
+          }
+
           if (!this.events || this.events.length === 0) {
             this.load();
           }
         }),
       )
       .subscribe();
-    this.renderCalendar();
+
+    this.renderCalendar(); // Render the calendar after initializing
   }
 
   delete(event: IEvent): void {
