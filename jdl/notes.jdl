@@ -1,0 +1,9 @@
+entity Note {
+  title String required,
+  content TextBlob required,
+  createdAt Instant,
+  updatedAt Instant
+}
+relationship ManyToOne {
+  Note to User
+}
