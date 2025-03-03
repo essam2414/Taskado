@@ -144,7 +144,51 @@ Browser Upgrade Prompt
 /* ==========================================================================
 Generic styles
 ========================================================================== */
+.taskado-card {
+  position: relative;
 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px;
+  border-radius: 16px;
+
+  transition: box-shadow 0.2s ease-in-out;
+  border: 1px solid #ccc;
+
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 0 8px rgba(33, 33, 33, 0.2);
+  }
+}
+
+.taskado-checkbox {
+  width: clamp(16px, 3vw, 24px);
+  height: clamp(16px, 3vw, 24px);
+  border-radius: 50%;
+  border: 1.5px solid gainsboro;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out,
+    background-color 0.2s ease-in-out;
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+
+  &:checked {
+    background-color: #564df2;
+    border-color: #564df2;
+  }
+
+  &:hover {
+    border-color: #564df2;
+  }
+}
 /* other generic styles */
 
 .jh-card {

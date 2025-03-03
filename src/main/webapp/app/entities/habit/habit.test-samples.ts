@@ -3,32 +3,41 @@ import dayjs from 'dayjs/esm';
 import { IHabit, NewHabit } from './habit.model';
 
 export const sampleWithRequiredData: IHabit = {
-  id: 7143,
-  name: 'siege rue deploy',
-  repeatFrequency: 'valentine successfully swelter',
-  startDate: dayjs('2025-01-31T18:30'),
+  id: 17758,
+  name: 'yet monster unless',
+  repeatType: 'why',
+  completed: true,
+  startDate: dayjs('2025-01-31T23:53'),
 };
 
 export const sampleWithPartialData: IHabit = {
-  id: 430,
-  name: 'once',
-  repeatFrequency: 'highlight submissive',
-  startDate: dayjs('2025-01-31T20:50'),
+  id: 8003,
+  name: 'following yippee highlight',
+  repeatType: 'favorite boo',
+  repeatDays: 'numb biodegradable',
+  completed: false,
+  startDate: dayjs('2025-02-01T03:49'),
+  completionRate: 2492.83,
 };
 
 export const sampleWithFullData: IHabit = {
-  id: 7287,
-  name: 'unto',
-  repeatFrequency: 'imaginary mid',
-  startDate: dayjs('2025-01-31T16:18'),
-  streak: 1453,
-  completionRate: 6719.86,
+  id: 1453,
+  name: 'uh-huh',
+  repeatType: 'awareness readily',
+  repeatInterval: 20219,
+  repeatDays: 'present',
+  repeatTimes: 'perky',
+  completed: true,
+  startDate: dayjs('2025-02-01T13:06'),
+  streak: 18761,
+  completionRate: 30822.96,
 };
 
 export const sampleWithNewData: NewHabit = {
-  name: 'drat awareness readily',
-  repeatFrequency: 'outside like',
-  startDate: dayjs('2025-02-01T07:18'),
+  name: 'but',
+  repeatType: 'management',
+  completed: false,
+  startDate: dayjs('2025-02-01T12:43'),
   id: null,
 };
 

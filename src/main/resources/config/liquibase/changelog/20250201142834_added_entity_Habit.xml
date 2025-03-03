@@ -17,7 +17,19 @@
             <column name="name" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
-            <column name="repeat_frequency" type="varchar(255)">
+            <column name="repeat_type" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="repeat_interval" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="repeat_days" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="repeat_times" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="completed" type="boolean">
                 <constraints nullable="false" />
             </column>
             <column name="start_date" type="${datetimeType}">
@@ -27,6 +39,9 @@
                 <constraints nullable="true" />
             </column>
             <column name="completion_rate" type="${floatType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="category_id" type="bigint">
                 <constraints nullable="true" />
             </column>
             <column name="user_id" type="bigint">
@@ -55,7 +70,11 @@
                   usePreparedStatements="true">
             <column name="id" type="numeric"/>
             <column name="name" type="string"/>
-            <column name="repeat_frequency" type="string"/>
+            <column name="repeat_type" type="string"/>
+            <column name="repeat_interval" type="numeric"/>
+            <column name="repeat_days" type="string"/>
+            <column name="repeat_times" type="string"/>
+            <column name="completed" type="boolean"/>
             <column name="start_date" type="date"/>
             <column name="streak" type="numeric"/>
             <column name="completion_rate" type="numeric"/>

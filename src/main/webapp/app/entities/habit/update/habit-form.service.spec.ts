@@ -21,10 +21,15 @@ describe('Habit Form Service', () => {
           expect.objectContaining({
             id: expect.any(Object),
             name: expect.any(Object),
-            repeatFrequency: expect.any(Object),
+            repeatType: expect.any(Object),
+            repeatInterval: expect.any(Object),
+            repeatDays: expect.any(Object),
+            repeatTimes: expect.any(Object),
+            completed: expect.any(Object),
             startDate: expect.any(Object),
             streak: expect.any(Object),
             completionRate: expect.any(Object),
+            category: expect.any(Object),
             user: expect.any(Object),
           }),
         );
@@ -37,10 +42,15 @@ describe('Habit Form Service', () => {
           expect.objectContaining({
             id: expect.any(Object),
             name: expect.any(Object),
-            repeatFrequency: expect.any(Object),
+            repeatType: expect.any(Object),
+            repeatInterval: expect.any(Object),
+            repeatDays: expect.any(Object),
+            repeatTimes: expect.any(Object),
+            completed: expect.any(Object),
             startDate: expect.any(Object),
             streak: expect.any(Object),
             completionRate: expect.any(Object),
+            category: expect.any(Object),
             user: expect.any(Object),
           }),
         );

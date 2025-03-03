@@ -1,13 +1,15 @@
 <div>
-  <h2 id="page-heading" data-cy="HabitHeading">
+  <!-- Page heading & buttons -->
+  <h2 id="page-heading" data-cy="HabitHeading" class="mb-4">
     <span>Habits</span>
-
     <div class="d-flex justify-content-end">
+      <!-- Refresh list -->
       <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
         <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
         <span>Refresh list</span>
       </button>
 
+      <!-- Create a new Habit -->
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
@@ -20,108 +22,38 @@
     </div>
   </h2>
 
+  <!-- JHipster alert components for errors/messages -->
   <jhi-alert-error></jhi-alert-error>
-
   <jhi-alert></jhi-alert>
 
-  @if (habits?.length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span>No Habits found</span>
-    </div>
-  }
+  <!-- If there are no habits, display a warning -->
+  <div class="alert alert-warning" id="no-result" *ngIf="habits?.length === 0">
+    <span>No Habits found</span>
+  </div>
 
-  @if (habits && habits.length > 0) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
-          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span>ID</span>
+  <!-- Otherwise, show the habit list -->
+  <div class="habit-list" *ngIf="habits && habits.length > 0">
+    @for (habit of habits; track trackId(habit)) {
+      <!-- Make the item a flex container, name on left, streak on right -->
+      <div class="taskado-card" (click)="editHabit(habit)">
+        <div class="habit-info">
+          <input
+            type="checkbox"
+            class="form-check-input taskado-checkbox"
+            [checked]="habit.completed"
+            (change)="toggleCompleted(habit)"
+            (click)="$event.stopPropagation()"
+            id="habit-{{ habit.id }}"
+          />
+          <!-- Left side: the habit name -->
+          <div>
+            <strong>{{ habit.name }}</strong>
+          </div>
+        </div>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="name">
-              <div class="d-flex">
-                <span>Name</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="repeatFrequency">
-              <div class="d-flex">
-                <span>Repeat Frequency</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="startDate">
-              <div class="d-flex">
-                <span>Start Date</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="streak">
-              <div class="d-flex">
-                <span>Streak</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="completionRate">
-              <div class="d-flex">
-                <span>Completion Rate</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="user.id">
-              <div class="d-flex">
-                <span>User</span>
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (habit of habits; track trackId(habit)) {
-            <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/habit', habit.id, 'view']">{{ habit.id }}</a>
-              </td>
-              <td>{{ habit.name }}</td>
-              <td>{{ habit.repeatFrequency }}</td>
-              <td>{{ habit.startDate | formatMediumDatetime }}</td>
-              <td>{{ habit.streak }}</td>
-              <td>{{ habit.completionRate }}</td>
-              <td>
-                {{ habit.user?.id }}
-              </td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/habit', habit.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline">View</span>
-                  </a>
-
-                  <a [routerLink]="['/habit', habit.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline">Edit</span>
-                  </a>
-
-                  <button type="submit" (click)="delete(habit)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  }
+        <!-- Right side: the streak + fire icon -->
+        <div>{{ habit.streak }} 🔥</div>
+      </div>
+    }
+  </div>
 </div>

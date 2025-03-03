@@ -16,6 +16,7 @@ import { HabitDeleteDialogComponent } from '../delete/habit-delete-dialog.compon
   standalone: true,
   selector: 'jhi-habit',
   templateUrl: './habit.component.html',
+  styleUrls: ['../habit.component.scss'],
   imports: [
     RouterModule,
     FormsModule,
@@ -78,6 +79,17 @@ export class HabitComponent implements OnInit {
 
   navigateToWithComponentValues(event: SortState): void {
     this.handleNavigation(event);
+  }
+
+  editHabit(habit: IHabit): void {
+    this.router.navigate(['/habit', habit.id, 'edit']);
+  }
+
+  toggleCompleted(habit: IHabit): void {
+    habit.completed = !habit.completed;
+    this.habitService.update(habit).subscribe(() => {
+      this.habits = this.refineData([...(this.habits ?? [])]);
+    });
   }
 
   protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {

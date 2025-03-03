@@ -124,8 +124,20 @@ public class HabitResource {
                 if (habit.getName() != null) {
                     existingHabit.setName(habit.getName());
                 }
-                if (habit.getRepeatFrequency() != null) {
-                    existingHabit.setRepeatFrequency(habit.getRepeatFrequency());
+                if (habit.getRepeatType() != null) {
+                    existingHabit.setRepeatType(habit.getRepeatType());
+                }
+                if (habit.getRepeatInterval() != null) {
+                    existingHabit.setRepeatInterval(habit.getRepeatInterval());
+                }
+                if (habit.getRepeatDays() != null) {
+                    existingHabit.setRepeatDays(habit.getRepeatDays());
+                }
+                if (habit.getRepeatTimes() != null) {
+                    existingHabit.setRepeatTimes(habit.getRepeatTimes());
+                }
+                if (habit.getCompleted() != null) {
+                    existingHabit.setCompleted(habit.getCompleted());
                 }
                 if (habit.getStartDate() != null) {
                     existingHabit.setStartDate(habit.getStartDate());

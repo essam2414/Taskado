@@ -29,8 +29,21 @@ public class Habit implements Serializable {
     private String name;
 
     @NotNull
-    @Column(name = "repeat_frequency", nullable = false)
-    private String repeatFrequency;
+    @Column(name = "repeat_type", nullable = false)
+    private String repeatType;
+
+    @Column(name = "repeat_interval")
+    private Integer repeatInterval;
+
+    @Column(name = "repeat_days")
+    private String repeatDays;
+
+    @Column(name = "repeat_times")
+    private String repeatTimes;
+
+    @NotNull
+    @Column(name = "completed", nullable = false)
+    private Boolean completed;
 
     @NotNull
     @Column(name = "start_date", nullable = false)
@@ -41,6 +54,9 @@ public class Habit implements Serializable {
 
     @Column(name = "completion_rate")
     private Float completionRate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
@@ -73,17 +89,69 @@ public class Habit implements Serializable {
         this.name = name;
     }
 
-    public String getRepeatFrequency() {
-        return this.repeatFrequency;
+    public String getRepeatType() {
+        return this.repeatType;
     }
 
-    public Habit repeatFrequency(String repeatFrequency) {
-        this.setRepeatFrequency(repeatFrequency);
+    public Habit repeatType(String repeatType) {
+        this.setRepeatType(repeatType);
         return this;
     }
 
-    public void setRepeatFrequency(String repeatFrequency) {
-        this.repeatFrequency = repeatFrequency;
+    public void setRepeatType(String repeatType) {
+        this.repeatType = repeatType;
+    }
+
+    public Integer getRepeatInterval() {
+        return this.repeatInterval;
+    }
+
+    public Habit repeatInterval(Integer repeatInterval) {
+        this.setRepeatInterval(repeatInterval);
+        return this;
+    }
+
+    public void setRepeatInterval(Integer repeatInterval) {
+        this.repeatInterval = repeatInterval;
+    }
+
+    public String getRepeatDays() {
+        return this.repeatDays;
+    }
+
+    public Habit repeatDays(String repeatDays) {
+        this.setRepeatDays(repeatDays);
+        return this;
+    }
+
+    public void setRepeatDays(String repeatDays) {
+        this.repeatDays = repeatDays;
+    }
+
+    public String getRepeatTimes() {
+        return this.repeatTimes;
+    }
+
+    public Habit repeatTimes(String repeatTimes) {
+        this.setRepeatTimes(repeatTimes);
+        return this;
+    }
+
+    public void setRepeatTimes(String repeatTimes) {
+        this.repeatTimes = repeatTimes;
+    }
+
+    public Boolean getCompleted() {
+        return this.completed;
+    }
+
+    public Habit completed(Boolean completed) {
+        this.setCompleted(completed);
+        return this;
+    }
+
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
     }
 
     public Instant getStartDate() {
@@ -125,6 +193,19 @@ public class Habit implements Serializable {
         this.completionRate = completionRate;
     }
 
+    public Category getCategory() {
+        return this.category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public Habit category(Category category) {
+        this.setCategory(category);
+        return this;
+    }
+
     public User getUser() {
         return this.user;
     }
@@ -163,7 +244,11 @@ public class Habit implements Serializable {
         return "Habit{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
-            ", repeatFrequency='" + getRepeatFrequency() + "'" +
+            ", repeatType='" + getRepeatType() + "'" +
+            ", repeatInterval=" + getRepeatInterval() +
+            ", repeatDays='" + getRepeatDays() + "'" +
+            ", repeatTimes='" + getRepeatTimes() + "'" +
+            ", completed='" + getCompleted() + "'" +
             ", startDate='" + getStartDate() + "'" +
             ", streak=" + getStreak() +
             ", completionRate=" + getCompletionRate() +

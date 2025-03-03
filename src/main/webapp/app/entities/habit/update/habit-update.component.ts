@@ -7,10 +7,12 @@ import { finalize, map } from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { ICategory } from 'app/entities/category/category.model';
+import { CategoryService } from 'app/entities/category/service/category.service';
 import { IUser } from 'app/entities/user/user.model';
 import { UserService } from 'app/entities/user/service/user.service';
-import { IHabit } from '../habit.model';
 import { HabitService } from '../service/habit.service';
+import { IHabit } from '../habit.model';
 import { HabitFormGroup, HabitFormService } from './habit-form.service';
 
 @Component({
@@ -23,15 +25,19 @@ export class HabitUpdateComponent implements OnInit {
   isSaving = false;
   habit: IHabit | null = null;
 
+  categoriesSharedCollection: ICategory[] = [];
   usersSharedCollection: IUser[] = [];
 
   protected habitService = inject(HabitService);
   protected habitFormService = inject(HabitFormService);
+  protected categoryService = inject(CategoryService);
   protected userService = inject(UserService);
   protected activatedRoute = inject(ActivatedRoute);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: HabitFormGroup = this.habitFormService.createHabitFormGroup();
+
+  compareCategory = (o1: ICategory | null, o2: ICategory | null): boolean => this.categoryService.compareCategory(o1, o2);
 
   compareUser = (o1: IUser | null, o2: IUser | null): boolean => this.userService.compareUser(o1, o2);
 
@@ -83,10 +89,24 @@ export class HabitUpdateComponent implements OnInit {
     this.habit = habit;
     this.habitFormService.resetForm(this.editForm, habit);
 
+    this.categoriesSharedCollection = this.categoryService.addCategoryToCollectionIfMissing<ICategory>(
+      this.categoriesSharedCollection,
+      habit.category,
+    );
     this.usersSharedCollection = this.userService.addUserToCollectionIfMissing<IUser>(this.usersSharedCollection, habit.user);
   }
 
   protected loadRelationshipsOptions(): void {
+    this.categoryService
+      .query()
+      .pipe(map((res: HttpResponse<ICategory[]>) => res.body ?? []))
+      .pipe(
+        map((categories: ICategory[]) =>
+          this.categoryService.addCategoryToCollectionIfMissing<ICategory>(categories, this.habit?.category),
+        ),
+      )
+      .subscribe((categories: ICategory[]) => (this.categoriesSharedCollection = categories));
+
     this.userService
       .query()
       .pipe(map((res: HttpResponse<IUser[]>) => res.body ?? []))

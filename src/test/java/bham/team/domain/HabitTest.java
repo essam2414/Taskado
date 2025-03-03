@@ -1,5 +1,6 @@
 package bham.team.domain;
 
+import static bham.team.domain.CategoryTestSamples.*;
 import static bham.team.domain.HabitTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,5 +21,17 @@ class HabitTest {
 
         habit2 = getHabitSample2();
         assertThat(habit1).isNotEqualTo(habit2);
+    }
+
+    @Test
+    void categoryTest() {
+        Habit habit = getHabitRandomSampleGenerator();
+        Category categoryBack = getCategoryRandomSampleGenerator();
+
+        habit.setCategory(categoryBack);
+        assertThat(habit.getCategory()).isEqualTo(categoryBack);
+
+        habit.category(null);
+        assertThat(habit.getCategory()).isNull();
     }
 }

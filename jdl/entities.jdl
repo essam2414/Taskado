@@ -25,7 +25,11 @@ entity Event {
 
 entity Habit {
   name String required,
-  repeatFrequency String required,
+  repeatType String required,
+  repeatInterval Integer,
+  repeatDays String,
+  repeatTimes String,
+  completed Boolean required,
   startDate Instant required,
   streak Integer,
   completionRate Float
@@ -99,6 +103,7 @@ entity PomodoroSession {
 
 relationship ManyToOne {
   Task{category} to Category,
+  Habit{category} to Category,
   Task{user} to User with builtInEntity,
   Habit{user} to User with builtInEntity,
   Event{user} to User with builtInEntity,
