@@ -10,8 +10,25 @@
       "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "repeatFrequency",
+      "fieldName": "repeatType",
       "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "repeatInterval",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "repeatDays",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "repeatTimes",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "completed",
+      "fieldType": "Boolean",
       "fieldValidateRules": ["required"]
     },
     {
@@ -30,6 +47,12 @@
   ],
   "name": "Habit",
   "relationships": [
+    {
+      "otherEntityName": "category",
+      "relationshipName": "category",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
     {
       "otherEntityName": "user",
       "relationshipName": "user",

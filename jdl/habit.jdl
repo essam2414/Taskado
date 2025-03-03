@@ -1,7 +1,10 @@
 entity Habit {
-    name String required,
-    repeatFrequency String required,
+    name String required minLength(5),
+    repeatType String required,
+    repeatInterval Integer,
+    repeatDays String,
+    repeatTimes String,
     startDate Instant required,
-    streak Integer,
-    completionRate Float
+    streak Integer default(0) min(0),
+    completionRate Float default(0.0) min(0) max(100)
 }
