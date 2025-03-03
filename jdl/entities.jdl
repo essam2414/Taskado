@@ -76,12 +76,11 @@ entity Notification {
   sentVia NotificationChannel required
 }
 
-entity Goal {
+entity Note {
   title String required,
-  description String,
-  startDate Instant required,
-  endDate Instant,
-  progress Integer
+  content TextBlob required,
+  createdAt Instant required, 
+  uupdatedAt Instant
 }
 
 entity ProductivityReport {
@@ -108,7 +107,7 @@ relationship ManyToOne {
   Habit{user} to User with builtInEntity,
   Event{user} to User with builtInEntity,
   Notification{user} to User with builtInEntity,
-  Goal{user} to User with builtInEntity,
+  Note{user} to User with builtInEntity,
   ProductivityReport{user} to User with builtInEntity,
   PomodoroSession{user} to User with builtInEntity
 }

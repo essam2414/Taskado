@@ -1,0 +1,10 @@
+entity Note {
+  title String required,
+  content TextBlob required,
+  createdAt Instant required, 
+  uupdatedAt Instant
+}
+
+relationship ManyToOne {
+  Note{user} to User with builtInEntity,
+}
