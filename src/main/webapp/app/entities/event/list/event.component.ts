@@ -2,7 +2,6 @@ import { Component, NgZone, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
 import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
@@ -33,7 +32,7 @@ export class EventComponent implements OnInit {
   currentDate = new Date();
   daysInMonth = 0;
   firstDay = 0;
-  calendarDays: number[] = [];
+  calendarDays: (number | null)[] = [];
   subscription: Subscription | null = null;
   events?: IEvent[];
   isLoading = false;
@@ -51,12 +50,33 @@ export class EventComponent implements OnInit {
 
   // generate the calendar for the next month
   renderCalendar(): void {
-    this.daysInMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0).getDate();
-    this.firstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1).getDay();
+    const year = this.currentDate.getFullYear();
+    const month = this.currentDate.getMonth();
+
+    this.daysInMonth = new Date(year, month + 1, 0).getDate();
+    this.firstDay = new Date(year, month, 1).getDay();
 
     // creates an array where the first few elements are empty (padding for first day)
     // then fills in the numbers 1 to `daysInMonth`
-    this.calendarDays = [...Array(this.firstDay).fill(0), ...Array.from({ length: this.daysInMonth }, (_, i) => i + 1)];
+    this.calendarDays = [];
+
+    // fill with empty days at the start of the month
+    for (let i = 0; i < this.firstDay; i++) {
+      this.calendarDays.push(null); // Empty spots before 1st day of the month
+    }
+
+    // fill with actual day numbers (1 to 31 or less)
+    for (let i = 1; i <= this.daysInMonth; i++) {
+      this.calendarDays.push(i);
+    }
+  }
+
+  // function to change the month
+  changeMonth(step: number): void {
+    // this.currentDate.setMonth(this.currentDate.getMonth() + step);
+    // this.currentDate = new Date(this.currentDate);
+    this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + step, 1);
+    this.renderCalendar();
   }
 
   ngOnInit(): void {

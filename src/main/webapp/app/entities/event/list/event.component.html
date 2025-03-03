@@ -21,23 +21,21 @@
   </h2>
 
   <div class="calendar-container">
-    <div class="calendar">
-      <div class="calendar-header">
-        <button class="btn btn-light" id="prevMonth">&lt;</button>
-        <h2 id="monthYear"></h2>
-        <button class="btn btn-light" id="nextMonth">&gt;</button>
+    <!-- Navigation for Previous/Next Month -->
+    <div class="calendar-header">
+      <button class="btn btn-secondary" (click)="changeMonth(-1)">❮</button>
+      <h3>{{ currentDate.toLocaleString('default', { month: 'long', year: 'numeric' }) }}</h3>
+      <button class="btn btn-secondary" (click)="changeMonth(1)">❯</button>
+    </div>
+    <!-- Days of the Week -->
+    <div class="calendar-grid">
+      <div class="day-header" *ngFor="let day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']">
+        {{ day }}
       </div>
-      <div class="calendar-body">
-        <div class="calendar-days">
-          <div class="day">Sun</div>
-          <div class="day">Mon</div>
-          <div class="day">Tue</div>
-          <div class="day">Wed</div>
-          <div class="day">Thu</div>
-          <div class="day">Fri</div>
-          <div class="day">Sat</div>
-        </div>
-        <div class="calendar-dates" id="calendarDates"></div>
+
+      <!-- Actual Dates -->
+      <div class="calendar-day" *ngFor="let day of calendarDays">
+        <span *ngIf="day">{{ day }}</span>
       </div>
     </div>
   </div>
