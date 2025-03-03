@@ -2,7 +2,8 @@
 entity PomodoroSession {
   Start Instant required,
   Stop Instant,
-  duration Integer,
-  Paused Boolean,
 }
 
+relationship ManyToOne {
+  PomodoroSession{user} to User with builtInEntity
+}

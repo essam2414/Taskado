@@ -3,25 +3,24 @@
 }
 
 .task-row td {
-  padding: 20px 20px;
-}
-
-.completed td {
-  color: #ddd;
-}
-
-.completed .task-description {
-  color: #ddd;
+  padding: clamp(8px, 3vw, 20px);
 }
 
 .completed .task-title {
   text-decoration: line-through;
-  color: #aaa;
+}
+
+.non-clickable {
+  pointer-events: none;
+}
+
+.non-clickable .custom-checkbox {
+  pointer-events: auto;
 }
 
 .custom-checkbox {
-  width: 24px;
-  height: 24px;
+  width: clamp(16px, 3vw, 24px);
+  height: clamp(16px, 3vw, 24px);
   border-radius: 5px;
   border: 1.5px solid gainsboro;
   background-color: transparent;
@@ -44,28 +43,39 @@
 }
 
 .task-title {
-  font-size: 18px;
+  font-size: clamp(1rem, 3vw, 1.25rem);
   font-weight: 400;
   margin-bottom: 8px;
 }
 
 .task-description {
-  font-size: 16px;
+  font-size: clamp(0.875rem, 2vw, 1rem);
   font-weight: 200;
   color: #888;
+}
+
+.task-category {
+  display: inline-block;
+  border-radius: 6px;
+  text-align: center;
+  color: white;
+  font-weight: 400;
+  font-size: 12px;
+  padding: 4px 12px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .task-priority {
   color: #888;
   font-weight: 400;
+  font-size: clamp(0.75rem, 2vw, 1rem);
 }
 
 .priority-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
   display: inline-block;
-  margin-right: 10px;
+  width: clamp(6px, 1.5vw, 10px);
+  height: clamp(6px, 1.5vw, 10px);
+  border-radius: 50%;
 }
 
 .LOW {
@@ -84,4 +94,82 @@
 .task-date {
   text-align: right;
   color: #888;
+  font-size: clamp(0.75rem, 2vw, 1rem);
+}
+
+.color-box {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 8px;
+}
+
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+}
+
+.select-btn {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 20px);
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: 0.2s;
+}
+
+.select-btn:hover {
+  border-color: #007bff;
+}
+
+.select-btn fa-icon {
+  margin-left: auto;
+  color: black;
+  font-size: 18px;
+  transition: transform 0.3s;
+}
+
+.select-btn.active i {
+  transform: rotate(180deg);
+}
+
+.options {
+  position: absolute;
+  width: 100%;
+  background: white;
+  margin-top: 4px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+ul.options {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.option:hover {
+  background: #f2f2f2;
+}
+
+.add-btn {
+  margin-bottom: 20px;
 }

@@ -12,6 +12,7 @@ const initialAccount: Account = {} as Account;
   selector: 'jhi-settings',
   imports: [SharedModule, FormsModule, ReactiveFormsModule],
   templateUrl: './settings.component.html',
+  styleUrls: ['./settings.component.scss'],
 })
 export default class SettingsComponent implements OnInit {
   success = signal(false);
