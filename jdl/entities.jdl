@@ -83,20 +83,18 @@ entity Goal {
 entity ProductivityReport {
   tasksPlanned Integer,
   tasksCompleted Integer,
-  taskAvgCompletionTime Float,   
-  taskEfficiency Float,         
-  pomodoroSessions Integer,      
-  distractionsCount Integer,     
-  focusTime Float,               
-  focusScore Float required,     
+  taskAvgCompletionTime Float,
+  taskEfficiency Float,
+  pomodoroSessions Integer,
+  distractionsCount Integer,
+  focusTime Float,
+  focusScore Float required,
   timestamp Instant required
 }
 
 entity PomodoroSession {
   start Instant required,
   stop Instant,
-  duration Integer,
-  paused Boolean
 }
 
 relationship ManyToOne {

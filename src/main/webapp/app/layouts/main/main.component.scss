@@ -1,0 +1,35 @@
+.layout {
+  display: flex;
+  // transition: margin-left 0.3s ease-in-out;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  transition: margin-left 0.3s ease-in-out;
+  padding: clamp(20px, 5vw, 60px);
+  padding-bottom: 0;
+  margin-top: 44px;
+}
+
+/* When Sidebar is Expanded */
+.layout.expanded .main-content {
+  margin-left: 300px;
+}
+
+/* sidebar shifts main content */
+.layout.collapsed .main-content {
+  margin-left: 0;
+}
+
+/* sidebar goes over main content on mobile */
+@media (max-width: 768px) {
+  .layout.expanded .main-content {
+    margin-left: 0 !important;
+  }
+}

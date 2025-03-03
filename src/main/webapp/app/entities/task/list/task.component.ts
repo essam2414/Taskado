@@ -85,8 +85,8 @@ export class TaskComponent implements OnInit {
     return date.format(`D MMM${isNextYear ? ' YYYY' : ''} HH:mm`);
   }
 
-  viewTask(task: ITask): void {
-    this.router.navigate(['/task', task.id, 'view']);
+  editTask(task: ITask): void {
+    this.router.navigate(['/task', task.id, 'edit']);
   }
 
   load(): void {
