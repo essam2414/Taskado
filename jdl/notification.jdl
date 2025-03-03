@@ -24,7 +24,7 @@ enum NotificationChannel {
 }
 
 entity Notification {
-  message String required,
+  message String required minlength(5),
   notificationType NotificationType required,
   timestamp Instant required,
   linkedEntityType String,
@@ -37,4 +37,8 @@ entity Notification {
   isRecurring Boolean required,
   recurrencePattern String,
   sentVia NotificationChannel required
+}
+
+relationship ManyToOne {
+  Notification{user} to User with builtInEntity
 }

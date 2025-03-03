@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,7 +29,6 @@ import tech.jhipster.web.util.ResponseUtil;
 public class NotificationResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationResource.class);
-
     private static final String ENTITY_NAME = "notification";
 
     @Value("${jhipster.clientApp.name}")
@@ -42,17 +42,17 @@ public class NotificationResource {
 
     /**
      * {@code POST  /notifications} : Create a new notification.
-     *
-     * @param notification the notification to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new notification, or with status {@code 400 (Bad Request)} if the notification has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
     public ResponseEntity<Notification> createNotification(@Valid @RequestBody Notification notification) throws URISyntaxException {
         LOG.debug("REST request to save Notification : {}", notification);
+
         if (notification.getId() != null) {
             throw new BadRequestAlertException("A new notification cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        validateNotification(notification);
+
         notification = notificationRepository.save(notification);
         return ResponseEntity.created(new URI("/api/notifications/" + notification.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, notification.getId().toString()))
@@ -61,13 +61,6 @@ public class NotificationResource {
 
     /**
      * {@code PUT  /notifications/:id} : Updates an existing notification.
-     *
-     * @param id the id of the notification to save.
-     * @param notification the notification to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated notification,
-     * or with status {@code 400 (Bad Request)} if the notification is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the notification couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     public ResponseEntity<Notification> updateNotification(
@@ -75,16 +68,18 @@ public class NotificationResource {
         @Valid @RequestBody Notification notification
     ) throws URISyntaxException {
         LOG.debug("REST request to update Notification : {}, {}", id, notification);
+
         if (notification.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, notification.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
-
         if (!notificationRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
+
+        validateNotification(notification);
 
         notification = notificationRepository.save(notification);
         return ResponseEntity.ok()
@@ -93,29 +88,18 @@ public class NotificationResource {
     }
 
     /**
-     * {@code PATCH  /notifications/:id} : Partial updates given fields of an existing notification, field will ignore if it is null
-     *
-     * @param id the id of the notification to save.
-     * @param notification the notification to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated notification,
-     * or with status {@code 400 (Bad Request)} if the notification is not valid,
-     * or with status {@code 404 (Not Found)} if the notification is not found,
-     * or with status {@code 500 (Internal Server Error)} if the notification couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     * {@code PATCH  /notifications/:id} : Partial update an existing notification.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Notification> partialUpdateNotification(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody Notification notification
     ) throws URISyntaxException {
-        LOG.debug("REST request to partial update Notification partially : {}, {}", id, notification);
-        if (notification.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
+        LOG.debug("REST request to partially update Notification : {}, {}", id, notification);
+
         if (!Objects.equals(id, notification.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
-
         if (!notificationRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
@@ -124,22 +108,22 @@ public class NotificationResource {
             .findById(notification.getId())
             .map(existingNotification -> {
                 if (notification.getMessage() != null) {
+                    if (notification.getMessage().length() < 5) {
+                        throw new BadRequestAlertException("Message must be at least 5 characters", ENTITY_NAME, "shortMessage");
+                    }
                     existingNotification.setMessage(notification.getMessage());
                 }
-                if (notification.getNotificationType() != null) {
-                    existingNotification.setNotificationType(notification.getNotificationType());
-                }
                 if (notification.getTimestamp() != null) {
+                    if (notification.getTimestamp().isAfter(Instant.now())) {
+                        throw new BadRequestAlertException("Timestamp cannot be in the future", ENTITY_NAME, "invalidTimestamp");
+                    }
                     existingNotification.setTimestamp(notification.getTimestamp());
-                }
-                if (notification.getLinkedEntityType() != null) {
-                    existingNotification.setLinkedEntityType(notification.getLinkedEntityType());
-                }
-                if (notification.getRead() != null) {
-                    existingNotification.setRead(notification.getRead());
                 }
                 if (notification.getPriority() != null) {
                     existingNotification.setPriority(notification.getPriority());
+                }
+                if (notification.getRead() != null) {
+                    existingNotification.setRead(notification.getRead());
                 }
                 if (notification.getStatus() != null) {
                     existingNotification.setStatus(notification.getStatus());
@@ -174,9 +158,7 @@ public class NotificationResource {
     }
 
     /**
-     * {@code GET  /notifications} : get all the notifications.
-     *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of notifications in body.
+     * {@code GET  /notifications} : get all notifications.
      */
     @GetMapping("")
     public List<Notification> getAllNotifications() {
@@ -185,10 +167,7 @@ public class NotificationResource {
     }
 
     /**
-     * {@code GET  /notifications/:id} : get the "id" notification.
-     *
-     * @param id the id of the notification to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the notification, or with status {@code 404 (Not Found)}.
+     * {@code GET  /notifications/:id} : get a notification by ID.
      */
     @GetMapping("/{id}")
     public ResponseEntity<Notification> getNotification(@PathVariable("id") Long id) {
@@ -198,17 +177,29 @@ public class NotificationResource {
     }
 
     /**
-     * {@code DELETE  /notifications/:id} : delete the "id" notification.
-     *
-     * @param id the id of the notification to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
+     * {@code DELETE  /notifications/:id} : delete a notification by ID.
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNotification(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Notification : {}", id);
+        if (!notificationRepository.existsById(id)) {
+            throw new BadRequestAlertException("Notification not found", ENTITY_NAME, "idnotfound");
+        }
         notificationRepository.deleteById(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    /**
+     * Validate Notification fields.
+     */
+    private void validateNotification(Notification notification) {
+        if (notification.getMessage() != null && notification.getMessage().length() < 5) {
+            throw new BadRequestAlertException("Message must be at least 5 characters", ENTITY_NAME, "shortMessage");
+        }
+        if (notification.getTimestamp() != null && notification.getTimestamp().isAfter(Instant.now())) {
+            throw new BadRequestAlertException("Timestamp cannot be in the future", ENTITY_NAME, "invalidTimestamp");
+        }
     }
 }
