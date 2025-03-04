@@ -32,11 +32,6 @@ const routes: Routes = [
     loadChildren: () => import('./pomodoro-session/pomodoro-session.routes'),
   },
   {
-    path: 'goal',
-    data: { pageTitle: 'Goals' },
-    loadChildren: () => import('./goal/goal.routes'),
-  },
-  {
     path: 'productivity-report',
     data: { pageTitle: 'ProductivityReports' },
     loadChildren: () => import('./productivity-report/productivity-report.routes'),
