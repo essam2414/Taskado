@@ -1,4 +1,4 @@
-import { Component, NgZone, OnInit, inject } from '@angular/core';
+import { Component, HostListener, NgZone, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
 import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -33,8 +33,17 @@ export class TaskComponent implements OnInit {
   subscription: Subscription | null = null;
   tasks?: ITask[];
   isLoading = false;
+  newTaskTitle = '';
+
+  activeFilter = 'inbox';
+  filters = [
+    { label: 'Inbox', value: 'inbox', icon: 'inbox' },
+    { label: 'Today', value: 'today', icon: 'calendar-day' },
+    { label: 'Completed', value: 'completed', icon: 'circle-check' },
+  ];
 
   sortState = sortStateSignal({});
+  openMenuTaskId: number | null = null;
 
   public readonly router = inject(Router);
   protected readonly taskService = inject(TaskService);
@@ -58,10 +67,29 @@ export class TaskComponent implements OnInit {
       .subscribe();
   }
 
+  setFilter(selectedFilter: string): void {
+    this.activeFilter = selectedFilter;
+  }
+
+  getFilteredTasks(): ITask[] {
+    if (!this.tasks) return [];
+
+    if (this.activeFilter === 'today') {
+      return this.tasks.filter(task => task.dueDate && dayjs(task.dueDate).isSame(dayjs(), 'day') && !task.completed);
+    }
+    if (this.activeFilter === 'completed') {
+      return this.tasks.filter(task => task.completed);
+    }
+    return this.tasks.filter(task => !task.completed);
+  }
+
+  get activeFilterLabel(): string {
+    return this.filters.find(f => f.value === this.activeFilter)?.label ?? '';
+  }
+
   delete(task: ITask): void {
     const modalRef = this.modalService.open(TaskDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.task = task;
-    // unsubscribe not needed because closed completes on modal close
     modalRef.closed
       .pipe(
         filter(reason => reason === ITEM_DELETED_EVENT),
@@ -77,12 +105,30 @@ export class TaskComponent implements OnInit {
     });
   }
 
+  toggleMenu(taskId: number): void {
+    this.openMenuTaskId = this.openMenuTaskId === taskId ? null : taskId;
+  }
+
+  @HostListener('document:click', ['$event'])
+  closeMenu(event: Event): void {
+    const clickedInside = (event.target as HTMLElement).closest('.task-menu');
+    if (!clickedInside) {
+      this.openMenuTaskId = null; // Close menu
+    }
+  }
+
   formatTaskDate(dueDate: dayjs.Dayjs | string | null | undefined): string {
     if (!dueDate) return '';
     const date = dayjs(dueDate);
     const now = dayjs();
     const isNextYear = date.year() > now.year();
     return date.format(`D MMM${isNextYear ? ' YYYY' : ''} HH:mm`);
+  }
+
+  addTask(): void {
+    if (this.newTaskTitle.trim()) {
+      this.router.navigate(['/task/new'], { queryParams: { title: this.newTaskTitle } });
+    }
   }
 
   editTask(task: ITask): void {

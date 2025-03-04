@@ -1,15 +1,15 @@
 entity Category {
-  name String required unique,
+  name String required unique minLength(3),
   color String required
 }
 
 entity Task {
-  title String required,
-  description String,
+  title String required minLength(3) maxLength(100), 
+  description String maxLength(500),
   dueDate Instant,
   priority TaskPriority,
-  completed Boolean,
-  createdAt Instant,
+  completed Boolean required,
+  createdAt Instant required,
   updatedAt Instant
 }
 
@@ -21,6 +21,6 @@ enum TaskPriority {
 }
 
 relationship ManyToOne {
-  Task{category} to Category  
-  Task{user} to User
+  Task{category} to Category,
+  Task{user} to User with builtInEntity
 }

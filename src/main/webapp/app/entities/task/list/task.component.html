@@ -1,71 +1,119 @@
 <div>
-  <h2 id="page-heading" data-cy="TaskHeading">Tasks</h2>
+  <div class="task-header">
+    <div class="task-header-left">
+      <h2 id="page-heading" data-cy="TaskHeading">Tasks</h2>
+
+      <div class="task-filters">
+        <button
+          *ngFor="let filter of filters"
+          class="filter-btn"
+          [class.active]="activeFilter === filter.value"
+          (click)="setFilter(filter.value)"
+        >
+          <fa-icon [icon]="filter.icon"></fa-icon>
+          {{ filter.label }}
+        </button>
+      </div>
+    </div>
+
+    <button id="jh-create-entity" data-cy="entityCreateButton" class="header-btn jh-create-entity create-task" [routerLink]="['/task/new']">
+      <fa-icon icon="plus"></fa-icon>
+      <span>New task</span>
+    </button>
+  </div>
 
   <jhi-alert-error></jhi-alert-error>
 
   <jhi-alert></jhi-alert>
 
-  <div class="table-responsive table-entities" id="entities">
-    <table class="table table-hover" aria-describedby="page-heading">
-      <tbody>
-        @for (task of tasks; track trackId(task)) {
-          <tr
-            data-cy="entityTable"
-            [class.completed]="task.completed"
-            [class.non-clickable]="task.completed"
-            (click)="!task.completed && editTask(task)"
-            class="task-row"
-          >
-            <td>
-              <div class="form-check d-flex gap-4">
-                <input
-                  class="form-check-input custom-checkbox"
-                  type="checkbox"
-                  [checked]="task.completed"
-                  (change)="toggleCompleted(task)"
-                  (click)="$event.stopPropagation()"
-                  id="task-{{ task.id }}"
-                />
+  <div class="task-list">
+    <h3 class="task-subtitle">{{ activeFilterLabel }}</h3>
+    @for (task of getFilteredTasks(); track trackId(task)) {
+      <div
+        class="task-container"
+        [class.completed]="task.completed"
+        [class.non-clickable]="task.completed"
+        (click)="!task.completed && editTask(task)"
+      >
+        <div class="task-smth">
+          <input
+            type="checkbox"
+            class="form-check-input custom-checkbox"
+            [checked]="task.completed"
+            (change)="toggleCompleted(task)"
+            (click)="$event.stopPropagation()"
+            id="task-{{ task.id }}"
+          />
 
-                <label class="form-check-label" for="task-{{ task.id }}">
-                  <div class="task-title">{{ task.title }}</div>
-                  <div class="task-description">{{ task.description }}</div>
-                </label>
-              </div>
-            </td>
+          <div class="task-info">
+            <h3 class="task-title">{{ task.title }}</h3>
+            <div class="task-description">{{ task.description }}</div>
 
-            <td class="task-priority">
-              <span class="priority-dot" [ngClass]="task.priority"></span>
-              {{
-                { null: '', LOW: 'Low Priority', MEDIUM: 'Medium Priority', HIGH: 'High Priority', CRITICAL: 'Critical Priority' }[
-                  task.priority ?? 'null'
-                ]
-              }}
-            </td>
+            <div class="task-details">
+              @if (task.priority) {
+                <div class="task-tag task-priority" [ngClass]="task.priority">
+                  <fa-icon icon="flag"></fa-icon>
+                  {{
+                    { null: '', LOW: 'Low Priority', MEDIUM: 'Medium Priority', HIGH: 'High Priority', CRITICAL: 'Critical Priority' }[
+                      task.priority ?? 'null'
+                    ]
+                  }}
+                </div>
+              }
 
-            <td>
               @if (task.category) {
-                <div class="task-category" [ngStyle]="{ 'background-color': task.category.color }">
+                <div
+                  class="task-tag task-category"
+                  [ngStyle]="{
+                    color: task.category.color,
+                    'background-color': task.category.color + '30',
+                  }"
+                >
                   {{ task.category.name }}
                 </div>
               }
-            </td>
+            </div>
+          </div>
+        </div>
 
-            <td class="task-date">{{ formatTaskDate(task.dueDate) }}</td>
-          </tr>
-        }
-      </tbody>
-    </table>
+        <div class="task-date">
+          <span>{{ formatTaskDate(task.dueDate) }}</span>
+        </div>
 
-    <div class="add-btn">
+        <div class="task-menu" [class.open]="openMenuTaskId === task.id">
+          <fa-icon icon="ellipsis-vertical" class="menu-icon" (click)="toggleMenu(task.id); $event.stopPropagation()"></fa-icon>
+          <div class="menu-dropdown" [class.show]="openMenuTaskId === task.id">
+            <button (click)="editTask(task); $event.stopPropagation()">
+              <fa-icon icon="pencil"></fa-icon>
+              <span>Edit</span>
+            </button>
+            <button class="delete-btn" (click)="delete(task); $event.stopPropagation()">
+              <fa-icon icon="trash-alt"></fa-icon>
+              <span>Delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <div class="add-task">
+      <input
+        type="text"
+        class="task-input"
+        [(ngModel)]="newTaskTitle"
+        placeholder="Start typing to add a task..."
+        (keyup.enter)="addTask()"
+      />
+
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-task"
+        class="add-btn jh-create-entity create-task"
         [routerLink]="['/task/new']"
+        [queryParams]="{ title: newTaskTitle }"
+        [disabled]="!newTaskTitle.trim()"
       >
         <fa-icon icon="plus"></fa-icon>
-        <span>Add task</span>
       </button>
     </div>
   </div>

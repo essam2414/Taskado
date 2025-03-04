@@ -60,6 +60,12 @@ export class TaskUpdateComponent implements OnInit {
 
       this.loadRelationshipsOptions();
     });
+
+    this.activatedRoute.queryParams.subscribe(params => {
+      if (params['title'] && !this.task) {
+        this.editForm.patchValue({ title: params['title'] });
+      }
+    });
   }
 
   previousState(): void {

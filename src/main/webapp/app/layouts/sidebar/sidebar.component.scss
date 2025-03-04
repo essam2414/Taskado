@@ -187,9 +187,6 @@ $sidebar-active: #564df2;
 .nav-menu a.active {
   background-color: $sidebar-active;
   color: white;
-  box-shadow:
-    0px 2px 6px rgba(87, 78, 241, 0.2),
-    0px 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .nav-menu fa-icon {

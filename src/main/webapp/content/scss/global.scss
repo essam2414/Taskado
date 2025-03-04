@@ -131,6 +131,12 @@ a:hover {
   color: $dropdown-link-hover-color;
 }
 
+.modal-rounded .modal-content {
+  border-radius: 20px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border: none;
+}
+
 /* ==========================================================================
 Browser Upgrade Prompt
 ========================================================================== */
@@ -185,7 +191,6 @@ Generic styles
 }
 
 .footer {
-  border-top: 1px solid rgba(0, 0, 0, 0.125);
   padding-top: 10px;
   text-align: center;
 }
