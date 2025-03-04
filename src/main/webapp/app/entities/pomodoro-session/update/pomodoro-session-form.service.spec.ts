@@ -22,8 +22,6 @@ describe('PomodoroSession Form Service', () => {
             id: expect.any(Object),
             start: expect.any(Object),
             stop: expect.any(Object),
-            duration: expect.any(Object),
-            paused: expect.any(Object),
             user: expect.any(Object),
           }),
         );
@@ -37,8 +35,6 @@ describe('PomodoroSession Form Service', () => {
             id: expect.any(Object),
             start: expect.any(Object),
             stop: expect.any(Object),
-            duration: expect.any(Object),
-            paused: expect.any(Object),
             user: expect.any(Object),
           }),
         );

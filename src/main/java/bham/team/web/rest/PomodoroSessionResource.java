@@ -2,6 +2,7 @@ package bham.team.web.rest;
 
 import bham.team.domain.PomodoroSession;
 import bham.team.repository.PomodoroSessionRepository;
+import bham.team.service.dto.PomodoroSessionDTO;
 import bham.team.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -130,12 +131,6 @@ public class PomodoroSessionResource {
                 if (pomodoroSession.getStop() != null) {
                     existingPomodoroSession.setStop(pomodoroSession.getStop());
                 }
-                if (pomodoroSession.getDuration() != null) {
-                    existingPomodoroSession.setDuration(pomodoroSession.getDuration());
-                }
-                if (pomodoroSession.getPaused() != null) {
-                    existingPomodoroSession.setPaused(pomodoroSession.getPaused());
-                }
 
                 return existingPomodoroSession;
             })
@@ -153,9 +148,23 @@ public class PomodoroSessionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of pomodoroSessions in body.
      */
     @GetMapping("")
-    public List<PomodoroSession> getAllPomodoroSessions() {
+    public List<PomodoroSessionDTO> getAllPomodoroSessions() {
         LOG.debug("REST request to get all PomodoroSessions");
-        return pomodoroSessionRepository.findAll();
+        //return pomodoroSessionRepository.findAll();
+
+        return pomodoroSessionRepository
+            .findAll()
+            .stream()
+            .map(session ->
+                new PomodoroSessionDTO(
+                    session.getId(),
+                    session.getStart(),
+                    session.getStop(),
+                    session.getDuration(), // Automatically computed in pomodorosession.java
+                    session.getUser() != null ? session.getUser().getId() : null
+                )
+            )
+            .toList();
     }
 
     /**
@@ -165,10 +174,25 @@ public class PomodoroSessionResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the pomodoroSession, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<PomodoroSession> getPomodoroSession(@PathVariable("id") Long id) {
+    public ResponseEntity<PomodoroSessionDTO> getPomodoroSession(@PathVariable("id") Long id) {
         LOG.debug("REST request to get PomodoroSession : {}", id);
-        Optional<PomodoroSession> pomodoroSession = pomodoroSessionRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(pomodoroSession);
+        //Optional<PomodoroSession> pomodoroSession = pomodoroSessionRepository.findById(id);
+        //return ResponseUtil.wrapOrNotFound(pomodoroSession);
+        Optional<PomodoroSession> session = pomodoroSessionRepository.findById(id);
+
+        return session
+            .map(s ->
+                ResponseEntity.ok(
+                    new PomodoroSessionDTO(
+                        s.getId(),
+                        s.getStart(),
+                        s.getStop(),
+                        s.getDuration(),
+                        s.getUser() != null ? s.getUser().getId() : null
+                    )
+                )
+            )
+            .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**

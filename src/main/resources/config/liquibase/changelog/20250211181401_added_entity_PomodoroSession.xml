@@ -20,12 +20,6 @@
             <column name="stop" type="${datetimeType}">
                 <constraints nullable="true" />
             </column>
-            <column name="duration" type="integer">
-                <constraints nullable="true" />
-            </column>
-            <column name="paused" type="boolean">
-                <constraints nullable="true" />
-            </column>
             <column name="user_id" type="bigint">
                 <constraints nullable="true" />
             </column>
@@ -54,8 +48,6 @@
             <column name="id" type="numeric"/>
             <column name="start" type="date"/>
             <column name="stop" type="date"/>
-            <column name="duration" type="numeric"/>
-            <column name="paused" type="boolean"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

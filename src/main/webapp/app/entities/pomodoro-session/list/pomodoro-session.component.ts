@@ -25,6 +25,9 @@ import { PomodoroSessionDeleteDialogComponent } from '../delete/pomodoro-session
     DurationPipe,
     FormatMediumDatetimePipe,
     FormatMediumDatePipe,
+    FormatMediumDatetimePipe,
+    FormatMediumDatetimePipe,
+    FormatMediumDatetimePipe,
   ],
 })
 export class PomodoroSessionComponent implements OnInit {
@@ -41,7 +44,7 @@ export class PomodoroSessionComponent implements OnInit {
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
 
-  trackId = (item: IPomodoroSession): number => this.pomodoroSessionService.getPomodoroSessionIdentifier(item);
+  trackId = (_index: number, item: IPomodoroSession): number => this.pomodoroSessionService.getPomodoroSessionIdentifier(item);
 
   ngOnInit(): void {
     this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
