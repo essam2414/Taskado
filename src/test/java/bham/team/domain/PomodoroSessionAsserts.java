@@ -48,9 +48,7 @@ public class PomodoroSessionAsserts {
         assertThat(expected)
             .as("Verify PomodoroSession relevant properties")
             .satisfies(e -> assertThat(e.getStart()).as("check start").isEqualTo(actual.getStart()))
-            .satisfies(e -> assertThat(e.getStop()).as("check stop").isEqualTo(actual.getStop()))
-            .satisfies(e -> assertThat(e.getDuration()).as("check duration").isEqualTo(actual.getDuration()))
-            .satisfies(e -> assertThat(e.getPaused()).as("check paused").isEqualTo(actual.getPaused()));
+            .satisfies(e -> assertThat(e.getStop()).as("check stop").isEqualTo(actual.getStop()));
     }
 
     /**

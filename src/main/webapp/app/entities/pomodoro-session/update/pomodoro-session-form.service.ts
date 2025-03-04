@@ -28,14 +28,12 @@ type PomodoroSessionFormRawValue = FormValueOf<IPomodoroSession>;
 
 type NewPomodoroSessionFormRawValue = FormValueOf<NewPomodoroSession>;
 
-type PomodoroSessionFormDefaults = Pick<NewPomodoroSession, 'id' | 'start' | 'stop' | 'paused'>;
+type PomodoroSessionFormDefaults = Pick<NewPomodoroSession, 'id' | 'start' | 'stop'>;
 
 type PomodoroSessionFormGroupContent = {
   id: FormControl<PomodoroSessionFormRawValue['id'] | NewPomodoroSession['id']>;
   start: FormControl<PomodoroSessionFormRawValue['start']>;
   stop: FormControl<PomodoroSessionFormRawValue['stop']>;
-  duration: FormControl<PomodoroSessionFormRawValue['duration']>;
-  paused: FormControl<PomodoroSessionFormRawValue['paused']>;
   user: FormControl<PomodoroSessionFormRawValue['user']>;
 };
 
@@ -60,8 +58,6 @@ export class PomodoroSessionFormService {
         validators: [Validators.required],
       }),
       stop: new FormControl(pomodoroSessionRawValue.stop),
-      duration: new FormControl(pomodoroSessionRawValue.duration),
-      paused: new FormControl(pomodoroSessionRawValue.paused),
       user: new FormControl(pomodoroSessionRawValue.user),
     });
   }
@@ -89,7 +85,6 @@ export class PomodoroSessionFormService {
       id: null,
       start: currentTime,
       stop: currentTime,
-      paused: false,
     };
   }
 

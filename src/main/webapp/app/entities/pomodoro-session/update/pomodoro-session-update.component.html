@@ -55,16 +55,6 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_duration">Duration</label>
-          <input type="number" class="form-control" name="duration" id="field_duration" data-cy="duration" formControlName="duration" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_paused">Paused</label>
-          <input type="checkbox" class="form-check" name="paused" id="field_paused" data-cy="paused" formControlName="paused" />
-        </div>
-
-        <div class="mb-3">
           <label class="form-label" for="field_user">User</label>
           <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user" [compareWith]="compareUser">
             <option [ngValue]="null"></option>

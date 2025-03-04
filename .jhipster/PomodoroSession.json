@@ -12,14 +12,6 @@
     {
       "fieldName": "stop",
       "fieldType": "Instant"
-    },
-    {
-      "fieldName": "duration",
-      "fieldType": "Integer"
-    },
-    {
-      "fieldName": "paused",
-      "fieldType": "Boolean"
     }
   ],
   "name": "PomodoroSession",

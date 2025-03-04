@@ -5,8 +5,7 @@ export interface IPomodoroSession {
   id: number;
   start?: dayjs.Dayjs | null;
   stop?: dayjs.Dayjs | null;
-  duration?: number | null;
-  paused?: boolean | null;
+  duration?: IUser;
   user?: Pick<IUser, 'id'> | null;
 }
 

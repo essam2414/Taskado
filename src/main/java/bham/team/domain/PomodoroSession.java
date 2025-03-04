@@ -1,5 +1,6 @@
 package bham.team.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -30,12 +31,6 @@ public class PomodoroSession implements Serializable {
 
     @Column(name = "stop")
     private Instant stop;
-
-    @Column(name = "duration")
-    private Integer duration;
-
-    @Column(name = "paused")
-    private Boolean paused;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
@@ -78,33 +73,18 @@ public class PomodoroSession implements Serializable {
     }
 
     public void setStop(Instant stop) {
+        if (stop != null && start != null && stop.isBefore(start)) {
+            throw new IllegalArgumentException("Stop time must be after start time.");
+        }
         this.stop = stop;
     }
 
+    @JsonProperty("duration")
     public Integer getDuration() {
-        return this.duration;
-    }
-
-    public PomodoroSession duration(Integer duration) {
-        this.setDuration(duration);
-        return this;
-    }
-
-    public void setDuration(Integer duration) {
-        this.duration = duration;
-    }
-
-    public Boolean getPaused() {
-        return this.paused;
-    }
-
-    public PomodoroSession paused(Boolean paused) {
-        this.setPaused(paused);
-        return this;
-    }
-
-    public void setPaused(Boolean paused) {
-        this.paused = paused;
+        if (start != null && stop != null) {
+            return (int) java.time.Duration.between(start, stop).toMinutes();
+        }
+        return null; // Return null if session is ongoing
     }
 
     public User getUser() {
@@ -146,8 +126,6 @@ public class PomodoroSession implements Serializable {
             "id=" + getId() +
             ", start='" + getStart() + "'" +
             ", stop='" + getStop() + "'" +
-            ", duration=" + getDuration() +
-            ", paused='" + getPaused() + "'" +
             "}";
     }
 }
