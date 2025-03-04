@@ -44,6 +44,9 @@ import {
   faTags,
   faCog,
   faTornado,
+  faInbox,
+  faCalendarDay,
+  faEllipsisVertical,
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -96,5 +99,8 @@ export const fontAwesomeIcons = [
   faBell,
   faCog,
   faTornado,
+  faInbox,
+  faCalendarDay,
+  faEllipsisVertical,
   // jhipster-needle-add-icon-import
 ];

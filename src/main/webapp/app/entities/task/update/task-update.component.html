@@ -1,7 +1,7 @@
-<div class="d-flex justify-content-center">
-  <div>
+<div>
+  <div class="form-container">
     <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="jhi-task-heading" data-cy="TaskCreateUpdateHeading">Create or edit a Task</h2>
+      <h2 id="jhi-task-heading" data-cy="TaskCreateUpdateHeading">{{ task?.id ? 'Edit task' : 'Add a task' }}</h2>
 
       <div>
         <jhi-alert-error></jhi-alert-error>
