@@ -2,7 +2,6 @@ import { Component, NgZone, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
 import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
@@ -16,6 +15,7 @@ import { EventDeleteDialogComponent } from '../delete/event-delete-dialog.compon
   standalone: true,
   selector: 'jhi-event',
   templateUrl: './event.component.html',
+  styleUrls: ['../event.scss'],
   imports: [
     RouterModule,
     FormsModule,
@@ -28,6 +28,12 @@ import { EventDeleteDialogComponent } from '../delete/event-delete-dialog.compon
   ],
 })
 export class EventComponent implements OnInit {
+  // create a calendar with buttons to switch between months, the days of the week at the top
+  selectedDate: Date | null = null;
+  currentDate = new Date();
+  daysInMonth = 0;
+  firstDay = 0;
+  calendarDays: (number | null)[] = [];
   subscription: Subscription | null = null;
   events?: IEvent[];
   isLoading = false;
@@ -43,17 +49,56 @@ export class EventComponent implements OnInit {
 
   trackId = (item: IEvent): number => this.eventService.getEventIdentifier(item);
 
+  // generate the calendar for the next month
+  renderCalendar(): void {
+    const year = this.currentDate.getFullYear();
+    const month = this.currentDate.getMonth();
+
+    this.daysInMonth = new Date(year, month + 1, 0).getDate();
+    this.firstDay = new Date(year, month, 1).getDay();
+
+    // creates an array where the first few elements are empty (padding for first day)
+    // then fills in the numbers 1 to `daysInMonth`
+    this.calendarDays = [];
+
+    // fill with empty days at the start of the month
+    for (let i = 0; i < this.firstDay; i++) {
+      this.calendarDays.push(null); // Empty spots before 1st day of the month
+    }
+
+    // fill with actual day numbers (1 to 31 or less)
+    for (let i = 1; i <= this.daysInMonth; i++) {
+      this.calendarDays.push(i);
+    }
+  }
+
+  // function to change the month
+  changeMonth(step: number): void {
+    this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + step, 1);
+    this.renderCalendar();
+  }
+
   ngOnInit(): void {
     this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
       .pipe(
-        tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
-        tap(() => {
+        tap(([params, data]) => {
+          this.fillComponentAttributeFromRoute(params, data);
+
+          // Check for 'date' query parameter and set it as selected date if available
+          if (params.has('date')) {
+            this.selectedDate = new Date(params.get('date')!); // Set selected date from query params
+          } else {
+            this.selectedDate = new Date(); // Default to today's date
+          }
+
           if (!this.events || this.events.length === 0) {
             this.load();
           }
         }),
       )
       .subscribe();
+
+    this.renderCalendar(); // Render the calendar after initializing
   }
 
   delete(event: IEvent): void {
@@ -78,6 +123,20 @@ export class EventComponent implements OnInit {
 
   navigateToWithComponentValues(event: SortState): void {
     this.handleNavigation(event);
+  }
+
+  // add selected date functionality
+  // when a user clicks on a date in the calendar a create form is opened
+  selectDate(day: number): void {
+    if (!day) return;
+
+    const month = this.currentDate.getMonth();
+    const year = this.currentDate.getFullYear();
+    this.selectedDate = new Date(year, month, day);
+    // navigate to the create event page to create a new event for selected date
+    this.router.navigate(['/event/new'], {
+      queryParams: { date: this.selectedDate.toISOString() },
+    });
   }
 
   protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {

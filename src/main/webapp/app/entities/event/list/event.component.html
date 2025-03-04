@@ -1,6 +1,6 @@
 <div>
   <h2 id="page-heading" data-cy="EventHeading">
-    <span>Events</span>
+    <span>Calendar</span>
 
     <div class="d-flex justify-content-end">
       <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
@@ -20,6 +20,28 @@
     </div>
   </h2>
 
+  <div class="calendar-container">
+    <!-- Navigation for Previous/Next Month -->
+    <div class="calendar-header">
+      <button class="btn btn-secondary" (click)="changeMonth(-1)">❮</button>
+      <h3>{{ currentDate.toLocaleString('default', { month: 'long', year: 'numeric' }) }}</h3>
+      <button class="btn btn-secondary" (click)="changeMonth(1)">❯</button>
+    </div>
+    <!-- Days of the Week -->
+    <div class="calendar-grid">
+      <div class="day-header" *ngFor="let day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']">
+        {{ day }}
+      </div>
+
+      <!-- Actual Dates -->
+      <div class="calendar-day" *ngFor="let day of calendarDays">
+        <button *ngIf="day" class="date-button" (click)="selectDate(day)">
+          {{ day }}
+        </button>
+      </div>
+    </div>
+  </div>
+
   <jhi-alert-error></jhi-alert-error>
 
   <jhi-alert></jhi-alert>
@@ -27,117 +49,6 @@
   @if (events?.length === 0) {
     <div class="alert alert-warning" id="no-result">
       <span>No Events found</span>
-    </div>
-  }
-
-  @if (events && events.length > 0) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
-          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span>ID</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="title">
-              <div class="d-flex">
-                <span>Title</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="description">
-              <div class="d-flex">
-                <span>Description</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="eventDate">
-              <div class="d-flex">
-                <span>Event Date</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="startTime">
-              <div class="d-flex">
-                <span>Start Time</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="endTime">
-              <div class="d-flex">
-                <span>End Time</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="location">
-              <div class="d-flex">
-                <span>Location</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="reminder">
-              <div class="d-flex">
-                <span>Reminder</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="user.id">
-              <div class="d-flex">
-                <span>User</span>
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (event of events; track trackId(event)) {
-            <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/event', event.id, 'view']">{{ event.id }}</a>
-              </td>
-              <td>{{ event.title }}</td>
-              <td>{{ event.description }}</td>
-              <td>{{ event.eventDate | formatMediumDatetime }}</td>
-              <td>{{ event.startTime | formatMediumDatetime }}</td>
-              <td>{{ event.endTime | formatMediumDatetime }}</td>
-              <td>{{ event.location }}</td>
-              <td>{{ event.reminder }}</td>
-              <td>
-                {{ event.user?.id }}
-              </td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/event', event.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline">View</span>
-                  </a>
-
-                  <a [routerLink]="['/event', event.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline">Edit</span>
-                  </a>
-
-                  <button type="submit" (click)="delete(event)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
     </div>
   }
 </div>
