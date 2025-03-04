@@ -29,6 +29,7 @@ public class Notification implements Serializable {
     private Long id;
 
     @NotNull
+    @Size(min = 5, message = "Message must be at least 5 characters long")
     @Column(name = "message", nullable = false)
     private String message;
 
@@ -38,6 +39,7 @@ public class Notification implements Serializable {
     private NotificationType notificationType;
 
     @NotNull
+    @PastOrPresent(message = "Timestamp cannot be in the future")
     @Column(name = "timestamp", nullable = false)
     private Instant timestamp;
 
@@ -58,6 +60,7 @@ public class Notification implements Serializable {
     @Column(name = "status", nullable = false)
     private NotificationStatus status;
 
+    @FutureOrPresent(message = "Expiration date must be after timestamp")
     @Column(name = "expiration_date")
     private Instant expirationDate;
 
@@ -82,8 +85,7 @@ public class Notification implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here
-
+    // Getters and Setters with Fluent API
     public Long getId() {
         return this.id;
     }
@@ -279,8 +281,6 @@ public class Notification implements Serializable {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -294,28 +294,55 @@ public class Notification implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "Notification{" +
-            "id=" + getId() +
-            ", message='" + getMessage() + "'" +
-            ", notificationType='" + getNotificationType() + "'" +
-            ", timestamp='" + getTimestamp() + "'" +
-            ", linkedEntityType='" + getLinkedEntityType() + "'" +
-            ", read='" + getRead() + "'" +
-            ", priority='" + getPriority() + "'" +
-            ", status='" + getStatus() + "'" +
-            ", expirationDate='" + getExpirationDate() + "'" +
-            ", actionURL='" + getActionURL() + "'" +
-            ", icon='" + getIcon() + "'" +
-            ", isRecurring='" + getIsRecurring() + "'" +
-            ", recurrencePattern='" + getRecurrencePattern() + "'" +
-            ", sentVia='" + getSentVia() + "'" +
-            "}";
+        return (
+            "Notification{" +
+            "id=" +
+            getId() +
+            ", message='" +
+            getMessage() +
+            "'" +
+            ", notificationType='" +
+            getNotificationType() +
+            "'" +
+            ", timestamp='" +
+            getTimestamp() +
+            "'" +
+            ", linkedEntityType='" +
+            getLinkedEntityType() +
+            "'" +
+            ", read='" +
+            getRead() +
+            "'" +
+            ", priority='" +
+            getPriority() +
+            "'" +
+            ", status='" +
+            getStatus() +
+            "'" +
+            ", expirationDate='" +
+            getExpirationDate() +
+            "'" +
+            ", actionURL='" +
+            getActionURL() +
+            "'" +
+            ", icon='" +
+            getIcon() +
+            "'" +
+            ", isRecurring='" +
+            getIsRecurring() +
+            "'" +
+            ", recurrencePattern='" +
+            getRecurrencePattern() +
+            "'" +
+            ", sentVia='" +
+            getSentVia() +
+            "'" +
+            "}"
+        );
     }
 }

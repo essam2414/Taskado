@@ -1,197 +1,71 @@
-<div>
-  <h2 id="page-heading" data-cy="NotificationHeading">
-    <span>Notifications</span>
+<div class="container mt-4">
+  <h2 class="text-primary text-center" id="page-heading" data-cy="NotificationHeading">Notifications</h2>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
-        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
-        <span>Refresh list</span>
-      </button>
+  <div class="d-flex justify-content-between align-items-center my-3">
+    <button class="btn btn-outline-primary" (click)="load()" [disabled]="isLoading">
+      <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon> Refresh
+    </button>
 
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-notification"
-        [routerLink]="['/notification/new']"
-      >
-        <fa-icon icon="plus"></fa-icon>
-        <span>Create a new Notification</span>
-      </button>
-    </div>
-  </h2>
+    <button id="jh-create-entity" data-cy="entityCreateButton" class="btn btn-success" [routerLink]="['/notification/new']">
+      <fa-icon icon="plus"></fa-icon> Create Notification
+    </button>
+  </div>
 
   <jhi-alert-error></jhi-alert-error>
-
   <jhi-alert></jhi-alert>
 
   @if (notifications?.length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span>No Notifications found</span>
-    </div>
+    <div class="alert alert-warning text-center py-3"><fa-icon icon="exclamation-circle"></fa-icon> No Notifications found.</div>
   }
 
   @if (notifications && notifications.length > 0) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
-          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span>ID</span>
+    <div class="row">
+      @for (notification of notifications; track trackId(notification)) {
+        <div class="col-md-6 col-lg-4">
+          <div class="card shadow-sm mb-4">
+            <div class="card-body">
+              <h5 class="card-title text-dark font-weight-bold">
+                {{ notification.message }}
+              </h5>
+              <p class="text-muted mb-2"><fa-icon icon="tags"></fa-icon> {{ notification.notificationType }}</p>
+              <p class="text-muted mb-2">
+                <fa-icon icon="flag"></fa-icon> Priority:
+                <span
+                  class="badge"
+                  [ngClass]="{
+                    'bg-success': notification.priority === 'LOW',
+                    'bg-primary': notification.priority === 'MEDIUM',
+                    'bg-danger': notification.priority === 'HIGH',
+                  }"
+                >
+                  {{ notification.priority }}
+                </span>
+              </p>
+              <p class="text-muted mb-2">
+                <fa-icon icon="calendar"></fa-icon> Expiration Date:
+                <span class="badge bg-light text-dark">{{ notification.expirationDate | formatMediumDatetime }}</span>
+              </p>
+              <p class="text-muted">
+                <fa-icon icon="paper-plane"></fa-icon> Sent Via: <strong>{{ notification.sentVia }}</strong>
+              </p>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
+              <div class="d-flex justify-content-end mt-3">
+                <a [routerLink]="['/notification', notification.id, 'view']" class="btn btn-outline-info btn-sm mx-1">
+                  <fa-icon icon="eye"></fa-icon> View
+                </a>
+
+                <a [routerLink]="['/notification', notification.id, 'edit']" class="btn btn-outline-primary btn-sm mx-1">
+                  <fa-icon icon="pencil-alt"></fa-icon> Edit
+                </a>
+
+                <button type="submit" (click)="delete(notification)" class="btn btn-outline-danger btn-sm mx-1">
+                  <fa-icon icon="trash"></fa-icon> Delete
+                </button>
               </div>
-            </th>
-            <th scope="col" jhiSortBy="message">
-              <div class="d-flex">
-                <span>Message</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="notificationType">
-              <div class="d-flex">
-                <span>Notification Type</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="timestamp">
-              <div class="d-flex">
-                <span>Timestamp</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="linkedEntityType">
-              <div class="d-flex">
-                <span>Linked Entity Type</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="read">
-              <div class="d-flex">
-                <span>Read</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="priority">
-              <div class="d-flex">
-                <span>Priority</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="status">
-              <div class="d-flex">
-                <span>Status</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="expirationDate">
-              <div class="d-flex">
-                <span>Expiration Date</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="actionURL">
-              <div class="d-flex">
-                <span>Action URL</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="icon">
-              <div class="d-flex">
-                <span>Icon</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="isRecurring">
-              <div class="d-flex">
-                <span>Is Recurring</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="recurrencePattern">
-              <div class="d-flex">
-                <span>Recurrence Pattern</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="sentVia">
-              <div class="d-flex">
-                <span>Sent Via</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="user.id">
-              <div class="d-flex">
-                <span>User</span>
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (notification of notifications; track trackId(notification)) {
-            <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/notification', notification.id, 'view']">{{ notification.id }}</a>
-              </td>
-              <td>{{ notification.message }}</td>
-              <td>
-                {{
-                  { null: '', REMINDER: 'REMINDER', DEADLINE: 'DEADLINE', SYSTEM_UPDATE: 'SYSTEM_UPDATE' }[
-                    notification.notificationType ?? 'null'
-                  ]
-                }}
-              </td>
-              <td>{{ notification.timestamp | formatMediumDatetime }}</td>
-              <td>{{ notification.linkedEntityType }}</td>
-              <td>{{ notification.read }}</td>
-              <td>{{ { null: '', LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' }[notification.priority ?? 'null'] }}</td>
-              <td>{{ { null: '', SENT: 'SENT', PENDING: 'PENDING', FAILED: 'FAILED' }[notification.status ?? 'null'] }}</td>
-              <td>{{ notification.expirationDate | formatMediumDatetime }}</td>
-              <td>{{ notification.actionURL }}</td>
-              <td>{{ notification.icon }}</td>
-              <td>{{ notification.isRecurring }}</td>
-              <td>{{ notification.recurrencePattern }}</td>
-              <td>{{ { null: '', EMAIL: 'EMAIL', SMS: 'SMS', PUSH: 'PUSH' }[notification.sentVia ?? 'null'] }}</td>
-              <td>
-                {{ notification.user?.id }}
-              </td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/notification', notification.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline">View</span>
-                  </a>
-
-                  <a [routerLink]="['/notification', notification.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline">Edit</span>
-                  </a>
-
-                  <button type="submit" (click)="delete(notification)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+            </div>
+          </div>
+        </div>
+      }
     </div>
   }
 </div>
