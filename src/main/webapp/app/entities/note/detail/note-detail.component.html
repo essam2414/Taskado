@@ -1,0 +1,58 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (note(); as noteRef) {
+      <div>
+        <h2 data-cy="noteDetailsHeading"><span>Note</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ noteRef.id }}</span>
+          </dd>
+          <dt><span>Title</span></dt>
+          <dd>
+            <span>{{ noteRef.title }}</span>
+          </dd>
+          <dt><span>Content</span></dt>
+          <dd>
+            <span>{{ noteRef.content }}</span>
+          </dd>
+          <dt><span>Created At</span></dt>
+          <dd>
+            <span>{{ noteRef.createdAt | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Updated At</span></dt>
+          <dd>
+            <span>{{ noteRef.updatedAt | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Category</span></dt>
+          <dd>
+            @if (note()!.category) {
+              <div>
+                <a [routerLink]="['/category', note()!.category?.id, 'view']">{{ noteRef.category?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>User</span></dt>
+          <dd>
+            <span>{{ noteRef.user?.id }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/note', noteRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>
