@@ -32,11 +32,6 @@ const routes: Routes = [
     loadChildren: () => import('./pomodoro-session/pomodoro-session.routes'),
   },
   {
-    path: 'goal',
-    data: { pageTitle: 'Goals' },
-    loadChildren: () => import('./goal/goal.routes'),
-  },
-  {
     path: 'productivity-report',
     data: { pageTitle: 'ProductivityReports' },
     loadChildren: () => import('./productivity-report/productivity-report.routes'),
@@ -45,6 +40,11 @@ const routes: Routes = [
     path: 'category',
     data: { pageTitle: 'Categories' },
     loadChildren: () => import('./category/category.routes'),
+  },
+  {
+    path: 'note',
+    data: { pageTitle: 'Notes' },
+    loadChildren: () => import('./note/note.routes'),
   },
   /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
 ];
