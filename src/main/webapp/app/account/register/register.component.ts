@@ -51,6 +51,10 @@ export default class RegisterComponent implements AfterViewInit {
 
   private readonly registerService = inject(RegisterService);
 
+  goBack(): void {
+    window.history.back();
+  }
+
   ngAfterViewInit(): void {
     this.login().nativeElement.focus();
   }

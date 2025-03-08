@@ -47,11 +47,16 @@ export class AccountService {
   }
 
   identity(force?: boolean): Observable<Account | null> {
+    if (!this.isGuestUser() && sessionStorage.getItem('guest')) {
+      sessionStorage.removeItem('guest');
+    }
+    if (this.isGuestUser()) {
+      return of(this.getGuestAccount());
+    }
     if (!this.accountCache$ || force) {
       this.accountCache$ = this.fetch().pipe(
         tap((account: Account) => {
           this.authenticate(account);
-
           this.navigateToStoredUrl();
         }),
         shareReplay(),
@@ -68,6 +73,22 @@ export class AccountService {
     return this.authenticationState.asObservable();
   }
 
+  enableGuestMode(): void {
+    sessionStorage.setItem('guest', 'true');
+    this.authenticate(this.getGuestAccount());
+  }
+
+  isGuestUser(): boolean {
+    return sessionStorage.getItem('guest') === 'true';
+  }
+
+  logout(): void {
+    sessionStorage.removeItem('guest');
+    this.authenticate(null);
+    this.accountCache$ = null;
+    this.router.navigate(['/login']);
+  }
+
   private fetch(): Observable<Account> {
     return this.http.get<Account>(this.applicationConfigService.getEndpointFor('api/account'));
   }
@@ -80,5 +101,18 @@ export class AccountService {
       this.stateStorageService.clearUrl();
       this.router.navigateByUrl(previousUrl);
     }
+  }
+
+  private getGuestAccount(): Account {
+    return {
+      login: 'guest',
+      firstName: 'Guest',
+      lastName: '',
+      email: '',
+      authorities: [],
+      imageUrl: '',
+      activated: true,
+      langKey: 'en',
+    } as Account;
   }
 }

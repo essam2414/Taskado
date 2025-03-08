@@ -11,6 +11,10 @@ export const UserRouteAccessService: CanActivateFn = (next: ActivatedRouteSnapsh
   const stateStorageService = inject(StateStorageService);
   return accountService.identity().pipe(
     map(account => {
+      if (accountService.isGuestUser()) {
+        return true;
+      }
+
       if (account) {
         const { authorities } = next.data;
 

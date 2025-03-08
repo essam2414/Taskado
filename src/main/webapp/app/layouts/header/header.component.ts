@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { VERSION } from 'app/app.constants';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'jhi-header',
@@ -12,10 +12,15 @@ import { RouterModule } from '@angular/router';
 })
 export class HeaderComponent {
   version = '';
+  private readonly router = inject(Router);
 
   constructor() {
     if (VERSION) {
       this.version = VERSION.toLowerCase().startsWith('v') ? VERSION : `v${VERSION}`;
     }
+  }
+
+  login(): void {
+    this.router.navigate(['/login']);
   }
 }

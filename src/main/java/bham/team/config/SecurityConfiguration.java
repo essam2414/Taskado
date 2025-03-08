@@ -77,6 +77,16 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/api/account/reset-password/init")).permitAll()
                     .requestMatchers(mvc.pattern("/api/account/reset-password/finish")).permitAll()
                     .requestMatchers(mvc.pattern("/api/admin/**")).hasAuthority(AuthoritiesConstants.ADMIN)
+                    // Allow guests to access ONLY specific API endpoints
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/tasks/**")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/habits/**")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/events/**")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/notes/**")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/pomodoro-sessions/**")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/notifications/**")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/categories/**")).permitAll()
+                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/productivity-reports/**")).permitAll()
+                    // Protect everything else
                     .requestMatchers(mvc.pattern("/api/**")).authenticated()
                     .requestMatchers(mvc.pattern("/v3/api-docs/**")).hasAuthority(AuthoritiesConstants.ADMIN)
                     .requestMatchers(mvc.pattern("/management/health")).permitAll()

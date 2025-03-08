@@ -34,4 +34,8 @@ export default class PasswordResetInitComponent implements AfterViewInit {
   requestReset(): void {
     this.passwordResetInitService.save(this.resetRequestForm.get(['email'])!.value).subscribe(() => this.success.set(true));
   }
+
+  goBack(): void {
+    window.history.back();
+  }
 }

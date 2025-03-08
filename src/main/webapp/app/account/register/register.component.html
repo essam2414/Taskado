@@ -1,5 +1,3 @@
-<jhi-header></jhi-header>
-
 <div>
   <div>
     <div>
@@ -27,7 +25,12 @@
 
   <div class="auth-wrapper">
     <div class="auth-container">
-      <h1 class="auth-title" data-cy="registerTitle">Sign up</h1>
+      <div class="auth-header">
+        <button class="auth-back-btn" (click)="goBack()">
+          <fa-icon icon="arrow-left"></fa-icon>
+        </button>
+        <h1 class="auth-title" data-cy="registerTitle">Sign up</h1>
+      </div>
 
       @if (!success()) {
         <form class="auth-form" name="form" (ngSubmit)="register()" [formGroup]="registerForm">

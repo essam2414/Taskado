@@ -17,7 +17,7 @@ const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./landing-page/landing-page.component'),
-    title: 'Team project 2024-2025 app',
+    title: 'Taskado',
   },
   {
     path: 'dashboard',

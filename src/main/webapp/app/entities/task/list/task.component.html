@@ -6,7 +6,7 @@
       <div class="task-filters">
         <button
           *ngFor="let filter of filters"
-          class="filter-btn"
+          class="btn-filter"
           [class.active]="activeFilter === filter.value"
           (click)="setFilter(filter.value)"
         >
@@ -16,7 +16,7 @@
       </div>
     </div>
 
-    <button id="jh-create-entity" data-cy="entityCreateButton" class="header-btn jh-create-entity create-task" [routerLink]="['/task/new']">
+    <button id="jh-create-entity" data-cy="entityCreateButton" class="btn-add jh-create-entity create-task" [routerLink]="['/task/new']">
       <fa-icon icon="plus"></fa-icon>
       <span>New task</span>
     </button>
@@ -30,7 +30,7 @@
     <h3 class="task-subtitle">{{ activeFilterLabel }}</h3>
     @for (task of getFilteredTasks(); track trackId(task)) {
       <div
-        class="task-container"
+        class="app-card"
         [class.completed]="task.completed"
         [class.non-clickable]="task.completed"
         (click)="!task.completed && editTask(task)"
@@ -55,7 +55,7 @@
                   <fa-icon icon="flag"></fa-icon>
                   {{
                     { null: '', LOW: 'Low Priority', MEDIUM: 'Medium Priority', HIGH: 'High Priority', CRITICAL: 'Critical Priority' }[
-                      task.priority ?? 'null'
+                      task.priority
                     ]
                   }}
                 </div>
@@ -80,14 +80,14 @@
           <span>{{ formatTaskDate(task.dueDate) }}</span>
         </div>
 
-        <div class="task-menu" [class.open]="openMenuTaskId === task.id">
-          <fa-icon icon="ellipsis-vertical" class="menu-icon" (click)="toggleMenu(task.id); $event.stopPropagation()"></fa-icon>
-          <div class="menu-dropdown" [class.show]="openMenuTaskId === task.id">
-            <button (click)="editTask(task); $event.stopPropagation()">
+        <div class="dropdown dropdown-action" [class.open]="openMenuTaskId === task.id">
+          <fa-icon icon="ellipsis-vertical" class="dropdown-btn" (click)="toggleMenu(task.id); $event.stopPropagation()"></fa-icon>
+          <div class="dropdown-menu" [class.show]="openMenuTaskId === task.id">
+            <button class="dropdown-item" (click)="editTask(task); $event.stopPropagation()">
               <fa-icon icon="pencil"></fa-icon>
               <span>Edit</span>
             </button>
-            <button class="delete-btn" (click)="delete(task); $event.stopPropagation()">
+            <button class="dropdown-item delete" (click)="delete(task); $event.stopPropagation()">
               <fa-icon icon="trash-alt"></fa-icon>
               <span>Delete</span>
             </button>
@@ -108,7 +108,7 @@
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
-        class="add-btn jh-create-entity create-task"
+        class="btn-add-icon jh-create-entity create-task"
         [routerLink]="['/task/new']"
         [queryParams]="{ title: newTaskTitle }"
         [disabled]="!newTaskTitle.trim()"
