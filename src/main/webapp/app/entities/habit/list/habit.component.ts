@@ -8,6 +8,7 @@ import { SortByDirective, SortDirective, SortService, type SortState, sortStateS
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
 import { FormsModule } from '@angular/forms';
 import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
+import { DataUtils } from 'app/core/util/data-util.service';
 import { IHabit } from '../habit.model';
 import { EntityArrayResponseType, HabitService } from '../service/habit.service';
 import { HabitDeleteDialogComponent } from '../delete/habit-delete-dialog.component';
@@ -33,16 +34,23 @@ export class HabitComponent implements OnInit {
   habits?: IHabit[];
   isLoading = false;
 
+  daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
   sortState = sortStateSignal({});
 
   public readonly router = inject(Router);
   protected readonly habitService = inject(HabitService);
   protected readonly activatedRoute = inject(ActivatedRoute);
   protected readonly sortService = inject(SortService);
+  protected dataUtils = inject(DataUtils);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
 
   trackId = (item: IHabit): number => this.habitService.getHabitIdentifier(item);
+
+  trackByHabitId(index: number, habit: IHabit): number {
+    return habit.id;
+  }
 
   ngOnInit(): void {
     this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
@@ -55,6 +63,14 @@ export class HabitComponent implements OnInit {
         }),
       )
       .subscribe();
+  }
+
+  byteSize(base64String: string): string {
+    return this.dataUtils.byteSize(base64String);
+  }
+
+  openFile(base64String: string, contentType: string | null | undefined): void {
+    return this.dataUtils.openFile(base64String, contentType);
   }
 
   delete(habit: IHabit): void {
@@ -81,15 +97,16 @@ export class HabitComponent implements OnInit {
     this.handleNavigation(event);
   }
 
-  editHabit(habit: IHabit): void {
-    this.router.navigate(['/habit', habit.id, 'edit']);
+  toggleDayCompleted(habit: IHabit, dayIndex: number): void {
+    if (!habit.daysCompleted) {
+      habit.daysCompleted = [false, false, false, false, false, false, false];
+    }
+    const wasCompleted = habit.daysCompleted[dayIndex];
+    habit.daysCompleted[dayIndex] = !wasCompleted;
   }
 
-  toggleCompleted(habit: IHabit): void {
-    habit.completed = !habit.completed;
-    this.habitService.update(habit).subscribe(() => {
-      this.habits = this.refineData([...(this.habits ?? [])]);
-    });
+  editHabit(habit: IHabit): void {
+    this.router.navigate(['/habit', habit.id, 'edit']);
   }
 
   protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {

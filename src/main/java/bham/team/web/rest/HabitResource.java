@@ -124,6 +124,15 @@ public class HabitResource {
                 if (habit.getName() != null) {
                     existingHabit.setName(habit.getName());
                 }
+                if (habit.getStartDate() != null) {
+                    existingHabit.setStartDate(habit.getStartDate());
+                }
+                if (habit.getStreak() != null) {
+                    existingHabit.setStreak(habit.getStreak());
+                }
+                if (habit.getCompletionRate() != null) {
+                    existingHabit.setCompletionRate(habit.getCompletionRate());
+                }
                 if (habit.getRepeatType() != null) {
                     existingHabit.setRepeatType(habit.getRepeatType());
                 }
@@ -136,17 +145,8 @@ public class HabitResource {
                 if (habit.getRepeatTimes() != null) {
                     existingHabit.setRepeatTimes(habit.getRepeatTimes());
                 }
-                if (habit.getCompleted() != null) {
-                    existingHabit.setCompleted(habit.getCompleted());
-                }
-                if (habit.getStartDate() != null) {
-                    existingHabit.setStartDate(habit.getStartDate());
-                }
-                if (habit.getStreak() != null) {
-                    existingHabit.setStreak(habit.getStreak());
-                }
-                if (habit.getCompletionRate() != null) {
-                    existingHabit.setCompletionRate(habit.getCompletionRate());
+                if (habit.getCompletedDates() != null) {
+                    existingHabit.setCompletedDates(habit.getCompletedDates());
                 }
 
                 return existingHabit;

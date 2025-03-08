@@ -1,59 +1,56 @@
 <div>
-  <!-- Page heading & buttons -->
-  <h2 id="page-heading" data-cy="HabitHeading" class="mb-4">
-    <span>Habits</span>
-    <div class="d-flex justify-content-end">
-      <!-- Refresh list -->
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
-        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
-        <span>Refresh list</span>
-      </button>
+  <div class="habit-header">
+    <h2 id="page-heading" data-cy="HabitHeading">Habits</h2>
 
-      <!-- Create a new Habit -->
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-habit"
-        [routerLink]="['/habit/new']"
-      >
-        <fa-icon icon="plus"></fa-icon>
-        <span>Create a new Habit</span>
-      </button>
-    </div>
-  </h2>
+    <button
+      id="jh-create-entity"
+      data-cy="entityCreateButton"
+      class="header-btn jh-create-entity create-habit"
+      [routerLink]="['/habit/new']"
+    >
+      <fa-icon icon="plus"></fa-icon>
+      <span>Create a new habit</span>
+    </button>
+  </div>
 
-  <!-- JHipster alert components for errors/messages -->
   <jhi-alert-error></jhi-alert-error>
   <jhi-alert></jhi-alert>
 
-  <!-- If there are no habits, display a warning -->
-  <div class="alert alert-warning" id="no-result" *ngIf="habits?.length === 0">
-    <span>No Habits found</span>
-  </div>
+  @if (habits?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Habits found</span>
+    </div>
+  }
 
-  <!-- Otherwise, show the habit list -->
-  <div class="habit-list" *ngIf="habits && habits.length > 0">
-    @for (habit of habits; track trackId(habit)) {
-      <!-- Make the item a flex container, name on left, streak on right -->
-      <div class="taskado-card" (click)="editHabit(habit)">
-        <div class="habit-info">
-          <input
-            type="checkbox"
-            class="form-check-input taskado-checkbox"
-            [checked]="habit.completed"
-            (change)="toggleCompleted(habit)"
-            (click)="$event.stopPropagation()"
-            id="habit-{{ habit.id }}"
-          />
-          <!-- Left side: the habit name -->
-          <div>
-            <strong>{{ habit.name }}</strong>
-          </div>
-        </div>
-
-        <!-- Right side: the streak + fire icon -->
-        <div>{{ habit.streak }} 🔥</div>
+  @if (habits && habits.length > 0) {
+    <div class="habit-container">
+      <!-- Header -->
+      <div class="habit-week habit-row">
+        <div></div>
+        <div *ngFor="let day of daysOfWeek" class="habit-day">{{ day }}</div>
+        <div></div>
       </div>
-    }
-  </div>
+
+      <!-- Habit Rows -->
+      <div class="habit-list">
+        <div *ngFor="let habit of habits; trackBy: trackByHabitId" class="app-card habit-row" (click)="editHabit(habit)">
+          <div class="habit-name">{{ habit.name }}</div>
+
+          <!-- 7 Days Checkboxes -->
+          <div *ngFor="let day of daysOfWeek; let i = index" class="habit-day">
+            <input
+              type="checkbox"
+              class="custom-checkbox"
+              [checked]="habit.completedDates?.includes(day) ?? false"
+              (change)="toggleDayCompleted(habit, i)"
+              (click)="$event.stopPropagation()"
+            />
+          </div>
+
+          <!-- Streak -->
+          <div class="habit-streak">{{ habit.streak }} 🔥</div>
+        </div>
+      </div>
+    </div>
+  }
 </div>
