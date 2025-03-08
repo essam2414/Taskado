@@ -1,0 +1,19 @@
+.app-card {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px;
+  border-radius: 16px;
+
+  transition: box-shadow 0.2s ease-in-out;
+  background-color: white;
+
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 0 8px rgba(33, 33, 33, 0.2);
+  }
+}

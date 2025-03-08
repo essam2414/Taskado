@@ -1,5 +1,6 @@
-import { Component, OnInit, inject, Renderer2 } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { Component, OnInit, inject, Renderer2, computed } from '@angular/core';
+import { Router, RouterOutlet, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 import { AccountService } from 'app/core/auth/account.service';
 import { AppPageTitleStrategy } from 'app/app-page-title-strategy';
@@ -13,7 +14,7 @@ import PageRibbonComponent from '../profiles/page-ribbon.component';
   selector: 'jhi-main',
   templateUrl: './main.component.html',
   providers: [AppPageTitleStrategy],
-  imports: [RouterOutlet, SidebarComponent, FooterComponent, PageRibbonComponent],
+  imports: [RouterOutlet, SidebarComponent, FooterComponent, PageRibbonComponent, CommonModule, RouterModule],
   styleUrls: ['./main.component.scss'],
 })
 export default class MainComponent implements OnInit {
@@ -26,6 +27,10 @@ export default class MainComponent implements OnInit {
 
   private readonly appPageTitleStrategy = inject(AppPageTitleStrategy);
   private readonly accountService = inject(AccountService);
+
+  isGuest(): boolean {
+    return this.accountService.isGuestUser();
+  }
 
   ngOnInit(): void {
     // try to log in automatically
@@ -42,5 +47,9 @@ export default class MainComponent implements OnInit {
         this.renderer.removeClass(document.body, 'landing-bg');
       }
     });
+  }
+
+  login(): void {
+    this.router.navigate(['/login']);
   }
 }

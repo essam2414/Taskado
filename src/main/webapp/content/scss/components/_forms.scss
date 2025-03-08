@@ -1,0 +1,52 @@
+$primary: #564df2;
+
+.form-container {
+  padding: clamp(20px, 5vw, 40px);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.form-group {
+  margin-bottom: clamp(12px, 3vw, 18px);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: clamp(0.8rem, 2.5vw, 1rem);
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: clamp(10px, 3vw, 14px);
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  transition: all 0.2s ease-in-out;
+  background-color: white;
+
+  &:focus {
+    border-color: $primary;
+  }
+}
+
+form h2 {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 600;
+  margin-bottom: 30px;
+}
+
+// Ensure it overrides Bootswatch styles
+input.form-control,
+textarea.form-control,
+input[type='text'],
+input[type='password'],
+input[type='email'],
+input[type='number'],
+input[type='tel'],
+[contenteditable].form-control {
+  box-shadow: none !important;
+  outline: none !important;
+}

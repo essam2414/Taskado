@@ -17,14 +17,25 @@ $primary: #564df2;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
+.auth-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 4px;
+  margin-bottom: 24px;
+}
 
 .auth-title {
   font-size: clamp(1.5rem, 4vw, 2rem);
-  margin-bottom: clamp(20px, 4vw, 40px);
+  text-align: center;
 }
 
 .auth-desc {
-  font-size: clamp(1rem, 3vw, 1.25rem);
+  font-size: clamp(0.8rem, 3vw, 1.1rem);
+  text-align: center;
 }
 
 .auth-input-group {
@@ -90,4 +101,23 @@ $primary: #564df2;
   font-weight: 400;
   text-decoration: none;
   font-size: clamp(0.8rem, 2vw, 1rem);
+}
+
+.auth-back-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #6b6b78;
+  transition: color 0.2s ease-in-out;
+
+  position: absolute;
+  left: 10px;
+
+  &:hover {
+    color: #564df2;
+  }
+
+  fa-icon {
+    font-size: 1.2rem;
+  }
 }

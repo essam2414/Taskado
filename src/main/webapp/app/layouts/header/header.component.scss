@@ -13,23 +13,56 @@
   padding-right: clamp(20px, 5vw, 60px);
 }
 
-.landing-header a {
-  text-decoration: none;
-  color: inherit;
-}
-
 .logo {
   display: flex;
   align-items: center;
   gap: 8px;
+  color: #2c2c38;
+}
+
+.header-nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  gap: 24px;
+}
+
+.header-nav a {
+  font-size: 1rem;
+  color: #7d7d8a;
+  font-weight: 300;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+.header-nav a:hover {
+  color: #564df2; /* Your theme’s purple */
 }
 
 .logo-text {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 400;
   margin: 0;
 }
 
+.logo fa-icon {
+  font-size: 20px;
+  color: inherit;
+}
+
 .team-info {
-  font-size: 14px;
+  font-size: 12px;
+  margin: 0;
+  color: #2c2c38;
+  transition: color 0.2s ease-in-out;
+
+  &:hover {
+    color: #564df2;
+  }
+}
+
+.header-left a {
+  text-decoration: none;
 }

@@ -16,6 +16,7 @@ import { Account } from 'app/core/auth/account.model';
 })
 export default class HomeComponent implements OnInit, OnDestroy {
   account = signal<Account | null>(null);
+  isGuest = false;
 
   private readonly destroy$ = new Subject<void>();
 
@@ -27,6 +28,7 @@ export default class HomeComponent implements OnInit, OnDestroy {
       .getAuthenticationState()
       .pipe(takeUntil(this.destroy$))
       .subscribe(account => this.account.set(account));
+    this.isGuest = sessionStorage.getItem('guest') === 'true';
   }
 
   login(): void {

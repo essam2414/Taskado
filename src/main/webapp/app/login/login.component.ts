@@ -54,4 +54,8 @@ export default class LoginComponent implements OnInit, AfterViewInit {
       error: () => this.authenticationError.set(true),
     });
   }
+
+  goBack(): void {
+    window.history.back();
+  }
 }

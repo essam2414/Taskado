@@ -1,25 +1,39 @@
 .landing-container {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 40px;
+  min-height: 85vh;
+}
 
-  text-align: center;
+.svg-overlay {
+  position: fixed; /* Full screen coverage */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: -1;
+
+  background-image: url('/content/images/background.svg'); /* External file */
+  background-size: cover; /* Cover full screen */
+  background-position: center;
+  opacity: 0.05;
 }
 
 .landing-text {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
+  gap: 8px;
 
   max-width: 750px;
+  z-index: 2;
 }
 
 .landing-title {
   font-size: clamp(2rem, 8vw, 4rem);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
 }
 
 .landing-subtitle {
@@ -36,17 +50,29 @@
   font-size: clamp(1rem, 3vw, 1.25rem);
 }
 
+.landing-buttons svg {
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  fill: currentColor;
+  margin-left: 4px;
+}
+
 .account-options {
   display: flex;
-  justify-content: center;
   gap: 12px;
 }
 
 .guest-option a {
-  font-size: clamp(0.9rem, 2vw, 1rem);
+  font-size: clamp(1rem, 2vw, 1.1rem);
   color: #b3b3c5;
+  transition: color 0.2s ease-in-out;
 
   &:hover {
     color: darken(#b3b3c5, 10%);
   }
+}
+
+.text-highlight {
+  color: #564df2;
 }

@@ -1,9 +1,13 @@
-<jhi-header></jhi-header>
-
 <div>
   <div class="auth-wrapper">
     <div class="auth-container">
-      <h1 class="auth-title" data-cy="loginTitle">Log in</h1>
+      <div class="auth-header">
+        <button class="auth-back-btn" (click)="goBack()">
+          <fa-icon icon="arrow-left"></fa-icon>
+        </button>
+
+        <h1 class="auth-title" data-cy="loginTitle">Log in</h1>
+      </div>
 
       @if (authenticationError()) {
         <div class="auth-alert" data-cy="loginError"><strong>Failed to sign in!</strong> Please check your credentials and try again.</div>

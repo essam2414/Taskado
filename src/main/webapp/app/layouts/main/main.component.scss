@@ -1,6 +1,5 @@
 .layout {
   display: flex;
-  // transition: margin-left 0.3s ease-in-out;
   min-height: 100vh;
 }
 
@@ -8,8 +7,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
 
+  min-height: 100vh;
   transition: margin-left 0.3s ease-in-out;
   padding: clamp(20px, 5vw, 60px);
   padding-bottom: 0;
@@ -34,4 +33,42 @@ jhi-footer {
   .layout.expanded .main-content {
     margin-left: 0 !important;
   }
+}
+
+/* Guest banner */
+.guest-banner {
+  width: 100%;
+
+  padding: 10px;
+  background: #ffefe7; /* Soft warm pastel to match theme */
+  color: #6b4f4f; /* Muted text color for readability */
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.guest-banner .icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  fill: currentColor;
+}
+
+.guest-banner a {
+  font-size: 14px;
+  text-decoration: underline;
+  color: #564df2;
+  transition: color 0.2s ease-in-out;
+}
+
+.guest-banner a:hover {
+  color: #3d38b1;
 }
