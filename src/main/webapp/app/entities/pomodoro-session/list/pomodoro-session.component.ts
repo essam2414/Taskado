@@ -1,124 +1,64 @@
-import { Component, NgZone, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
-import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { interval, Subscription } from 'rxjs';
+import { CommonModule } from '@angular/common';
 import SharedModule from 'app/shared/shared.module';
-import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
-import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
-import { FormsModule } from '@angular/forms';
-import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
-import { IPomodoroSession } from '../pomodoro-session.model';
-import { EntityArrayResponseType, PomodoroSessionService } from '../service/pomodoro-session.service';
-import { PomodoroSessionDeleteDialogComponent } from '../delete/pomodoro-session-delete-dialog.component';
 
 @Component({
-  standalone: true,
   selector: 'jhi-pomodoro-session',
+  standalone: true,
+  imports: [CommonModule, SharedModule],
   templateUrl: './pomodoro-session.component.html',
-  imports: [
-    RouterModule,
-    FormsModule,
-    SharedModule,
-    SortDirective,
-    SortByDirective,
-    DurationPipe,
-    FormatMediumDatetimePipe,
-    FormatMediumDatePipe,
-    FormatMediumDatetimePipe,
-    FormatMediumDatetimePipe,
-    FormatMediumDatetimePipe,
-  ],
+  styleUrls: ['./pomodoro-session.component.scss'],
 })
-export class PomodoroSessionComponent implements OnInit {
-  subscription: Subscription | null = null;
-  pomodoroSessions?: IPomodoroSession[];
-  isLoading = false;
+export class PomodoroSessionComponent implements OnInit, OnDestroy {
+  timeRemaining: number;
+  timerRunning = false;
 
-  sortState = sortStateSignal({});
+  private readonly timerDuration = 1500; // 25 mins
+  private timerSubscription?: Subscription;
 
-  public readonly router = inject(Router);
-  protected readonly pomodoroSessionService = inject(PomodoroSessionService);
-  protected readonly activatedRoute = inject(ActivatedRoute);
-  protected readonly sortService = inject(SortService);
-  protected modalService = inject(NgbModal);
-  protected ngZone = inject(NgZone);
+  constructor() {
+    // Initialize dependent variable inside the constructor
+    this.timeRemaining = this.timerDuration;
+  }
 
-  trackId = (_index: number, item: IPomodoroSession): number => this.pomodoroSessionService.getPomodoroSessionIdentifier(item);
+  get formattedTime(): string {
+    const minutes = Math.floor(this.timeRemaining / 60)
+      .toString()
+      .padStart(2, '0');
+    const seconds = (this.timeRemaining % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  }
 
   ngOnInit(): void {
-    this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
-      .pipe(
-        tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
-        tap(() => {
-          if (!this.pomodoroSessions || this.pomodoroSessions.length === 0) {
-            this.load();
-          }
-        }),
-      )
-      .subscribe();
+    this.resetTimer();
   }
 
-  delete(pomodoroSession: IPomodoroSession): void {
-    const modalRef = this.modalService.open(PomodoroSessionDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.pomodoroSession = pomodoroSession;
-    // unsubscribe not needed because closed completes on modal close
-    modalRef.closed
-      .pipe(
-        filter(reason => reason === ITEM_DELETED_EVENT),
-        tap(() => this.load()),
-      )
-      .subscribe();
-  }
-
-  load(): void {
-    this.queryBackend().subscribe({
-      next: (res: EntityArrayResponseType) => {
-        this.onResponseSuccess(res);
-      },
-    });
-  }
-
-  navigateToWithComponentValues(event: SortState): void {
-    this.handleNavigation(event);
-  }
-
-  protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
-    this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]));
-  }
-
-  protected onResponseSuccess(response: EntityArrayResponseType): void {
-    const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
-    this.pomodoroSessions = this.refineData(dataFromBody);
-  }
-
-  protected refineData(data: IPomodoroSession[]): IPomodoroSession[] {
-    const { predicate, order } = this.sortState();
-    return predicate && order ? data.sort(this.sortService.startSort({ predicate, order })) : data;
-  }
-
-  protected fillComponentAttributesFromResponseBody(data: IPomodoroSession[] | null): IPomodoroSession[] {
-    return data ?? [];
-  }
-
-  protected queryBackend(): Observable<EntityArrayResponseType> {
-    this.isLoading = true;
-    const queryObject: any = {
-      sort: this.sortService.buildSortParam(this.sortState()),
-    };
-    return this.pomodoroSessionService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
-  }
-
-  protected handleNavigation(sortState: SortState): void {
-    const queryParamsObj = {
-      sort: this.sortService.buildSortParam(sortState),
-    };
-
-    this.ngZone.run(() => {
-      this.router.navigate(['./'], {
-        relativeTo: this.activatedRoute,
-        queryParams: queryParamsObj,
+  startTimer(): void {
+    if (!this.timerRunning) {
+      this.timerSubscription = interval(1000).subscribe(() => {
+        if (this.timeRemaining > 0) {
+          this.timeRemaining--;
+        } else {
+          this.pauseTimer();
+          // Optional: handle timer completion
+        }
       });
-    });
+      this.timerRunning = true;
+    }
+  }
+
+  pauseTimer(): void {
+    this.timerSubscription?.unsubscribe();
+    this.timerRunning = false;
+  }
+
+  resetTimer(): void {
+    this.pauseTimer();
+    this.timeRemaining = this.timerDuration;
+  }
+
+  ngOnDestroy(): void {
+    this.timerSubscription?.unsubscribe();
   }
 }

@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { UserRouteAccessService } from 'app/core/auth/user-route-access.service';
 import { ASC } from 'app/config/navigation.constants';
 import PomodoroSessionResolve from './route/pomodoro-session-routing-resolve.service';
+import { PomodoroSessionComponent } from './list/pomodoro-session.component';
 
 const pomodoroSessionRoute: Routes = [
   {
@@ -34,6 +35,14 @@ const pomodoroSessionRoute: Routes = [
     loadComponent: () => import('./update/pomodoro-session-update.component').then(m => m.PomodoroSessionUpdateComponent),
     resolve: {
       pomodoroSession: PomodoroSessionResolve,
+    },
+    canActivate: [UserRouteAccessService],
+  },
+  {
+    path: '',
+    loadComponent: () => import('./list/pomodoro-session.component').then(m => m.PomodoroSessionComponent),
+    data: {
+      defaultSort: `id,${ASC}`,
     },
     canActivate: [UserRouteAccessService],
   },
