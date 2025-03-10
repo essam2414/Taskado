@@ -66,3 +66,74 @@
 .header-left a {
   text-decoration: none;
 }
+
+/* MOBILE SIDEBAR */
+.mobile-sidebar {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 250px;
+  height: 100%;
+  background: white;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+
+  padding: 20px;
+  transition: right 0.3s ease-in-out;
+  z-index: 100;
+
+  .close-sidebar {
+    align-self: flex-end;
+    font-size: 24px;
+    margin-bottom: 10px;
+    border: none;
+    background: none;
+  }
+
+  &.open {
+    right: 0;
+  }
+}
+
+.mobile-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  a {
+    text-decoration: none;
+    color: #2c2c38;
+    font-size: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 4px;
+  }
+}
+
+.mobile-sidebar-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.menu-toggle {
+  display: none; // Default hidden
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: #2c2c38;
+}
+
+@media (max-width: 768px) {
+  .header-nav,
+  .header-btns {
+    display: none; // Hide desktop nav & buttons on mobile
+  }
+
+  .menu-toggle {
+    display: flex; // Show mobile menu button
+  }
+}

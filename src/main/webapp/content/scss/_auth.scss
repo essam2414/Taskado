@@ -58,7 +58,7 @@ $primary: #564df2;
 }
 
 .auth-input-group input:focus {
-  border-color: $primary;
+  border-color: var(--accent-color);
   outline: none;
 }
 
@@ -76,7 +76,7 @@ $primary: #564df2;
   padding: clamp(10px, 3vw, 14px);
   font-size: clamp(1rem, 2.5vw, 1.1rem);
   border-radius: 8px;
-  background: $primary;
+  background: var(--accent-color);
   color: white;
   border: none;
   cursor: pointer;
@@ -84,7 +84,7 @@ $primary: #564df2;
 }
 
 .auth-btn:hover {
-  background: darken($primary, 10%);
+  filter: brightness(90%);
 }
 
 .auth-links {

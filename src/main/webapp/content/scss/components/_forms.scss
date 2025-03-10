@@ -21,14 +21,17 @@ $primary: #564df2;
 .form-control {
   width: 100%;
   padding: clamp(10px, 3vw, 14px);
-  border: 1.5px solid #ddd;
+  border: 1.5px solid var(--border-color);
   border-radius: 8px;
   font-size: clamp(0.9rem, 2.5vw, 1rem);
-  transition: all 0.2s ease-in-out;
-  background-color: white;
+  transition: all 0.3s ease-in-out;
+  background-color: var(--card-bg);
+  color: var(--text-secondary);
 
   &:focus {
-    border-color: $primary;
+    border-color: var(--accent-color);
+    color: var(--text-primary);
+    background-color: var(--card-bg);
   }
 }
 
