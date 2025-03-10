@@ -76,18 +76,6 @@ entity Notification {
   sentVia NotificationChannel required
 }
 
-entity ProductivityReport {
-  tasksPlanned Integer,
-  tasksCompleted Integer,
-  taskAvgCompletionTime Float,
-  taskEfficiency Float,
-  pomodoroSessions Integer,
-  distractionsCount Integer,
-  focusTime Float,
-  focusScore Float required,
-  timestamp Instant required
-}
-
 entity PomodoroSession {
   start Instant required,
   stop Instant,
@@ -98,6 +86,19 @@ entity Note {
   content TextBlob required,
   createdAt Instant required,
   updatedAt Instant
+}
+
+@service(serviceClass)
+entity ProductivityReport {
+  tasksPlanned Integer required min(1),
+  taskCompleted Integer required min(0),
+  taskAvgCompletionTime Float min(0.1),      // Average time spent per task
+  taskEfficiency Float min(0) max(1),        // Ratio of completed vs planned tasks
+  focusTime Float min(0),                    // Total time spent in pomodoro mode
+  focusScore Float min(0) max(100),          // Score calculated based on productivity
+  habitCompletionRate Float min(0) max(100), // Percentage of habits completed during this period
+  habitStreakImpact Integer min(0),          // Influence of habits on productivity, calculated from habit streaks
+  timestamp Instant required                 // When report was generated
 }
 
 relationship ManyToOne {
@@ -111,4 +112,13 @@ relationship ManyToOne {
   ProductivityReport{user} to User with builtInEntity,
   PomodoroSession{user} to User with builtInEntity,
   Note{user} to User with builtInEntity,
+}
+
+relationship OneToMany {
+  ProductivityReport{pomodoroSessions} to PomodoroSession
+}
+
+relationship ManyToMany {
+  ProductivityReport{completedTaskList} to Task
+  ProductivityReport{completedHabitList} to Habit
 }
