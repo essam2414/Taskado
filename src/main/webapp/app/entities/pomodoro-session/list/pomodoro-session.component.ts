@@ -3,6 +3,8 @@ import { interval, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import SharedModule from 'app/shared/shared.module';
 
+type PomodoroMode = 'pomodoro' | 'shortBreak' | 'longBreak';
+
 @Component({
   selector: 'jhi-pomodoro-session',
   standalone: true,
@@ -11,15 +13,22 @@ import SharedModule from 'app/shared/shared.module';
   styleUrls: ['./pomodoro-session.component.scss'],
 })
 export class PomodoroSessionComponent implements OnInit, OnDestroy {
-  timeRemaining: number;
-  timerRunning = false;
+  // Public properties
+  modeDurations: Record<PomodoroMode, number> = {
+    pomodoro: 1500,
+    shortBreak: 300,
+    longBreak: 900,
+  };
 
-  private readonly timerDuration = 1500; // 25 mins
+  currentMode: PomodoroMode = 'pomodoro';
+  timerRunning = false;
+  timeRemaining = this.modeDurations[this.currentMode];
+
+  // Private properties
   private timerSubscription?: Subscription;
 
-  constructor() {
-    // Initialize dependent variable inside the constructor
-    this.timeRemaining = this.timerDuration;
+  ngOnInit(): void {
+    this.switchMode(this.currentMode);
   }
 
   get formattedTime(): string {
@@ -30,7 +39,8 @@ export class PomodoroSessionComponent implements OnInit, OnDestroy {
     return `${minutes}:${seconds}`;
   }
 
-  ngOnInit(): void {
+  switchMode(mode: PomodoroMode): void {
+    this.currentMode = mode;
     this.resetTimer();
   }
 
@@ -41,7 +51,7 @@ export class PomodoroSessionComponent implements OnInit, OnDestroy {
           this.timeRemaining--;
         } else {
           this.pauseTimer();
-          // Optional: handle timer completion
+          // Optional: Auto-switch logic
         }
       });
       this.timerRunning = true;
@@ -55,7 +65,7 @@ export class PomodoroSessionComponent implements OnInit, OnDestroy {
 
   resetTimer(): void {
     this.pauseTimer();
-    this.timeRemaining = this.timerDuration;
+    this.timeRemaining = this.modeDurations[this.currentMode];
   }
 
   ngOnDestroy(): void {
