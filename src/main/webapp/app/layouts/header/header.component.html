@@ -9,6 +9,7 @@
     </a>
   </div>
 
+  <!-- NAVIGATION (Hidden on mobile) -->
   <div class="header-nav">
     <a routerLink="/#features">About</a>
     <a routerLink="/#how-it-works">Features</a>
@@ -19,5 +20,29 @@
   <div class="header-btns">
     <button class="btn btn-primary" routerLink="/account/register">Sign Up</button>
     <button class="btn btn-outline" (click)="login()">Log in</button>
+  </div>
+
+  <!-- MOBILE MENU TOGGLE -->
+  <button class="menu-toggle" (click)="toggleSidebar()">
+    <fa-icon icon="bars"></fa-icon>
+  </button>
+
+  <!-- MOBILE SIDEBAR -->
+  <div class="mobile-sidebar" [class.open]="sidebarOpen">
+    <button class="close-sidebar" (click)="toggleSidebar()">
+      <fa-icon icon="times"></fa-icon>
+    </button>
+
+    <div class="mobile-sidebar-nav">
+      <a routerLink="/#features" (click)="toggleSidebar()">About</a>
+      <a routerLink="/#how-it-works" (click)="toggleSidebar()">Features</a>
+      <a routerLink="/#testimonials" (click)="toggleSidebar()">FAQ</a>
+      <a routerLink="/#faq" (click)="toggleSidebar()">Contact</a>
+    </div>
+
+    <div class="mobile-sidebar-btns">
+      <button class="btn btn-primary" routerLink="/account/register" (click)="toggleSidebar()">Sign Up</button>
+      <button class="btn btn-outline" (click)="login(); toggleSidebar()">Log in</button>
+    </div>
   </div>
 </div>

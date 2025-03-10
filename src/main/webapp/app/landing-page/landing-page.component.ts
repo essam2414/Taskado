@@ -22,6 +22,6 @@ export default class LandingPageComponent {
 
   continueAsGuest(): void {
     this.accountService.enableGuestMode();
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['app//dashboard']);
   }
 }
