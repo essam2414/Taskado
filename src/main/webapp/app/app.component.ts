@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import dayjs from 'dayjs/esm';
 import { FaIconLibrary } from '@fortawesome/angular-fontawesome';
@@ -20,7 +20,7 @@ import { Router } from '@angular/router';
     // jhipster-needle-angular-add-module JHipster will add new module here
   ],
 })
-export default class AppComponent {
+export default class AppComponent implements OnInit {
   private readonly applicationConfigService = inject(ApplicationConfigService);
   private readonly iconLibrary = inject(FaIconLibrary);
   private readonly dpConfig = inject(NgbDatepickerConfig);
