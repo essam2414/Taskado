@@ -24,19 +24,15 @@ enum NotificationChannel {
 }
 
 entity Notification {
-  message String required minlength(5),
+  message String required,
   notificationType NotificationType required,
   timestamp Instant required,
-  linkedEntityType String,
   read Boolean required,
   priority Priority required,
   status NotificationStatus required,
-  expirationDate Instant,
-  actionURL String,
-  icon String,
-  isRecurring Boolean required,
-  recurrencePattern String,
-  sentVia NotificationChannel required
+  sentVia NotificationChannel required,
+  linkedEntityType String,
+  linkedEntityId Long
 }
 
 relationship ManyToOne {

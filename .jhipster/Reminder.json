@@ -1,0 +1,49 @@
+{
+  "annotations": {
+    "changelogDate": "20250311004206"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "title",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "reminderDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "repeatType",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "repeatInterval",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "linkedEntityType",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "linkedEntityId",
+      "fieldType": "Long"
+    }
+  ],
+  "name": "Reminder",
+  "relationships": [
+    {
+      "otherEntityName": "user",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipWithBuiltInEntity": true
+    }
+  ],
+  "searchEngine": "no"
+}
