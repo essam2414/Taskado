@@ -26,13 +26,11 @@ enum NotificationChannel {
 entity Notification {
   message String required,
   notificationType NotificationType required,
-  timestamp Instant required,
+  createdAt Instant required,
   read Boolean required,
   priority Priority required,
   status NotificationStatus required,
-  sentVia NotificationChannel required,
-  linkedEntityType String,
-  linkedEntityId Long
+  sentVia NotificationChannel required
 }
 
 relationship ManyToOne {
