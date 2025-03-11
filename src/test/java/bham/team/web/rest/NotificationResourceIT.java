@@ -45,11 +45,8 @@ class NotificationResourceIT {
     private static final NotificationType DEFAULT_NOTIFICATION_TYPE = NotificationType.REMINDER;
     private static final NotificationType UPDATED_NOTIFICATION_TYPE = NotificationType.DEADLINE;
 
-    private static final Instant DEFAULT_TIMESTAMP = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_TIMESTAMP = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-
-    private static final String DEFAULT_LINKED_ENTITY_TYPE = "AAAAAAAAAA";
-    private static final String UPDATED_LINKED_ENTITY_TYPE = "BBBBBBBBBB";
+    private static final Instant DEFAULT_CREATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final Boolean DEFAULT_READ = false;
     private static final Boolean UPDATED_READ = true;
@@ -59,21 +56,6 @@ class NotificationResourceIT {
 
     private static final NotificationStatus DEFAULT_STATUS = NotificationStatus.SENT;
     private static final NotificationStatus UPDATED_STATUS = NotificationStatus.PENDING;
-
-    private static final Instant DEFAULT_EXPIRATION_DATE = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_EXPIRATION_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-
-    private static final String DEFAULT_ACTION_URL = "AAAAAAAAAA";
-    private static final String UPDATED_ACTION_URL = "BBBBBBBBBB";
-
-    private static final String DEFAULT_ICON = "AAAAAAAAAA";
-    private static final String UPDATED_ICON = "BBBBBBBBBB";
-
-    private static final Boolean DEFAULT_IS_RECURRING = false;
-    private static final Boolean UPDATED_IS_RECURRING = true;
-
-    private static final String DEFAULT_RECURRENCE_PATTERN = "AAAAAAAAAA";
-    private static final String UPDATED_RECURRENCE_PATTERN = "BBBBBBBBBB";
 
     private static final NotificationChannel DEFAULT_SENT_VIA = NotificationChannel.EMAIL;
     private static final NotificationChannel UPDATED_SENT_VIA = NotificationChannel.SMS;
@@ -113,16 +95,10 @@ class NotificationResourceIT {
         return new Notification()
             .message(DEFAULT_MESSAGE)
             .notificationType(DEFAULT_NOTIFICATION_TYPE)
-            .timestamp(DEFAULT_TIMESTAMP)
-            .linkedEntityType(DEFAULT_LINKED_ENTITY_TYPE)
+            .createdAt(DEFAULT_CREATED_AT)
             .read(DEFAULT_READ)
             .priority(DEFAULT_PRIORITY)
             .status(DEFAULT_STATUS)
-            .expirationDate(DEFAULT_EXPIRATION_DATE)
-            .actionURL(DEFAULT_ACTION_URL)
-            .icon(DEFAULT_ICON)
-            .isRecurring(DEFAULT_IS_RECURRING)
-            .recurrencePattern(DEFAULT_RECURRENCE_PATTERN)
             .sentVia(DEFAULT_SENT_VIA);
     }
 
@@ -136,16 +112,10 @@ class NotificationResourceIT {
         return new Notification()
             .message(UPDATED_MESSAGE)
             .notificationType(UPDATED_NOTIFICATION_TYPE)
-            .timestamp(UPDATED_TIMESTAMP)
-            .linkedEntityType(UPDATED_LINKED_ENTITY_TYPE)
+            .createdAt(UPDATED_CREATED_AT)
             .read(UPDATED_READ)
             .priority(UPDATED_PRIORITY)
             .status(UPDATED_STATUS)
-            .expirationDate(UPDATED_EXPIRATION_DATE)
-            .actionURL(UPDATED_ACTION_URL)
-            .icon(UPDATED_ICON)
-            .isRecurring(UPDATED_IS_RECURRING)
-            .recurrencePattern(UPDATED_RECURRENCE_PATTERN)
             .sentVia(UPDATED_SENT_VIA);
     }
 
@@ -235,10 +205,10 @@ class NotificationResourceIT {
 
     @Test
     @Transactional
-    void checkTimestampIsRequired() throws Exception {
+    void checkCreatedAtIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
-        notification.setTimestamp(null);
+        notification.setCreatedAt(null);
 
         // Create the Notification, which fails.
 
@@ -299,22 +269,6 @@ class NotificationResourceIT {
 
     @Test
     @Transactional
-    void checkIsRecurringIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        // set the field null
-        notification.setIsRecurring(null);
-
-        // Create the Notification, which fails.
-
-        restNotificationMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(notification)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
     void checkSentViaIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
@@ -343,16 +297,10 @@ class NotificationResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(notification.getId().intValue())))
             .andExpect(jsonPath("$.[*].message").value(hasItem(DEFAULT_MESSAGE)))
             .andExpect(jsonPath("$.[*].notificationType").value(hasItem(DEFAULT_NOTIFICATION_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].timestamp").value(hasItem(DEFAULT_TIMESTAMP.toString())))
-            .andExpect(jsonPath("$.[*].linkedEntityType").value(hasItem(DEFAULT_LINKED_ENTITY_TYPE)))
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
             .andExpect(jsonPath("$.[*].read").value(hasItem(DEFAULT_READ.booleanValue())))
             .andExpect(jsonPath("$.[*].priority").value(hasItem(DEFAULT_PRIORITY.toString())))
             .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS.toString())))
-            .andExpect(jsonPath("$.[*].expirationDate").value(hasItem(DEFAULT_EXPIRATION_DATE.toString())))
-            .andExpect(jsonPath("$.[*].actionURL").value(hasItem(DEFAULT_ACTION_URL)))
-            .andExpect(jsonPath("$.[*].icon").value(hasItem(DEFAULT_ICON)))
-            .andExpect(jsonPath("$.[*].isRecurring").value(hasItem(DEFAULT_IS_RECURRING.booleanValue())))
-            .andExpect(jsonPath("$.[*].recurrencePattern").value(hasItem(DEFAULT_RECURRENCE_PATTERN)))
             .andExpect(jsonPath("$.[*].sentVia").value(hasItem(DEFAULT_SENT_VIA.toString())));
     }
 
@@ -370,16 +318,10 @@ class NotificationResourceIT {
             .andExpect(jsonPath("$.id").value(notification.getId().intValue()))
             .andExpect(jsonPath("$.message").value(DEFAULT_MESSAGE))
             .andExpect(jsonPath("$.notificationType").value(DEFAULT_NOTIFICATION_TYPE.toString()))
-            .andExpect(jsonPath("$.timestamp").value(DEFAULT_TIMESTAMP.toString()))
-            .andExpect(jsonPath("$.linkedEntityType").value(DEFAULT_LINKED_ENTITY_TYPE))
+            .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
             .andExpect(jsonPath("$.read").value(DEFAULT_READ.booleanValue()))
             .andExpect(jsonPath("$.priority").value(DEFAULT_PRIORITY.toString()))
             .andExpect(jsonPath("$.status").value(DEFAULT_STATUS.toString()))
-            .andExpect(jsonPath("$.expirationDate").value(DEFAULT_EXPIRATION_DATE.toString()))
-            .andExpect(jsonPath("$.actionURL").value(DEFAULT_ACTION_URL))
-            .andExpect(jsonPath("$.icon").value(DEFAULT_ICON))
-            .andExpect(jsonPath("$.isRecurring").value(DEFAULT_IS_RECURRING.booleanValue()))
-            .andExpect(jsonPath("$.recurrencePattern").value(DEFAULT_RECURRENCE_PATTERN))
             .andExpect(jsonPath("$.sentVia").value(DEFAULT_SENT_VIA.toString()));
     }
 
@@ -405,16 +347,10 @@ class NotificationResourceIT {
         updatedNotification
             .message(UPDATED_MESSAGE)
             .notificationType(UPDATED_NOTIFICATION_TYPE)
-            .timestamp(UPDATED_TIMESTAMP)
-            .linkedEntityType(UPDATED_LINKED_ENTITY_TYPE)
+            .createdAt(UPDATED_CREATED_AT)
             .read(UPDATED_READ)
             .priority(UPDATED_PRIORITY)
             .status(UPDATED_STATUS)
-            .expirationDate(UPDATED_EXPIRATION_DATE)
-            .actionURL(UPDATED_ACTION_URL)
-            .icon(UPDATED_ICON)
-            .isRecurring(UPDATED_IS_RECURRING)
-            .recurrencePattern(UPDATED_RECURRENCE_PATTERN)
             .sentVia(UPDATED_SENT_VIA);
 
         restNotificationMockMvc
@@ -495,13 +431,7 @@ class NotificationResourceIT {
         Notification partialUpdatedNotification = new Notification();
         partialUpdatedNotification.setId(notification.getId());
 
-        partialUpdatedNotification
-            .notificationType(UPDATED_NOTIFICATION_TYPE)
-            .timestamp(UPDATED_TIMESTAMP)
-            .read(UPDATED_READ)
-            .priority(UPDATED_PRIORITY)
-            .recurrencePattern(UPDATED_RECURRENCE_PATTERN)
-            .sentVia(UPDATED_SENT_VIA);
+        partialUpdatedNotification.message(UPDATED_MESSAGE).createdAt(UPDATED_CREATED_AT).priority(UPDATED_PRIORITY);
 
         restNotificationMockMvc
             .perform(
@@ -535,16 +465,10 @@ class NotificationResourceIT {
         partialUpdatedNotification
             .message(UPDATED_MESSAGE)
             .notificationType(UPDATED_NOTIFICATION_TYPE)
-            .timestamp(UPDATED_TIMESTAMP)
-            .linkedEntityType(UPDATED_LINKED_ENTITY_TYPE)
+            .createdAt(UPDATED_CREATED_AT)
             .read(UPDATED_READ)
             .priority(UPDATED_PRIORITY)
             .status(UPDATED_STATUS)
-            .expirationDate(UPDATED_EXPIRATION_DATE)
-            .actionURL(UPDATED_ACTION_URL)
-            .icon(UPDATED_ICON)
-            .isRecurring(UPDATED_IS_RECURRING)
-            .recurrencePattern(UPDATED_RECURRENCE_PATTERN)
             .sentVia(UPDATED_SENT_VIA);
 
         restNotificationMockMvc

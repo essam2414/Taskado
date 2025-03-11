@@ -16,7 +16,6 @@ import { NotificationDeleteDialogComponent } from '../delete/notification-delete
   standalone: true,
   selector: 'jhi-notification',
   templateUrl: './notification.component.html',
-  styleUrls: ['../notification.scss'],
   imports: [
     RouterModule,
     FormsModule,

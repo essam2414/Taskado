@@ -29,7 +29,6 @@ public class Notification implements Serializable {
     private Long id;
 
     @NotNull
-    @Size(min = 5, message = "Message must be at least 5 characters long")
     @Column(name = "message", nullable = false)
     private String message;
 
@@ -39,12 +38,8 @@ public class Notification implements Serializable {
     private NotificationType notificationType;
 
     @NotNull
-    @PastOrPresent(message = "Timestamp cannot be in the future")
-    @Column(name = "timestamp", nullable = false)
-    private Instant timestamp;
-
-    @Column(name = "linked_entity_type")
-    private String linkedEntityType;
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
 
     @NotNull
     @Column(name = "read", nullable = false)
@@ -60,23 +55,6 @@ public class Notification implements Serializable {
     @Column(name = "status", nullable = false)
     private NotificationStatus status;
 
-    @FutureOrPresent(message = "Expiration date must be after timestamp")
-    @Column(name = "expiration_date")
-    private Instant expirationDate;
-
-    @Column(name = "action_url")
-    private String actionURL;
-
-    @Column(name = "icon")
-    private String icon;
-
-    @NotNull
-    @Column(name = "is_recurring", nullable = false)
-    private Boolean isRecurring;
-
-    @Column(name = "recurrence_pattern")
-    private String recurrencePattern;
-
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "sent_via", nullable = false)
@@ -85,7 +63,8 @@ public class Notification implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    // Getters and Setters with Fluent API
+    // jhipster-needle-entity-add-field - JHipster will add fields here
+
     public Long getId() {
         return this.id;
     }
@@ -125,30 +104,17 @@ public class Notification implements Serializable {
         this.notificationType = notificationType;
     }
 
-    public Instant getTimestamp() {
-        return this.timestamp;
+    public Instant getCreatedAt() {
+        return this.createdAt;
     }
 
-    public Notification timestamp(Instant timestamp) {
-        this.setTimestamp(timestamp);
+    public Notification createdAt(Instant createdAt) {
+        this.setCreatedAt(createdAt);
         return this;
     }
 
-    public void setTimestamp(Instant timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getLinkedEntityType() {
-        return this.linkedEntityType;
-    }
-
-    public Notification linkedEntityType(String linkedEntityType) {
-        this.setLinkedEntityType(linkedEntityType);
-        return this;
-    }
-
-    public void setLinkedEntityType(String linkedEntityType) {
-        this.linkedEntityType = linkedEntityType;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Boolean getRead() {
@@ -190,71 +156,6 @@ public class Notification implements Serializable {
         this.status = status;
     }
 
-    public Instant getExpirationDate() {
-        return this.expirationDate;
-    }
-
-    public Notification expirationDate(Instant expirationDate) {
-        this.setExpirationDate(expirationDate);
-        return this;
-    }
-
-    public void setExpirationDate(Instant expirationDate) {
-        this.expirationDate = expirationDate;
-    }
-
-    public String getActionURL() {
-        return this.actionURL;
-    }
-
-    public Notification actionURL(String actionURL) {
-        this.setActionURL(actionURL);
-        return this;
-    }
-
-    public void setActionURL(String actionURL) {
-        this.actionURL = actionURL;
-    }
-
-    public String getIcon() {
-        return this.icon;
-    }
-
-    public Notification icon(String icon) {
-        this.setIcon(icon);
-        return this;
-    }
-
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
-    public Boolean getIsRecurring() {
-        return this.isRecurring;
-    }
-
-    public Notification isRecurring(Boolean isRecurring) {
-        this.setIsRecurring(isRecurring);
-        return this;
-    }
-
-    public void setIsRecurring(Boolean isRecurring) {
-        this.isRecurring = isRecurring;
-    }
-
-    public String getRecurrencePattern() {
-        return this.recurrencePattern;
-    }
-
-    public Notification recurrencePattern(String recurrencePattern) {
-        this.setRecurrencePattern(recurrencePattern);
-        return this;
-    }
-
-    public void setRecurrencePattern(String recurrencePattern) {
-        this.recurrencePattern = recurrencePattern;
-    }
-
     public NotificationChannel getSentVia() {
         return this.sentVia;
     }
@@ -281,6 +182,8 @@ public class Notification implements Serializable {
         return this;
     }
 
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -294,55 +197,22 @@ public class Notification implements Serializable {
 
     @Override
     public int hashCode() {
+        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
+    // prettier-ignore
     @Override
     public String toString() {
-        return (
-            "Notification{" +
-            "id=" +
-            getId() +
-            ", message='" +
-            getMessage() +
-            "'" +
-            ", notificationType='" +
-            getNotificationType() +
-            "'" +
-            ", timestamp='" +
-            getTimestamp() +
-            "'" +
-            ", linkedEntityType='" +
-            getLinkedEntityType() +
-            "'" +
-            ", read='" +
-            getRead() +
-            "'" +
-            ", priority='" +
-            getPriority() +
-            "'" +
-            ", status='" +
-            getStatus() +
-            "'" +
-            ", expirationDate='" +
-            getExpirationDate() +
-            "'" +
-            ", actionURL='" +
-            getActionURL() +
-            "'" +
-            ", icon='" +
-            getIcon() +
-            "'" +
-            ", isRecurring='" +
-            getIsRecurring() +
-            "'" +
-            ", recurrencePattern='" +
-            getRecurrencePattern() +
-            "'" +
-            ", sentVia='" +
-            getSentVia() +
-            "'" +
-            "}"
-        );
+        return "Notification{" +
+            "id=" + getId() +
+            ", message='" + getMessage() + "'" +
+            ", notificationType='" + getNotificationType() + "'" +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", read='" + getRead() + "'" +
+            ", priority='" + getPriority() + "'" +
+            ", status='" + getStatus() + "'" +
+            ", sentVia='" + getSentVia() + "'" +
+            "}";
     }
 }

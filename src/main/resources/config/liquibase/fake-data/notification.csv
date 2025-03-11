@@ -1,11 +1,11 @@
-id;message;notification_type;timestamp;linked_entity_type;read;priority;status;expiration_date;action_url;icon;is_recurring;recurrence_pattern;sent_via
-1;loyally;SYSTEM_UPDATE;2025-02-02T16:50:08;uh-huh;true;CRITICAL;FAILED;2025-02-02T20:32:24;gnaw outside;kindly;false;horn ironclad forswear;PUSH
-2;before and;REMINDER;2025-02-03T13:30:32;rationalise ew um;true;CRITICAL;SENT;2025-02-02T20:49:55;innocently;yuck before;false;egg educated;EMAIL
-3;presell for;SYSTEM_UPDATE;2025-02-03T05:05:13;on;false;CRITICAL;FAILED;2025-02-03T08:34:02;next;ill cinema besides;false;phooey;EMAIL
-4;founder;REMINDER;2025-02-02T21:30:20;briefly pomelo onto;false;MEDIUM;SENT;2025-02-02T18:06:56;tender going;bitterly;false;solder against infatuated;EMAIL
-5;not only;DEADLINE;2025-02-02T22:44:02;forenenst;false;LOW;PENDING;2025-02-03T02:34:48;before;bah mountain phew;false;brr;EMAIL
-6;pantyhose;REMINDER;2025-02-03T10:52:54;far rotating;true;CRITICAL;FAILED;2025-02-03T08:19:16;swing decision;psst;false;zowie;SMS
-7;restfully drat;REMINDER;2025-02-03T12:53:37;dense;true;CRITICAL;PENDING;2025-02-03T01:03:12;internationalize readmit gah;cop-out obedience sandbar;true;fiercely;EMAIL
-8;till contractor;REMINDER;2025-02-03T02:05:00;spattering and;true;HIGH;SENT;2025-02-03T08:57:51;stabilise please;drowse willing memorable;true;eek able;EMAIL
-9;sandbar;REMINDER;2025-02-03T02:51:50;illustrious highly for;true;MEDIUM;PENDING;2025-02-02T20:34:39;lobotomise adviser;smoothly;false;mystify bank;SMS
-10;selfishly from;DEADLINE;2025-02-03T09:33:56;bathrobe familiarize properly;false;MEDIUM;PENDING;2025-02-02T19:05:10;wherever scaffold;upbeat expostulate;true;flimsy creative entice;SMS
+id;message;notification_type;created_at;read;priority;status;sent_via
+1;loyally;SYSTEM_UPDATE;2025-03-10T03:22:21;true;HIGH;PENDING;EMAIL
+2;drag near testing;SYSTEM_UPDATE;2025-03-10T01:45:27;false;CRITICAL;PENDING;PUSH
+3;sympathetically untidy from;DEADLINE;2025-03-10T21:17:50;false;MEDIUM;FAILED;SMS
+4;ick alongside;SYSTEM_UPDATE;2025-03-11T00:00:02;true;MEDIUM;PENDING;PUSH
+5;punctually instead decongestant;SYSTEM_UPDATE;2025-03-10T11:14:40;false;HIGH;FAILED;EMAIL
+6;or ha;REMINDER;2025-03-10T15:47:01;false;HIGH;PENDING;PUSH
+7;opposite inventory;DEADLINE;2025-03-10T23:14:54;false;CRITICAL;PENDING;SMS
+8;omelet;REMINDER;2025-03-10T02:30:47;true;LOW;FAILED;EMAIL
+9;vacantly;REMINDER;2025-03-11T00:21:45;false;CRITICAL;PENDING;SMS
+10;ill cinema besides;DEADLINE;2025-03-10T07:22:52;false;MEDIUM;PENDING;EMAIL

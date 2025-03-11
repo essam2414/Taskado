@@ -47,6 +47,7 @@ import {
   faInbox,
   faCalendarDay,
   faEllipsisVertical,
+  faPalette,
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -102,5 +103,6 @@ export const fontAwesomeIcons = [
   faInbox,
   faCalendarDay,
   faEllipsisVertical,
+  faPalette,
   // jhipster-needle-add-icon-import
 ];
