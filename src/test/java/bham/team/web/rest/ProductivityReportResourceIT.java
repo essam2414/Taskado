@@ -4,6 +4,7 @@ import static bham.team.domain.ProductivityReportAsserts.*;
 import static bham.team.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -11,17 +12,24 @@ import bham.team.IntegrationTest;
 import bham.team.domain.ProductivityReport;
 import bham.team.repository.ProductivityReportRepository;
 import bham.team.repository.UserRepository;
+import bham.team.service.ProductivityReportService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,33 +39,28 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the {@link ProductivityReportResource} REST controller.
  */
 @IntegrationTest
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser
 class ProductivityReportResourceIT {
 
-    private static final Integer DEFAULT_TASKS_PLANNED = 1;
-    private static final Integer UPDATED_TASKS_PLANNED = 2;
+    private static final Integer DEFAULT_TASKS_PLANNED = 0;
+    private static final Integer UPDATED_TASKS_PLANNED = 1;
 
-    private static final Integer DEFAULT_TASKS_COMPLETED = 1;
-    private static final Integer UPDATED_TASKS_COMPLETED = 2;
+    private static final Integer DEFAULT_TASKS_COMPLETED = 0;
+    private static final Integer UPDATED_TASKS_COMPLETED = 1;
 
-    private static final Float DEFAULT_TASK_AVG_COMPLETION_TIME = 1F;
-    private static final Float UPDATED_TASK_AVG_COMPLETION_TIME = 2F;
+    private static final Integer DEFAULT_POMODORO_SESSIONS_COMPLETED = 0;
+    private static final Integer UPDATED_POMODORO_SESSIONS_COMPLETED = 1;
 
-    private static final Float DEFAULT_TASK_EFFICIENCY = 1F;
-    private static final Float UPDATED_TASK_EFFICIENCY = 2F;
+    private static final Float DEFAULT_TOTAL_FOCUS_TIME = 0F;
+    private static final Float UPDATED_TOTAL_FOCUS_TIME = 1F;
 
-    private static final Integer DEFAULT_POMODORO_SESSIONS = 1;
-    private static final Integer UPDATED_POMODORO_SESSIONS = 2;
+    private static final Integer DEFAULT_DISTRACTIONS_COUNT = 0;
+    private static final Integer UPDATED_DISTRACTIONS_COUNT = 1;
 
-    private static final Integer DEFAULT_DISTRACTIONS_COUNT = 1;
-    private static final Integer UPDATED_DISTRACTIONS_COUNT = 2;
-
-    private static final Float DEFAULT_FOCUS_TIME = 1F;
-    private static final Float UPDATED_FOCUS_TIME = 2F;
-
-    private static final Float DEFAULT_FOCUS_SCORE = 1F;
-    private static final Float UPDATED_FOCUS_SCORE = 2F;
+    private static final Float DEFAULT_EFFICIENCY_SCORE = 0F;
+    private static final Float UPDATED_EFFICIENCY_SCORE = 1F;
 
     private static final Instant DEFAULT_TIMESTAMP = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_TIMESTAMP = Instant.now().truncatedTo(ChronoUnit.MILLIS);
@@ -76,6 +79,12 @@ class ProductivityReportResourceIT {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Mock
+    private ProductivityReportRepository productivityReportRepositoryMock;
+
+    @Mock
+    private ProductivityReportService productivityReportServiceMock;
 
     @Autowired
     private EntityManager em;
@@ -97,12 +106,10 @@ class ProductivityReportResourceIT {
         return new ProductivityReport()
             .tasksPlanned(DEFAULT_TASKS_PLANNED)
             .tasksCompleted(DEFAULT_TASKS_COMPLETED)
-            .taskAvgCompletionTime(DEFAULT_TASK_AVG_COMPLETION_TIME)
-            .taskEfficiency(DEFAULT_TASK_EFFICIENCY)
-            .pomodoroSessions(DEFAULT_POMODORO_SESSIONS)
+            .pomodoroSessionsCompleted(DEFAULT_POMODORO_SESSIONS_COMPLETED)
+            .totalFocusTime(DEFAULT_TOTAL_FOCUS_TIME)
             .distractionsCount(DEFAULT_DISTRACTIONS_COUNT)
-            .focusTime(DEFAULT_FOCUS_TIME)
-            .focusScore(DEFAULT_FOCUS_SCORE)
+            .efficiencyScore(DEFAULT_EFFICIENCY_SCORE)
             .timestamp(DEFAULT_TIMESTAMP);
     }
 
@@ -116,12 +123,10 @@ class ProductivityReportResourceIT {
         return new ProductivityReport()
             .tasksPlanned(UPDATED_TASKS_PLANNED)
             .tasksCompleted(UPDATED_TASKS_COMPLETED)
-            .taskAvgCompletionTime(UPDATED_TASK_AVG_COMPLETION_TIME)
-            .taskEfficiency(UPDATED_TASK_EFFICIENCY)
-            .pomodoroSessions(UPDATED_POMODORO_SESSIONS)
+            .pomodoroSessionsCompleted(UPDATED_POMODORO_SESSIONS_COMPLETED)
+            .totalFocusTime(UPDATED_TOTAL_FOCUS_TIME)
             .distractionsCount(UPDATED_DISTRACTIONS_COUNT)
-            .focusTime(UPDATED_FOCUS_TIME)
-            .focusScore(UPDATED_FOCUS_SCORE)
+            .efficiencyScore(UPDATED_EFFICIENCY_SCORE)
             .timestamp(UPDATED_TIMESTAMP);
     }
 
@@ -182,10 +187,42 @@ class ProductivityReportResourceIT {
 
     @Test
     @Transactional
-    void checkFocusScoreIsRequired() throws Exception {
+    void checkTasksPlannedIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
-        productivityReport.setFocusScore(null);
+        productivityReport.setTasksPlanned(null);
+
+        // Create the ProductivityReport, which fails.
+
+        restProductivityReportMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(productivityReport)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkTasksCompletedIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        productivityReport.setTasksCompleted(null);
+
+        // Create the ProductivityReport, which fails.
+
+        restProductivityReportMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(productivityReport)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkPomodoroSessionsCompletedIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        productivityReport.setPomodoroSessionsCompleted(null);
 
         // Create the ProductivityReport, which fails.
 
@@ -226,13 +263,28 @@ class ProductivityReportResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(productivityReport.getId().intValue())))
             .andExpect(jsonPath("$.[*].tasksPlanned").value(hasItem(DEFAULT_TASKS_PLANNED)))
             .andExpect(jsonPath("$.[*].tasksCompleted").value(hasItem(DEFAULT_TASKS_COMPLETED)))
-            .andExpect(jsonPath("$.[*].taskAvgCompletionTime").value(hasItem(DEFAULT_TASK_AVG_COMPLETION_TIME.doubleValue())))
-            .andExpect(jsonPath("$.[*].taskEfficiency").value(hasItem(DEFAULT_TASK_EFFICIENCY.doubleValue())))
-            .andExpect(jsonPath("$.[*].pomodoroSessions").value(hasItem(DEFAULT_POMODORO_SESSIONS)))
+            .andExpect(jsonPath("$.[*].pomodoroSessionsCompleted").value(hasItem(DEFAULT_POMODORO_SESSIONS_COMPLETED)))
+            .andExpect(jsonPath("$.[*].totalFocusTime").value(hasItem(DEFAULT_TOTAL_FOCUS_TIME.doubleValue())))
             .andExpect(jsonPath("$.[*].distractionsCount").value(hasItem(DEFAULT_DISTRACTIONS_COUNT)))
-            .andExpect(jsonPath("$.[*].focusTime").value(hasItem(DEFAULT_FOCUS_TIME.doubleValue())))
-            .andExpect(jsonPath("$.[*].focusScore").value(hasItem(DEFAULT_FOCUS_SCORE.doubleValue())))
+            .andExpect(jsonPath("$.[*].efficiencyScore").value(hasItem(DEFAULT_EFFICIENCY_SCORE.doubleValue())))
             .andExpect(jsonPath("$.[*].timestamp").value(hasItem(DEFAULT_TIMESTAMP.toString())));
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllProductivityReportsWithEagerRelationshipsIsEnabled() throws Exception {
+        when(productivityReportServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restProductivityReportMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
+
+        verify(productivityReportServiceMock, times(1)).findAllWithEagerRelationships(any());
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllProductivityReportsWithEagerRelationshipsIsNotEnabled() throws Exception {
+        when(productivityReportServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restProductivityReportMockMvc.perform(get(ENTITY_API_URL + "?eagerload=false")).andExpect(status().isOk());
+        verify(productivityReportRepositoryMock, times(1)).findAll(any(Pageable.class));
     }
 
     @Test
@@ -249,12 +301,10 @@ class ProductivityReportResourceIT {
             .andExpect(jsonPath("$.id").value(productivityReport.getId().intValue()))
             .andExpect(jsonPath("$.tasksPlanned").value(DEFAULT_TASKS_PLANNED))
             .andExpect(jsonPath("$.tasksCompleted").value(DEFAULT_TASKS_COMPLETED))
-            .andExpect(jsonPath("$.taskAvgCompletionTime").value(DEFAULT_TASK_AVG_COMPLETION_TIME.doubleValue()))
-            .andExpect(jsonPath("$.taskEfficiency").value(DEFAULT_TASK_EFFICIENCY.doubleValue()))
-            .andExpect(jsonPath("$.pomodoroSessions").value(DEFAULT_POMODORO_SESSIONS))
+            .andExpect(jsonPath("$.pomodoroSessionsCompleted").value(DEFAULT_POMODORO_SESSIONS_COMPLETED))
+            .andExpect(jsonPath("$.totalFocusTime").value(DEFAULT_TOTAL_FOCUS_TIME.doubleValue()))
             .andExpect(jsonPath("$.distractionsCount").value(DEFAULT_DISTRACTIONS_COUNT))
-            .andExpect(jsonPath("$.focusTime").value(DEFAULT_FOCUS_TIME.doubleValue()))
-            .andExpect(jsonPath("$.focusScore").value(DEFAULT_FOCUS_SCORE.doubleValue()))
+            .andExpect(jsonPath("$.efficiencyScore").value(DEFAULT_EFFICIENCY_SCORE.doubleValue()))
             .andExpect(jsonPath("$.timestamp").value(DEFAULT_TIMESTAMP.toString()));
     }
 
@@ -280,12 +330,10 @@ class ProductivityReportResourceIT {
         updatedProductivityReport
             .tasksPlanned(UPDATED_TASKS_PLANNED)
             .tasksCompleted(UPDATED_TASKS_COMPLETED)
-            .taskAvgCompletionTime(UPDATED_TASK_AVG_COMPLETION_TIME)
-            .taskEfficiency(UPDATED_TASK_EFFICIENCY)
-            .pomodoroSessions(UPDATED_POMODORO_SESSIONS)
+            .pomodoroSessionsCompleted(UPDATED_POMODORO_SESSIONS_COMPLETED)
+            .totalFocusTime(UPDATED_TOTAL_FOCUS_TIME)
             .distractionsCount(UPDATED_DISTRACTIONS_COUNT)
-            .focusTime(UPDATED_FOCUS_TIME)
-            .focusScore(UPDATED_FOCUS_SCORE)
+            .efficiencyScore(UPDATED_EFFICIENCY_SCORE)
             .timestamp(UPDATED_TIMESTAMP);
 
         restProductivityReportMockMvc
@@ -366,7 +414,7 @@ class ProductivityReportResourceIT {
         ProductivityReport partialUpdatedProductivityReport = new ProductivityReport();
         partialUpdatedProductivityReport.setId(productivityReport.getId());
 
-        partialUpdatedProductivityReport.tasksPlanned(UPDATED_TASKS_PLANNED).taskEfficiency(UPDATED_TASK_EFFICIENCY);
+        partialUpdatedProductivityReport.tasksCompleted(UPDATED_TASKS_COMPLETED).distractionsCount(UPDATED_DISTRACTIONS_COUNT);
 
         restProductivityReportMockMvc
             .perform(
@@ -400,12 +448,10 @@ class ProductivityReportResourceIT {
         partialUpdatedProductivityReport
             .tasksPlanned(UPDATED_TASKS_PLANNED)
             .tasksCompleted(UPDATED_TASKS_COMPLETED)
-            .taskAvgCompletionTime(UPDATED_TASK_AVG_COMPLETION_TIME)
-            .taskEfficiency(UPDATED_TASK_EFFICIENCY)
-            .pomodoroSessions(UPDATED_POMODORO_SESSIONS)
+            .pomodoroSessionsCompleted(UPDATED_POMODORO_SESSIONS_COMPLETED)
+            .totalFocusTime(UPDATED_TOTAL_FOCUS_TIME)
             .distractionsCount(UPDATED_DISTRACTIONS_COUNT)
-            .focusTime(UPDATED_FOCUS_TIME)
-            .focusScore(UPDATED_FOCUS_SCORE)
+            .efficiencyScore(UPDATED_EFFICIENCY_SCORE)
             .timestamp(UPDATED_TIMESTAMP);
 
         restProductivityReportMockMvc

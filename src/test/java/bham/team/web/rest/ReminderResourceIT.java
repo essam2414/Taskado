@@ -345,11 +345,7 @@ class ReminderResourceIT {
         Reminder partialUpdatedReminder = new Reminder();
         partialUpdatedReminder.setId(reminder.getId());
 
-        partialUpdatedReminder
-            .title(UPDATED_TITLE)
-            .description(UPDATED_DESCRIPTION)
-            .reminderDate(UPDATED_REMINDER_DATE)
-            .repeatInterval(UPDATED_REPEAT_INTERVAL);
+        partialUpdatedReminder.description(UPDATED_DESCRIPTION).reminderDate(UPDATED_REMINDER_DATE).repeatInterval(UPDATED_REPEAT_INTERVAL);
 
         restReminderMockMvc
             .perform(

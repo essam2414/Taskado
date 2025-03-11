@@ -328,12 +328,7 @@ class TaskResourceIT {
         Task partialUpdatedTask = new Task();
         partialUpdatedTask.setId(task.getId());
 
-        partialUpdatedTask
-            .description(UPDATED_DESCRIPTION)
-            .priority(UPDATED_PRIORITY)
-            .completed(UPDATED_COMPLETED)
-            .createdAt(UPDATED_CREATED_AT)
-            .updatedAt(UPDATED_UPDATED_AT);
+        partialUpdatedTask.title(UPDATED_TITLE).dueDate(UPDATED_DUE_DATE).completed(UPDATED_COMPLETED).updatedAt(UPDATED_UPDATED_AT);
 
         restTaskMockMvc
             .perform(

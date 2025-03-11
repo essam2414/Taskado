@@ -391,7 +391,7 @@ class HabitResourceIT {
         Habit partialUpdatedHabit = new Habit();
         partialUpdatedHabit.setId(habit.getId());
 
-        partialUpdatedHabit.repeatType(UPDATED_REPEAT_TYPE).completed(UPDATED_COMPLETED).completionRate(UPDATED_COMPLETION_RATE);
+        partialUpdatedHabit.repeatInterval(UPDATED_REPEAT_INTERVAL).completed(UPDATED_COMPLETED).streak(UPDATED_STREAK);
 
         restHabitMockMvc
             .perform(

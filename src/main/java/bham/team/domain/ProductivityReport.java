@@ -1,9 +1,12 @@
 package bham.team.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -24,37 +27,65 @@ public class ProductivityReport implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "tasks_planned")
+    @NotNull
+    @Min(value = 0)
+    @Column(name = "tasks_planned", nullable = false)
     private Integer tasksPlanned;
 
-    @Column(name = "tasks_completed")
+    @NotNull
+    @Min(value = 0)
+    @Column(name = "tasks_completed", nullable = false)
     private Integer tasksCompleted;
 
-    @Column(name = "task_avg_completion_time")
-    private Float taskAvgCompletionTime;
+    @NotNull
+    @Min(value = 0)
+    @Column(name = "pomodoro_sessions_completed", nullable = false)
+    private Integer pomodoroSessionsCompleted;
 
-    @Column(name = "task_efficiency")
-    private Float taskEfficiency;
+    @DecimalMin(value = "0")
+    @Column(name = "total_focus_time")
+    private Float totalFocusTime;
 
-    @Column(name = "pomodoro_sessions")
-    private Integer pomodoroSessions;
-
+    @Min(value = 0)
     @Column(name = "distractions_count")
     private Integer distractionsCount;
 
-    @Column(name = "focus_time")
-    private Float focusTime;
-
-    @NotNull
-    @Column(name = "focus_score", nullable = false)
-    private Float focusScore;
+    @DecimalMin(value = "0")
+    @DecimalMax(value = "100")
+    @Column(name = "efficiency_score")
+    private Float efficiencyScore;
 
     @NotNull
     @Column(name = "timestamp", nullable = false)
     private Instant timestamp;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "productivityReport")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "user", "productivityReport" }, allowSetters = true)
+    private Set<PomodoroSession> pomodoroSessions = new HashSet<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "rel_productivity_report__completed_tasks",
+        joinColumns = @JoinColumn(name = "productivity_report_id"),
+        inverseJoinColumns = @JoinColumn(name = "completed_tasks_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "category", "user", "productivityReports" }, allowSetters = true)
+    private Set<Task> completedTasks = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "rel_productivity_report__completed_habits",
+        joinColumns = @JoinColumn(name = "productivity_report_id"),
+        inverseJoinColumns = @JoinColumn(name = "completed_habits_id")
+    )
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "category", "user", "productivityReports" }, allowSetters = true)
+    private Set<Habit> completedHabits = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -97,43 +128,30 @@ public class ProductivityReport implements Serializable {
         this.tasksCompleted = tasksCompleted;
     }
 
-    public Float getTaskAvgCompletionTime() {
-        return this.taskAvgCompletionTime;
+    public Integer getPomodoroSessionsCompleted() {
+        return this.pomodoroSessionsCompleted;
     }
 
-    public ProductivityReport taskAvgCompletionTime(Float taskAvgCompletionTime) {
-        this.setTaskAvgCompletionTime(taskAvgCompletionTime);
+    public ProductivityReport pomodoroSessionsCompleted(Integer pomodoroSessionsCompleted) {
+        this.setPomodoroSessionsCompleted(pomodoroSessionsCompleted);
         return this;
     }
 
-    public void setTaskAvgCompletionTime(Float taskAvgCompletionTime) {
-        this.taskAvgCompletionTime = taskAvgCompletionTime;
+    public void setPomodoroSessionsCompleted(Integer pomodoroSessionsCompleted) {
+        this.pomodoroSessionsCompleted = pomodoroSessionsCompleted;
     }
 
-    public Float getTaskEfficiency() {
-        return this.taskEfficiency;
+    public Float getTotalFocusTime() {
+        return this.totalFocusTime;
     }
 
-    public ProductivityReport taskEfficiency(Float taskEfficiency) {
-        this.setTaskEfficiency(taskEfficiency);
+    public ProductivityReport totalFocusTime(Float totalFocusTime) {
+        this.setTotalFocusTime(totalFocusTime);
         return this;
     }
 
-    public void setTaskEfficiency(Float taskEfficiency) {
-        this.taskEfficiency = taskEfficiency;
-    }
-
-    public Integer getPomodoroSessions() {
-        return this.pomodoroSessions;
-    }
-
-    public ProductivityReport pomodoroSessions(Integer pomodoroSessions) {
-        this.setPomodoroSessions(pomodoroSessions);
-        return this;
-    }
-
-    public void setPomodoroSessions(Integer pomodoroSessions) {
-        this.pomodoroSessions = pomodoroSessions;
+    public void setTotalFocusTime(Float totalFocusTime) {
+        this.totalFocusTime = totalFocusTime;
     }
 
     public Integer getDistractionsCount() {
@@ -149,30 +167,17 @@ public class ProductivityReport implements Serializable {
         this.distractionsCount = distractionsCount;
     }
 
-    public Float getFocusTime() {
-        return this.focusTime;
+    public Float getEfficiencyScore() {
+        return this.efficiencyScore;
     }
 
-    public ProductivityReport focusTime(Float focusTime) {
-        this.setFocusTime(focusTime);
+    public ProductivityReport efficiencyScore(Float efficiencyScore) {
+        this.setEfficiencyScore(efficiencyScore);
         return this;
     }
 
-    public void setFocusTime(Float focusTime) {
-        this.focusTime = focusTime;
-    }
-
-    public Float getFocusScore() {
-        return this.focusScore;
-    }
-
-    public ProductivityReport focusScore(Float focusScore) {
-        this.setFocusScore(focusScore);
-        return this;
-    }
-
-    public void setFocusScore(Float focusScore) {
-        this.focusScore = focusScore;
+    public void setEfficiencyScore(Float efficiencyScore) {
+        this.efficiencyScore = efficiencyScore;
     }
 
     public Instant getTimestamp() {
@@ -188,6 +193,37 @@ public class ProductivityReport implements Serializable {
         this.timestamp = timestamp;
     }
 
+    public Set<PomodoroSession> getPomodoroSessions() {
+        return this.pomodoroSessions;
+    }
+
+    public void setPomodoroSessions(Set<PomodoroSession> pomodoroSessions) {
+        if (this.pomodoroSessions != null) {
+            this.pomodoroSessions.forEach(i -> i.setProductivityReport(null));
+        }
+        if (pomodoroSessions != null) {
+            pomodoroSessions.forEach(i -> i.setProductivityReport(this));
+        }
+        this.pomodoroSessions = pomodoroSessions;
+    }
+
+    public ProductivityReport pomodoroSessions(Set<PomodoroSession> pomodoroSessions) {
+        this.setPomodoroSessions(pomodoroSessions);
+        return this;
+    }
+
+    public ProductivityReport addPomodoroSessions(PomodoroSession pomodoroSession) {
+        this.pomodoroSessions.add(pomodoroSession);
+        pomodoroSession.setProductivityReport(this);
+        return this;
+    }
+
+    public ProductivityReport removePomodoroSessions(PomodoroSession pomodoroSession) {
+        this.pomodoroSessions.remove(pomodoroSession);
+        pomodoroSession.setProductivityReport(null);
+        return this;
+    }
+
     public User getUser() {
         return this.user;
     }
@@ -198,6 +234,52 @@ public class ProductivityReport implements Serializable {
 
     public ProductivityReport user(User user) {
         this.setUser(user);
+        return this;
+    }
+
+    public Set<Task> getCompletedTasks() {
+        return this.completedTasks;
+    }
+
+    public void setCompletedTasks(Set<Task> tasks) {
+        this.completedTasks = tasks;
+    }
+
+    public ProductivityReport completedTasks(Set<Task> tasks) {
+        this.setCompletedTasks(tasks);
+        return this;
+    }
+
+    public ProductivityReport addCompletedTasks(Task task) {
+        this.completedTasks.add(task);
+        return this;
+    }
+
+    public ProductivityReport removeCompletedTasks(Task task) {
+        this.completedTasks.remove(task);
+        return this;
+    }
+
+    public Set<Habit> getCompletedHabits() {
+        return this.completedHabits;
+    }
+
+    public void setCompletedHabits(Set<Habit> habits) {
+        this.completedHabits = habits;
+    }
+
+    public ProductivityReport completedHabits(Set<Habit> habits) {
+        this.setCompletedHabits(habits);
+        return this;
+    }
+
+    public ProductivityReport addCompletedHabits(Habit habit) {
+        this.completedHabits.add(habit);
+        return this;
+    }
+
+    public ProductivityReport removeCompletedHabits(Habit habit) {
+        this.completedHabits.remove(habit);
         return this;
     }
 
@@ -227,12 +309,10 @@ public class ProductivityReport implements Serializable {
             "id=" + getId() +
             ", tasksPlanned=" + getTasksPlanned() +
             ", tasksCompleted=" + getTasksCompleted() +
-            ", taskAvgCompletionTime=" + getTaskAvgCompletionTime() +
-            ", taskEfficiency=" + getTaskEfficiency() +
-            ", pomodoroSessions=" + getPomodoroSessions() +
+            ", pomodoroSessionsCompleted=" + getPomodoroSessionsCompleted() +
+            ", totalFocusTime=" + getTotalFocusTime() +
             ", distractionsCount=" + getDistractionsCount() +
-            ", focusTime=" + getFocusTime() +
-            ", focusScore=" + getFocusScore() +
+            ", efficiencyScore=" + getEfficiencyScore() +
             ", timestamp='" + getTimestamp() + "'" +
             "}";
     }

@@ -2,9 +2,12 @@ package bham.team.domain;
 
 import static bham.team.domain.CategoryTestSamples.*;
 import static bham.team.domain.HabitTestSamples.*;
+import static bham.team.domain.ProductivityReportTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import bham.team.web.rest.TestUtil;
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class HabitTest {
@@ -33,5 +36,27 @@ class HabitTest {
 
         habit.category(null);
         assertThat(habit.getCategory()).isNull();
+    }
+
+    @Test
+    void productivityReportTest() {
+        Habit habit = getHabitRandomSampleGenerator();
+        ProductivityReport productivityReportBack = getProductivityReportRandomSampleGenerator();
+
+        habit.addProductivityReport(productivityReportBack);
+        assertThat(habit.getProductivityReports()).containsOnly(productivityReportBack);
+        assertThat(productivityReportBack.getCompletedHabits()).containsOnly(habit);
+
+        habit.removeProductivityReport(productivityReportBack);
+        assertThat(habit.getProductivityReports()).doesNotContain(productivityReportBack);
+        assertThat(productivityReportBack.getCompletedHabits()).doesNotContain(habit);
+
+        habit.productivityReports(new HashSet<>(Set.of(productivityReportBack)));
+        assertThat(habit.getProductivityReports()).containsOnly(productivityReportBack);
+        assertThat(productivityReportBack.getCompletedHabits()).containsOnly(habit);
+
+        habit.setProductivityReports(new HashSet<>());
+        assertThat(habit.getProductivityReports()).doesNotContain(productivityReportBack);
+        assertThat(productivityReportBack.getCompletedHabits()).doesNotContain(habit);
     }
 }

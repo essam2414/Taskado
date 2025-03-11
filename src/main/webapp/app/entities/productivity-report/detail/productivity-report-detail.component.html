@@ -23,29 +23,21 @@
           <dd>
             <span>{{ productivityReportRef.tasksCompleted }}</span>
           </dd>
-          <dt><span>Task Avg Completion Time</span></dt>
+          <dt><span>Pomodoro Sessions Completed</span></dt>
           <dd>
-            <span>{{ productivityReportRef.taskAvgCompletionTime }}</span>
+            <span>{{ productivityReportRef.pomodoroSessionsCompleted }}</span>
           </dd>
-          <dt><span>Task Efficiency</span></dt>
+          <dt><span>Total Focus Time</span></dt>
           <dd>
-            <span>{{ productivityReportRef.taskEfficiency }}</span>
-          </dd>
-          <dt><span>Pomodoro Sessions</span></dt>
-          <dd>
-            <span>{{ productivityReportRef.pomodoroSessions }}</span>
+            <span>{{ productivityReportRef.totalFocusTime }}</span>
           </dd>
           <dt><span>Distractions Count</span></dt>
           <dd>
             <span>{{ productivityReportRef.distractionsCount }}</span>
           </dd>
-          <dt><span>Focus Time</span></dt>
+          <dt><span>Efficiency Score</span></dt>
           <dd>
-            <span>{{ productivityReportRef.focusTime }}</span>
-          </dd>
-          <dt><span>Focus Score</span></dt>
-          <dd>
-            <span>{{ productivityReportRef.focusScore }}</span>
+            <span>{{ productivityReportRef.efficiencyScore }}</span>
           </dd>
           <dt><span>Timestamp</span></dt>
           <dd>
@@ -54,6 +46,24 @@
           <dt><span>User</span></dt>
           <dd>
             <span>{{ productivityReportRef.user?.id }}</span>
+          </dd>
+          <dt><span>Completed Tasks</span></dt>
+          <dd>
+            @for (completedTasks of productivityReportRef.completedTasks; track $index; let last = $last) {
+              <span>
+                <a [routerLink]="['/task', completedTasks.id, 'view']">{{ completedTasks?.id }}</a
+                >{{ last ? '' : ', ' }}
+              </span>
+            }
+          </dd>
+          <dt><span>Completed Habits</span></dt>
+          <dd>
+            @for (completedHabits of productivityReportRef.completedHabits; track $index; let last = $last) {
+              <span>
+                <a [routerLink]="['/habit', completedHabits.id, 'view']">{{ completedHabits?.id }}</a
+                >{{ last ? '' : ', ' }}
+              </span>
+            }
           </dd>
         </dl>
 

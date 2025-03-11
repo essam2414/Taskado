@@ -24,7 +24,7 @@ public class ProductivityReportRepositoryWithBagRelationshipsImpl implements Pro
 
     @Override
     public Optional<ProductivityReport> fetchBagRelationships(Optional<ProductivityReport> productivityReport) {
-        return productivityReport.map(this::fetchCompletedTaskLists).map(this::fetchCompletedHabitLists);
+        return productivityReport.map(this::fetchCompletedTasks).map(this::fetchCompletedHabits);
     }
 
     @Override
@@ -39,27 +39,27 @@ public class ProductivityReportRepositoryWithBagRelationshipsImpl implements Pro
     @Override
     public List<ProductivityReport> fetchBagRelationships(List<ProductivityReport> productivityReports) {
         return Optional.of(productivityReports)
-            .map(this::fetchCompletedTaskLists)
-            .map(this::fetchCompletedHabitLists)
+            .map(this::fetchCompletedTasks)
+            .map(this::fetchCompletedHabits)
             .orElse(Collections.emptyList());
     }
 
-    ProductivityReport fetchCompletedTaskLists(ProductivityReport result) {
+    ProductivityReport fetchCompletedTasks(ProductivityReport result) {
         return entityManager
             .createQuery(
-                "select productivityReport from ProductivityReport productivityReport left join fetch productivityReport.completedTaskLists where productivityReport.id = :id",
+                "select productivityReport from ProductivityReport productivityReport left join fetch productivityReport.completedTasks where productivityReport.id = :id",
                 ProductivityReport.class
             )
             .setParameter(ID_PARAMETER, result.getId())
             .getSingleResult();
     }
 
-    List<ProductivityReport> fetchCompletedTaskLists(List<ProductivityReport> productivityReports) {
+    List<ProductivityReport> fetchCompletedTasks(List<ProductivityReport> productivityReports) {
         HashMap<Object, Integer> order = new HashMap<>();
         IntStream.range(0, productivityReports.size()).forEach(index -> order.put(productivityReports.get(index).getId(), index));
         List<ProductivityReport> result = entityManager
             .createQuery(
-                "select productivityReport from ProductivityReport productivityReport left join fetch productivityReport.completedTaskLists where productivityReport in :productivityReports",
+                "select productivityReport from ProductivityReport productivityReport left join fetch productivityReport.completedTasks where productivityReport in :productivityReports",
                 ProductivityReport.class
             )
             .setParameter(PRODUCTIVITYREPORTS_PARAMETER, productivityReports)
@@ -68,22 +68,22 @@ public class ProductivityReportRepositoryWithBagRelationshipsImpl implements Pro
         return result;
     }
 
-    ProductivityReport fetchCompletedHabitLists(ProductivityReport result) {
+    ProductivityReport fetchCompletedHabits(ProductivityReport result) {
         return entityManager
             .createQuery(
-                "select productivityReport from ProductivityReport productivityReport left join fetch productivityReport.completedHabitLists where productivityReport.id = :id",
+                "select productivityReport from ProductivityReport productivityReport left join fetch productivityReport.completedHabits where productivityReport.id = :id",
                 ProductivityReport.class
             )
             .setParameter(ID_PARAMETER, result.getId())
             .getSingleResult();
     }
 
-    List<ProductivityReport> fetchCompletedHabitLists(List<ProductivityReport> productivityReports) {
+    List<ProductivityReport> fetchCompletedHabits(List<ProductivityReport> productivityReports) {
         HashMap<Object, Integer> order = new HashMap<>();
         IntStream.range(0, productivityReports.size()).forEach(index -> order.put(productivityReports.get(index).getId(), index));
         List<ProductivityReport> result = entityManager
             .createQuery(
-                "select productivityReport from ProductivityReport productivityReport left join fetch productivityReport.completedHabitLists where productivityReport in :productivityReports",
+                "select productivityReport from ProductivityReport productivityReport left join fetch productivityReport.completedHabits where productivityReport in :productivityReports",
                 ProductivityReport.class
             )
             .setParameter(PRODUCTIVITYREPORTS_PARAMETER, productivityReports)

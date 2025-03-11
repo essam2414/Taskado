@@ -285,7 +285,7 @@ class PomodoroSessionResourceIT {
         PomodoroSession partialUpdatedPomodoroSession = new PomodoroSession();
         partialUpdatedPomodoroSession.setId(pomodoroSession.getId());
 
-        partialUpdatedPomodoroSession.start(UPDATED_START);
+        partialUpdatedPomodoroSession.stop(UPDATED_STOP);
 
         restPomodoroSessionMockMvc
             .perform(

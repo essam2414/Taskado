@@ -1,14 +1,12 @@
 @service(serviceClass)
 entity ProductivityReport {
-  tasksPlanned Integer required min(1),
-  taskCompleted Integer required min(0),
-  taskAvgCompletionTime Float min(0.1),      // Average time spent per task
-  taskEfficiency Float min(0) max(1),        // Ratio of completed vs planned tasks
-  focusTime Float min(0),                    // Total time spent in pomodoro mode
-  focusScore Float min(0) max(100),          // Score calculated based on productivity
-  habitCompletionRate Float min(0) max(100), // Percentage of habits completed during this period
-  habitStreakImpact Integer min(0),          // Influence of habits on productivity, calculated from habit streaks
-  timestamp Instant required                 // When report was generated
+  tasksPlanned Integer required min(0),        // How many tasks were planned
+  tasksCompleted Integer required min(0),      // How many tasks were completed
+  pomodoroSessionsCompleted Integer required min(0), // Pomodoro cycles finished
+  totalFocusTime Float min(0),                 // Total time spent in focus (in hours)
+  distractionsCount Integer min(0),            // Number of distractions recorded
+  efficiencyScore Float min(0) max(100),       // Performance score (calculated from tasks & focus)
+  timestamp Instant required                   // When report was generated
 }
 
 relationship ManyToOne {
@@ -20,6 +18,6 @@ relationship OneToMany {
 }
 
 relationship ManyToMany {
-  ProductivityReport{completedTaskList} to Task
-  ProductivityReport{completedHabitList} to Habit
+  ProductivityReport{completedTasks} to Task,
+  ProductivityReport{completedHabits} to Habit
 }

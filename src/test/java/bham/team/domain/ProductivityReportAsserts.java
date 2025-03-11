@@ -50,13 +50,13 @@ public class ProductivityReportAsserts {
             .satisfies(e -> assertThat(e.getTasksPlanned()).as("check tasksPlanned").isEqualTo(actual.getTasksPlanned()))
             .satisfies(e -> assertThat(e.getTasksCompleted()).as("check tasksCompleted").isEqualTo(actual.getTasksCompleted()))
             .satisfies(e ->
-                assertThat(e.getTaskAvgCompletionTime()).as("check taskAvgCompletionTime").isEqualTo(actual.getTaskAvgCompletionTime())
+                assertThat(e.getPomodoroSessionsCompleted())
+                    .as("check pomodoroSessionsCompleted")
+                    .isEqualTo(actual.getPomodoroSessionsCompleted())
             )
-            .satisfies(e -> assertThat(e.getTaskEfficiency()).as("check taskEfficiency").isEqualTo(actual.getTaskEfficiency()))
-            .satisfies(e -> assertThat(e.getPomodoroSessions()).as("check pomodoroSessions").isEqualTo(actual.getPomodoroSessions()))
+            .satisfies(e -> assertThat(e.getTotalFocusTime()).as("check totalFocusTime").isEqualTo(actual.getTotalFocusTime()))
             .satisfies(e -> assertThat(e.getDistractionsCount()).as("check distractionsCount").isEqualTo(actual.getDistractionsCount()))
-            .satisfies(e -> assertThat(e.getFocusTime()).as("check focusTime").isEqualTo(actual.getFocusTime()))
-            .satisfies(e -> assertThat(e.getFocusScore()).as("check focusScore").isEqualTo(actual.getFocusScore()))
+            .satisfies(e -> assertThat(e.getEfficiencyScore()).as("check efficiencyScore").isEqualTo(actual.getEfficiencyScore()))
             .satisfies(e -> assertThat(e.getTimestamp()).as("check timestamp").isEqualTo(actual.getTimestamp()));
     }
 
@@ -67,6 +67,9 @@ public class ProductivityReportAsserts {
      * @param actual the actual entity
      */
     public static void assertProductivityReportUpdatableRelationshipsEquals(ProductivityReport expected, ProductivityReport actual) {
-        // empty method
+        assertThat(expected)
+            .as("Verify ProductivityReport relationships")
+            .satisfies(e -> assertThat(e.getCompletedTasks()).as("check completedTasks").isEqualTo(actual.getCompletedTasks()))
+            .satisfies(e -> assertThat(e.getCompletedHabits()).as("check completedHabits").isEqualTo(actual.getCompletedHabits()));
     }
 }

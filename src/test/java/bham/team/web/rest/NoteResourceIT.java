@@ -307,7 +307,7 @@ class NoteResourceIT {
         Note partialUpdatedNote = new Note();
         partialUpdatedNote.setId(note.getId());
 
-        partialUpdatedNote.title(UPDATED_TITLE).createdAt(UPDATED_CREATED_AT).updatedAt(UPDATED_UPDATED_AT);
+        partialUpdatedNote.title(UPDATED_TITLE).createdAt(UPDATED_CREATED_AT);
 
         restNoteMockMvc
             .perform(

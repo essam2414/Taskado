@@ -6,8 +6,12 @@ import { Subject, from, of } from 'rxjs';
 
 import { IUser } from 'app/entities/user/user.model';
 import { UserService } from 'app/entities/user/service/user.service';
-import { ProductivityReportService } from '../service/productivity-report.service';
+import { ITask } from 'app/entities/task/task.model';
+import { TaskService } from 'app/entities/task/service/task.service';
+import { IHabit } from 'app/entities/habit/habit.model';
+import { HabitService } from 'app/entities/habit/service/habit.service';
 import { IProductivityReport } from '../productivity-report.model';
+import { ProductivityReportService } from '../service/productivity-report.service';
 import { ProductivityReportFormService } from './productivity-report-form.service';
 
 import { ProductivityReportUpdateComponent } from './productivity-report-update.component';
@@ -19,6 +23,8 @@ describe('ProductivityReport Management Update Component', () => {
   let productivityReportFormService: ProductivityReportFormService;
   let productivityReportService: ProductivityReportService;
   let userService: UserService;
+  let taskService: TaskService;
+  let habitService: HabitService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,6 +48,8 @@ describe('ProductivityReport Management Update Component', () => {
     productivityReportFormService = TestBed.inject(ProductivityReportFormService);
     productivityReportService = TestBed.inject(ProductivityReportService);
     userService = TestBed.inject(UserService);
+    taskService = TestBed.inject(TaskService);
+    habitService = TestBed.inject(HabitService);
 
     comp = fixture.componentInstance;
   });
@@ -49,10 +57,10 @@ describe('ProductivityReport Management Update Component', () => {
   describe('ngOnInit', () => {
     it('Should call User query and add missing value', () => {
       const productivityReport: IProductivityReport = { id: 456 };
-      const user: IUser = { id: 5384 };
+      const user: IUser = { id: 5188 };
       productivityReport.user = user;
 
-      const userCollection: IUser[] = [{ id: 5554 }];
+      const userCollection: IUser[] = [{ id: 29049 }];
       jest.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
       const additionalUsers = [user];
       const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
@@ -69,15 +77,65 @@ describe('ProductivityReport Management Update Component', () => {
       expect(comp.usersSharedCollection).toEqual(expectedCollection);
     });
 
+    it('Should call Task query and add missing value', () => {
+      const productivityReport: IProductivityReport = { id: 456 };
+      const completedTasks: ITask[] = [{ id: 26845 }];
+      productivityReport.completedTasks = completedTasks;
+
+      const taskCollection: ITask[] = [{ id: 28628 }];
+      jest.spyOn(taskService, 'query').mockReturnValue(of(new HttpResponse({ body: taskCollection })));
+      const additionalTasks = [...completedTasks];
+      const expectedCollection: ITask[] = [...additionalTasks, ...taskCollection];
+      jest.spyOn(taskService, 'addTaskToCollectionIfMissing').mockReturnValue(expectedCollection);
+
+      activatedRoute.data = of({ productivityReport });
+      comp.ngOnInit();
+
+      expect(taskService.query).toHaveBeenCalled();
+      expect(taskService.addTaskToCollectionIfMissing).toHaveBeenCalledWith(
+        taskCollection,
+        ...additionalTasks.map(expect.objectContaining),
+      );
+      expect(comp.tasksSharedCollection).toEqual(expectedCollection);
+    });
+
+    it('Should call Habit query and add missing value', () => {
+      const productivityReport: IProductivityReport = { id: 456 };
+      const completedHabits: IHabit[] = [{ id: 24413 }];
+      productivityReport.completedHabits = completedHabits;
+
+      const habitCollection: IHabit[] = [{ id: 10691 }];
+      jest.spyOn(habitService, 'query').mockReturnValue(of(new HttpResponse({ body: habitCollection })));
+      const additionalHabits = [...completedHabits];
+      const expectedCollection: IHabit[] = [...additionalHabits, ...habitCollection];
+      jest.spyOn(habitService, 'addHabitToCollectionIfMissing').mockReturnValue(expectedCollection);
+
+      activatedRoute.data = of({ productivityReport });
+      comp.ngOnInit();
+
+      expect(habitService.query).toHaveBeenCalled();
+      expect(habitService.addHabitToCollectionIfMissing).toHaveBeenCalledWith(
+        habitCollection,
+        ...additionalHabits.map(expect.objectContaining),
+      );
+      expect(comp.habitsSharedCollection).toEqual(expectedCollection);
+    });
+
     it('Should update editForm', () => {
       const productivityReport: IProductivityReport = { id: 456 };
-      const user: IUser = { id: 10294 };
+      const user: IUser = { id: 21279 };
       productivityReport.user = user;
+      const completedTasks: ITask = { id: 13100 };
+      productivityReport.completedTasks = [completedTasks];
+      const completedHabits: IHabit = { id: 28564 };
+      productivityReport.completedHabits = [completedHabits];
 
       activatedRoute.data = of({ productivityReport });
       comp.ngOnInit();
 
       expect(comp.usersSharedCollection).toContain(user);
+      expect(comp.tasksSharedCollection).toContain(completedTasks);
+      expect(comp.habitsSharedCollection).toContain(completedHabits);
       expect(comp.productivityReport).toEqual(productivityReport);
     });
   });
@@ -158,6 +216,26 @@ describe('ProductivityReport Management Update Component', () => {
         jest.spyOn(userService, 'compareUser');
         comp.compareUser(entity, entity2);
         expect(userService.compareUser).toHaveBeenCalledWith(entity, entity2);
+      });
+    });
+
+    describe('compareTask', () => {
+      it('Should forward to taskService', () => {
+        const entity = { id: 123 };
+        const entity2 = { id: 456 };
+        jest.spyOn(taskService, 'compareTask');
+        comp.compareTask(entity, entity2);
+        expect(taskService.compareTask).toHaveBeenCalledWith(entity, entity2);
+      });
+    });
+
+    describe('compareHabit', () => {
+      it('Should forward to habitService', () => {
+        const entity = { id: 123 };
+        const entity2 = { id: 456 };
+        jest.spyOn(habitService, 'compareHabit');
+        comp.compareHabit(entity, entity2);
+        expect(habitService.compareHabit).toHaveBeenCalledWith(entity, entity2);
       });
     });
   });

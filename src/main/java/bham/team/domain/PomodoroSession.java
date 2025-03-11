@@ -1,6 +1,6 @@
 package bham.team.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -34,6 +34,10 @@ public class PomodoroSession implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "pomodoroSessions", "user", "completedTasks", "completedHabits" }, allowSetters = true)
+    private ProductivityReport productivityReport;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -73,18 +77,7 @@ public class PomodoroSession implements Serializable {
     }
 
     public void setStop(Instant stop) {
-        if (stop != null && start != null && stop.isBefore(start)) {
-            throw new IllegalArgumentException("Stop time must be after start time.");
-        }
         this.stop = stop;
-    }
-
-    @JsonProperty("duration")
-    public Integer getDuration() {
-        if (start != null && stop != null) {
-            return (int) java.time.Duration.between(start, stop).toMinutes();
-        }
-        return null; // Return null if session is ongoing
     }
 
     public User getUser() {
@@ -97,6 +90,19 @@ public class PomodoroSession implements Serializable {
 
     public PomodoroSession user(User user) {
         this.setUser(user);
+        return this;
+    }
+
+    public ProductivityReport getProductivityReport() {
+        return this.productivityReport;
+    }
+
+    public void setProductivityReport(ProductivityReport productivityReport) {
+        this.productivityReport = productivityReport;
+    }
+
+    public PomodoroSession productivityReport(ProductivityReport productivityReport) {
+        this.setProductivityReport(productivityReport);
         return this;
     }
 

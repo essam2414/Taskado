@@ -27,20 +27,20 @@ type ProductivityReportFormRawValue = FormValueOf<IProductivityReport>;
 
 type NewProductivityReportFormRawValue = FormValueOf<NewProductivityReport>;
 
-type ProductivityReportFormDefaults = Pick<NewProductivityReport, 'id' | 'timestamp'>;
+type ProductivityReportFormDefaults = Pick<NewProductivityReport, 'id' | 'timestamp' | 'completedTasks' | 'completedHabits'>;
 
 type ProductivityReportFormGroupContent = {
   id: FormControl<ProductivityReportFormRawValue['id'] | NewProductivityReport['id']>;
   tasksPlanned: FormControl<ProductivityReportFormRawValue['tasksPlanned']>;
   tasksCompleted: FormControl<ProductivityReportFormRawValue['tasksCompleted']>;
-  taskAvgCompletionTime: FormControl<ProductivityReportFormRawValue['taskAvgCompletionTime']>;
-  taskEfficiency: FormControl<ProductivityReportFormRawValue['taskEfficiency']>;
-  pomodoroSessions: FormControl<ProductivityReportFormRawValue['pomodoroSessions']>;
+  pomodoroSessionsCompleted: FormControl<ProductivityReportFormRawValue['pomodoroSessionsCompleted']>;
+  totalFocusTime: FormControl<ProductivityReportFormRawValue['totalFocusTime']>;
   distractionsCount: FormControl<ProductivityReportFormRawValue['distractionsCount']>;
-  focusTime: FormControl<ProductivityReportFormRawValue['focusTime']>;
-  focusScore: FormControl<ProductivityReportFormRawValue['focusScore']>;
+  efficiencyScore: FormControl<ProductivityReportFormRawValue['efficiencyScore']>;
   timestamp: FormControl<ProductivityReportFormRawValue['timestamp']>;
   user: FormControl<ProductivityReportFormRawValue['user']>;
+  completedTasks: FormControl<ProductivityReportFormRawValue['completedTasks']>;
+  completedHabits: FormControl<ProductivityReportFormRawValue['completedHabits']>;
 };
 
 export type ProductivityReportFormGroup = FormGroup<ProductivityReportFormGroupContent>;
@@ -60,20 +60,30 @@ export class ProductivityReportFormService {
           validators: [Validators.required],
         },
       ),
-      tasksPlanned: new FormControl(productivityReportRawValue.tasksPlanned),
-      tasksCompleted: new FormControl(productivityReportRawValue.tasksCompleted),
-      taskAvgCompletionTime: new FormControl(productivityReportRawValue.taskAvgCompletionTime),
-      taskEfficiency: new FormControl(productivityReportRawValue.taskEfficiency),
-      pomodoroSessions: new FormControl(productivityReportRawValue.pomodoroSessions),
-      distractionsCount: new FormControl(productivityReportRawValue.distractionsCount),
-      focusTime: new FormControl(productivityReportRawValue.focusTime),
-      focusScore: new FormControl(productivityReportRawValue.focusScore, {
-        validators: [Validators.required],
+      tasksPlanned: new FormControl(productivityReportRawValue.tasksPlanned, {
+        validators: [Validators.required, Validators.min(0)],
+      }),
+      tasksCompleted: new FormControl(productivityReportRawValue.tasksCompleted, {
+        validators: [Validators.required, Validators.min(0)],
+      }),
+      pomodoroSessionsCompleted: new FormControl(productivityReportRawValue.pomodoroSessionsCompleted, {
+        validators: [Validators.required, Validators.min(0)],
+      }),
+      totalFocusTime: new FormControl(productivityReportRawValue.totalFocusTime, {
+        validators: [Validators.min(0)],
+      }),
+      distractionsCount: new FormControl(productivityReportRawValue.distractionsCount, {
+        validators: [Validators.min(0)],
+      }),
+      efficiencyScore: new FormControl(productivityReportRawValue.efficiencyScore, {
+        validators: [Validators.min(0), Validators.max(100)],
       }),
       timestamp: new FormControl(productivityReportRawValue.timestamp, {
         validators: [Validators.required],
       }),
       user: new FormControl(productivityReportRawValue.user),
+      completedTasks: new FormControl(productivityReportRawValue.completedTasks ?? []),
+      completedHabits: new FormControl(productivityReportRawValue.completedHabits ?? []),
     });
   }
 
@@ -102,6 +112,8 @@ export class ProductivityReportFormService {
     return {
       id: null,
       timestamp: currentTime,
+      completedTasks: [],
+      completedHabits: [],
     };
   }
 
@@ -120,6 +132,8 @@ export class ProductivityReportFormService {
     return {
       ...productivityReport,
       timestamp: productivityReport.timestamp ? productivityReport.timestamp.format(DATE_TIME_FORMAT) : undefined,
+      completedTasks: productivityReport.completedTasks ?? [],
+      completedHabits: productivityReport.completedHabits ?? [],
     };
   }
 }

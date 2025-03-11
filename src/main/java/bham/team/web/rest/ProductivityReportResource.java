@@ -2,6 +2,7 @@ package bham.team.web.rest;
 
 import bham.team.domain.ProductivityReport;
 import bham.team.repository.ProductivityReportRepository;
+import bham.team.service.ProductivityReportService;
 import bham.team.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
@@ -24,7 +24,6 @@ import tech.jhipster.web.util.ResponseUtil;
  */
 @RestController
 @RequestMapping("/api/productivity-reports")
-@Transactional
 public class ProductivityReportResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProductivityReportResource.class);
@@ -34,9 +33,15 @@ public class ProductivityReportResource {
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
+    private final ProductivityReportService productivityReportService;
+
     private final ProductivityReportRepository productivityReportRepository;
 
-    public ProductivityReportResource(ProductivityReportRepository productivityReportRepository) {
+    public ProductivityReportResource(
+        ProductivityReportService productivityReportService,
+        ProductivityReportRepository productivityReportRepository
+    ) {
+        this.productivityReportService = productivityReportService;
         this.productivityReportRepository = productivityReportRepository;
     }
 
@@ -54,7 +59,7 @@ public class ProductivityReportResource {
         if (productivityReport.getId() != null) {
             throw new BadRequestAlertException("A new productivityReport cannot already have an ID", ENTITY_NAME, "idexists");
         }
-        productivityReport = productivityReportRepository.save(productivityReport);
+        productivityReport = productivityReportService.save(productivityReport);
         return ResponseEntity.created(new URI("/api/productivity-reports/" + productivityReport.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, productivityReport.getId().toString()))
             .body(productivityReport);
@@ -87,7 +92,7 @@ public class ProductivityReportResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        productivityReport = productivityReportRepository.save(productivityReport);
+        productivityReport = productivityReportService.update(productivityReport);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, productivityReport.getId().toString()))
             .body(productivityReport);
@@ -121,40 +126,7 @@ public class ProductivityReportResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<ProductivityReport> result = productivityReportRepository
-            .findById(productivityReport.getId())
-            .map(existingProductivityReport -> {
-                if (productivityReport.getTasksPlanned() != null) {
-                    existingProductivityReport.setTasksPlanned(productivityReport.getTasksPlanned());
-                }
-                if (productivityReport.getTasksCompleted() != null) {
-                    existingProductivityReport.setTasksCompleted(productivityReport.getTasksCompleted());
-                }
-                if (productivityReport.getTaskAvgCompletionTime() != null) {
-                    existingProductivityReport.setTaskAvgCompletionTime(productivityReport.getTaskAvgCompletionTime());
-                }
-                if (productivityReport.getTaskEfficiency() != null) {
-                    existingProductivityReport.setTaskEfficiency(productivityReport.getTaskEfficiency());
-                }
-                if (productivityReport.getPomodoroSessions() != null) {
-                    existingProductivityReport.setPomodoroSessions(productivityReport.getPomodoroSessions());
-                }
-                if (productivityReport.getDistractionsCount() != null) {
-                    existingProductivityReport.setDistractionsCount(productivityReport.getDistractionsCount());
-                }
-                if (productivityReport.getFocusTime() != null) {
-                    existingProductivityReport.setFocusTime(productivityReport.getFocusTime());
-                }
-                if (productivityReport.getFocusScore() != null) {
-                    existingProductivityReport.setFocusScore(productivityReport.getFocusScore());
-                }
-                if (productivityReport.getTimestamp() != null) {
-                    existingProductivityReport.setTimestamp(productivityReport.getTimestamp());
-                }
-
-                return existingProductivityReport;
-            })
-            .map(productivityReportRepository::save);
+        Optional<ProductivityReport> result = productivityReportService.partialUpdate(productivityReport);
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -165,12 +137,15 @@ public class ProductivityReportResource {
     /**
      * {@code GET  /productivity-reports} : get all the productivityReports.
      *
+     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of productivityReports in body.
      */
     @GetMapping("")
-    public List<ProductivityReport> getAllProductivityReports() {
+    public List<ProductivityReport> getAllProductivityReports(
+        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
+    ) {
         LOG.debug("REST request to get all ProductivityReports");
-        return productivityReportRepository.findAll();
+        return productivityReportService.findAll();
     }
 
     /**
@@ -182,7 +157,7 @@ public class ProductivityReportResource {
     @GetMapping("/{id}")
     public ResponseEntity<ProductivityReport> getProductivityReport(@PathVariable("id") Long id) {
         LOG.debug("REST request to get ProductivityReport : {}", id);
-        Optional<ProductivityReport> productivityReport = productivityReportRepository.findById(id);
+        Optional<ProductivityReport> productivityReport = productivityReportService.findOne(id);
         return ResponseUtil.wrapOrNotFound(productivityReport);
     }
 
@@ -195,7 +170,7 @@ public class ProductivityReportResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProductivityReport(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete ProductivityReport : {}", id);
-        productivityReportRepository.deleteById(id);
+        productivityReportService.delete(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();

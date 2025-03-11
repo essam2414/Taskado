@@ -63,26 +63,20 @@ public class ProductivityReportService {
                 if (productivityReport.getTasksPlanned() != null) {
                     existingProductivityReport.setTasksPlanned(productivityReport.getTasksPlanned());
                 }
-                if (productivityReport.getTaskCompleted() != null) {
-                    existingProductivityReport.setTaskCompleted(productivityReport.getTaskCompleted());
+                if (productivityReport.getTasksCompleted() != null) {
+                    existingProductivityReport.setTasksCompleted(productivityReport.getTasksCompleted());
                 }
-                if (productivityReport.getTaskAvgCompletionTime() != null) {
-                    existingProductivityReport.setTaskAvgCompletionTime(productivityReport.getTaskAvgCompletionTime());
+                if (productivityReport.getPomodoroSessionsCompleted() != null) {
+                    existingProductivityReport.setPomodoroSessionsCompleted(productivityReport.getPomodoroSessionsCompleted());
                 }
-                if (productivityReport.getTaskEfficiency() != null) {
-                    existingProductivityReport.setTaskEfficiency(productivityReport.getTaskEfficiency());
+                if (productivityReport.getTotalFocusTime() != null) {
+                    existingProductivityReport.setTotalFocusTime(productivityReport.getTotalFocusTime());
                 }
-                if (productivityReport.getFocusTime() != null) {
-                    existingProductivityReport.setFocusTime(productivityReport.getFocusTime());
+                if (productivityReport.getDistractionsCount() != null) {
+                    existingProductivityReport.setDistractionsCount(productivityReport.getDistractionsCount());
                 }
-                if (productivityReport.getFocusScore() != null) {
-                    existingProductivityReport.setFocusScore(productivityReport.getFocusScore());
-                }
-                if (productivityReport.getHabitCompletionRate() != null) {
-                    existingProductivityReport.setHabitCompletionRate(productivityReport.getHabitCompletionRate());
-                }
-                if (productivityReport.getHabitStreakImpact() != null) {
-                    existingProductivityReport.setHabitStreakImpact(productivityReport.getHabitStreakImpact());
+                if (productivityReport.getEfficiencyScore() != null) {
+                    existingProductivityReport.setEfficiencyScore(productivityReport.getEfficiencyScore());
                 }
                 if (productivityReport.getTimestamp() != null) {
                     existingProductivityReport.setTimestamp(productivityReport.getTimestamp());

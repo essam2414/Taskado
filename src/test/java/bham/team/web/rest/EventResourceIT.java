@@ -375,7 +375,7 @@ class EventResourceIT {
         Event partialUpdatedEvent = new Event();
         partialUpdatedEvent.setId(event.getId());
 
-        partialUpdatedEvent.eventDate(UPDATED_EVENT_DATE).endTime(UPDATED_END_TIME).location(UPDATED_LOCATION);
+        partialUpdatedEvent.description(UPDATED_DESCRIPTION).startTime(UPDATED_START_TIME).reminder(UPDATED_REMINDER);
 
         restEventMockMvc
             .perform(

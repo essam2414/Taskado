@@ -56,23 +56,16 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="taskAvgCompletionTime">
+            <th scope="col" jhiSortBy="pomodoroSessionsCompleted">
               <div class="d-flex">
-                <span>Task Avg Completion Time</span>
+                <span>Pomodoro Sessions Completed</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="taskEfficiency">
+            <th scope="col" jhiSortBy="totalFocusTime">
               <div class="d-flex">
-                <span>Task Efficiency</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="pomodoroSessions">
-              <div class="d-flex">
-                <span>Pomodoro Sessions</span>
+                <span>Total Focus Time</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
@@ -84,16 +77,9 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
-            <th scope="col" jhiSortBy="focusTime">
+            <th scope="col" jhiSortBy="efficiencyScore">
               <div class="d-flex">
-                <span>Focus Time</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="focusScore">
-              <div class="d-flex">
-                <span>Focus Score</span>
+                <span>Efficiency Score</span>
 
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
@@ -111,6 +97,18 @@
                 <fa-icon class="p-1" icon="sort"></fa-icon>
               </div>
             </th>
+            <th scope="col" jhiSortBy="completedTasks.id">
+              <div class="d-flex">
+                <span>Completed Tasks</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="completedHabits.id">
+              <div class="d-flex">
+                <span>Completed Habits</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -122,15 +120,29 @@
               </td>
               <td>{{ productivityReport.tasksPlanned }}</td>
               <td>{{ productivityReport.tasksCompleted }}</td>
-              <td>{{ productivityReport.taskAvgCompletionTime }}</td>
-              <td>{{ productivityReport.taskEfficiency }}</td>
-              <td>{{ productivityReport.pomodoroSessions }}</td>
+              <td>{{ productivityReport.pomodoroSessionsCompleted }}</td>
+              <td>{{ productivityReport.totalFocusTime }}</td>
               <td>{{ productivityReport.distractionsCount }}</td>
-              <td>{{ productivityReport.focusTime }}</td>
-              <td>{{ productivityReport.focusScore }}</td>
+              <td>{{ productivityReport.efficiencyScore }}</td>
               <td>{{ productivityReport.timestamp | formatMediumDatetime }}</td>
               <td>
                 {{ productivityReport.user?.id }}
+              </td>
+              <td>
+                @for (completedTasks of productivityReport.completedTasks; track $index; let last = $last) {
+                  <span>
+                    <a class="form-control-static" [routerLink]="['/task', completedTasks.id, 'view']">{{ completedTasks.id }}</a
+                    >{{ last ? '' : ', ' }}
+                  </span>
+                }
+              </td>
+              <td>
+                @for (completedHabits of productivityReport.completedHabits; track $index; let last = $last) {
+                  <span>
+                    <a class="form-control-static" [routerLink]="['/habit', completedHabits.id, 'view']">{{ completedHabits.id }}</a
+                    >{{ last ? '' : ', ' }}
+                  </span>
+                }
               </td>
               <td class="text-end">
                 <div class="btn-group">
