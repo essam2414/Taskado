@@ -1,0 +1,143 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-reminder-heading" data-cy="ReminderCreateUpdateHeading">Create or edit a Reminder</h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let titleRef = editForm.get('title')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_title">Title</label>
+          <input type="text" class="form-control" name="title" id="field_title" data-cy="title" formControlName="title" />
+          @if (titleRef.invalid && (titleRef.dirty || titleRef.touched)) {
+            <div>
+              @if (editForm.get('title')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_description">Description</label>
+          <input
+            type="text"
+            class="form-control"
+            name="description"
+            id="field_description"
+            data-cy="description"
+            formControlName="description"
+          />
+        </div>
+
+        @let reminderDateRef = editForm.get('reminderDate')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_reminderDate">Reminder Date</label>
+          <div class="d-flex">
+            <input
+              id="field_reminderDate"
+              data-cy="reminderDate"
+              type="datetime-local"
+              class="form-control"
+              name="reminderDate"
+              formControlName="reminderDate"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (reminderDateRef.invalid && (reminderDateRef.dirty || reminderDateRef.touched)) {
+            <div>
+              @if (editForm.get('reminderDate')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('reminderDate')?.errors?.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_repeatType">Repeat Type</label>
+          <input
+            type="text"
+            class="form-control"
+            name="repeatType"
+            id="field_repeatType"
+            data-cy="repeatType"
+            formControlName="repeatType"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_repeatInterval">Repeat Interval</label>
+          <input
+            type="number"
+            class="form-control"
+            name="repeatInterval"
+            id="field_repeatInterval"
+            data-cy="repeatInterval"
+            formControlName="repeatInterval"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_linkedEntityType">Linked Entity Type</label>
+          <input
+            type="text"
+            class="form-control"
+            name="linkedEntityType"
+            id="field_linkedEntityType"
+            data-cy="linkedEntityType"
+            formControlName="linkedEntityType"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_linkedEntityId">Linked Entity Id</label>
+          <input
+            type="number"
+            class="form-control"
+            name="linkedEntityId"
+            id="field_linkedEntityId"
+            data-cy="linkedEntityId"
+            formControlName="linkedEntityId"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_user">User</label>
+          <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user" [compareWith]="compareUser">
+            <option [ngValue]="null"></option>
+            @for (userOption of usersSharedCollection; track $index) {
+              <option [ngValue]="userOption">{{ userOption.id }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

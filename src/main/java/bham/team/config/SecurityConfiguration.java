@@ -83,7 +83,6 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/events/**")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/notes/**")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/pomodoro-sessions/**")).permitAll()
-                    .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/notifications/**")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/categories/**")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/productivity-reports/**")).permitAll()
                     // Protect everything else

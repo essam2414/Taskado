@@ -63,17 +63,21 @@ enum NotificationChannel {
 entity Notification {
   message String required,
   notificationType NotificationType required,
-  timestamp Instant required,
-  linkedEntityType String,
+  createdAt Instant required,
   read Boolean required,
   priority Priority required,
   status NotificationStatus required,
-  expirationDate Instant,
-  actionURL String,
-  icon String,
-  isRecurring Boolean required,
-  recurrencePattern String,
   sentVia NotificationChannel required
+}
+
+entity Reminder {
+  title String required,
+  description String,
+  reminderDate Instant required,
+  repeatType String,
+  repeatInterval Integer,
+  linkedEntityType String,
+  linkedEntityId Long
 }
 
 entity ProductivityReport {
@@ -103,11 +107,12 @@ entity Note {
 relationship ManyToOne {
   Task{category} to Category,
   Habit{category} to Category,
-  Note{category} to Category
+  Note{category} to Category,
   Task{user} to User with builtInEntity,
   Habit{user} to User with builtInEntity,
   Event{user} to User with builtInEntity,
   Notification{user} to User with builtInEntity,
+  Reminder{user} to User with builtInEntity,
   ProductivityReport{user} to User with builtInEntity,
   PomodoroSession{user} to User with builtInEntity,
   Note{user} to User with builtInEntity,

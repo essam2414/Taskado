@@ -1,6 +1,6 @@
 {
   "annotations": {
-    "changelogDate": "20250203140952"
+    "changelogDate": "20250311004205"
   },
   "applications": "*",
   "fields": [
@@ -16,13 +16,9 @@
       "fieldValues": "REMINDER,DEADLINE,SYSTEM_UPDATE"
     },
     {
-      "fieldName": "timestamp",
+      "fieldName": "createdAt",
       "fieldType": "Instant",
       "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "linkedEntityType",
-      "fieldType": "String"
     },
     {
       "fieldName": "read",
@@ -40,27 +36,6 @@
       "fieldType": "NotificationStatus",
       "fieldValidateRules": ["required"],
       "fieldValues": "SENT,PENDING,FAILED"
-    },
-    {
-      "fieldName": "expirationDate",
-      "fieldType": "Instant"
-    },
-    {
-      "fieldName": "actionURL",
-      "fieldType": "String"
-    },
-    {
-      "fieldName": "icon",
-      "fieldType": "String"
-    },
-    {
-      "fieldName": "isRecurring",
-      "fieldType": "Boolean",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "recurrencePattern",
-      "fieldType": "String"
     },
     {
       "fieldName": "sentVia",
