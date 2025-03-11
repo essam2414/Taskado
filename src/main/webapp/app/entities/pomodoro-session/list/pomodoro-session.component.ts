@@ -3,17 +3,20 @@ import { interval, Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule } from '@angular/forms';
+import { NgxDraggableDomModule } from 'ngx-draggable-dom';
 
 export type PomodoroMode = 'pomodoro' | 'shortBreak' | 'longBreak';
 
 @Component({
   selector: 'jhi-pomodoro-session',
   standalone: true,
-  imports: [CommonModule, SharedModule, FormsModule],
+  imports: [CommonModule, SharedModule, FormsModule, NgxDraggableDomModule],
   templateUrl: './pomodoro-session.component.html',
   styleUrls: ['./pomodoro-session.scss'],
 })
 export class PomodoroSessionComponent implements OnInit, OnDestroy {
+  showSettings = false;
+  completedPomodoros = 0;
   modeDurations: Record<PomodoroMode, number> = {
     pomodoro: 1500,
     shortBreak: 300,
@@ -64,6 +67,10 @@ export class PomodoroSessionComponent implements OnInit, OnDestroy {
     this.timeRemaining = this.modeDurations[this.currentMode];
   }
 
+  resetPomodoroCounter(): void {
+    this.completedPomodoros = 0;
+  }
+
   skipSession(): void {
     this.pauseTimer();
     this.autoSwitchMode();
@@ -71,7 +78,12 @@ export class PomodoroSessionComponent implements OnInit, OnDestroy {
 
   autoSwitchMode(): void {
     if (this.currentMode === 'pomodoro') {
-      this.switchMode('shortBreak');
+      this.completedPomodoros++;
+      if (this.completedPomodoros % 4 === 0) {
+        this.switchMode('longBreak');
+      } else {
+        this.switchMode('shortBreak');
+      }
     } else {
       this.switchMode('pomodoro');
     }
