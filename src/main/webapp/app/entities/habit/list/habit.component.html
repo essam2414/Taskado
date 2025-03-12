@@ -1,6 +1,19 @@
 <div>
   <div class="habit-header">
-    <h2 id="page-heading" data-cy="HabitHeading">Habits</h2>
+    <div class="habit-header-left">
+      <h2 id="page-heading" data-cy="HabitHeading">Habits</h2>
+
+      <div class="habit-filters">
+        <button class="btn-filter">
+          <fa-icon icon="calendar-day"></fa-icon>
+          Today
+        </button>
+        <button class="btn-filter">
+          <fa-icon icon="inbox"></fa-icon>
+          All Habits
+        </button>
+      </div>
+    </div>
 
     <button
       id="jh-create-entity"
@@ -13,36 +26,80 @@
     </button>
   </div>
 
+  <!-- Week Navigation -->
+  <div class="week-nav">
+    <button class="btn" (click)="previousWeek()">
+      <fa-icon icon="chevron-left"></fa-icon>
+    </button>
+    <button class="btn" (click)="nextWeek()">
+      <fa-icon icon="chevron-right"></fa-icon>
+    </button>
+    <span> Week of {{ currentWeekStart.toDate() | date: 'MMM d, y' }} </span>
+  </div>
+
+  <!-- Progress Bar Section -->
+  <div class="progress-container">
+    <p style="margin: 0; font-weight: bold">Weekly Progress: {{ progressPercentage }}%</p>
+    <div class="progress">
+      <div
+        class="progress-bar"
+        role="progressbar"
+        [style.width.%]="progressPercentage"
+        [attr.aria-valuenow]="progressPercentage"
+        aria-valuemin="0"
+        aria-valuemax="100"
+      ></div>
+    </div>
+  </div>
+
+  <!-- NEW: Filter Toggle -->
+  <div style="margin-bottom: 12px">
+    <label>
+      <input type="checkbox" [(ngModel)]="showOnlyIncomplete" />
+      Show only incomplete
+    </label>
+  </div>
+
   <jhi-alert-error></jhi-alert-error>
   <jhi-alert></jhi-alert>
 
-  @if (habits?.length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span>No Habits found</span>
-    </div>
-  }
+  <!-- If no habits exist at all -->
+  <div *ngIf="habits?.length === 0" class="alert alert-warning" id="no-result">
+    <span>No Habits found</span>
+  </div>
 
-  @if (habits && habits.length > 0) {
-    <div class="habit-container">
-      <!-- Header -->
-      <div class="habit-week habit-row">
-        <div></div>
-        <div *ngFor="let day of daysOfWeek" class="habit-day">{{ day }}</div>
-        <div></div>
+  <!-- If we have some habits -->
+  <div *ngIf="habits && habits.length > 0">
+    <!-- If the filtered array is not empty, display the list -->
+    <div *ngIf="filteredHabits().length > 0" class="habit-container">
+      <!-- Header Row (days of the week) -->
+      <div class="habit-row habit-week">
+        <div class="habit-name"></div>
+        <div *ngFor="let day of getCurrentWeekDates()" class="habit-day">
+          {{ day | date: 'EEE' }}
+        </div>
+        <div class="habit-streak"></div>
       </div>
 
-      <!-- Habit Rows -->
+      <!-- Habit Rows (filtered) -->
       <div class="habit-list">
-        <div *ngFor="let habit of habits; trackBy: trackByHabitId" class="app-card habit-row" (click)="editHabit(habit)">
-          <div class="habit-name">{{ habit.name }}</div>
+        <div *ngFor="let habit of filteredHabits(); trackBy: trackByHabitId" class="app-card habit-row" (click)="editHabit(habit)">
+          <div
+            class="habit-name d-flex align-items-center"
+            style="width: 100%; justify-content: space-between; gap: 8px"
+            (click)="$event.stopPropagation()"
+          >
+            <span>{{ habit.name }}</span>
+            <button class="btn btn-sm" (click)="markAllForHabit(habit); $event.stopPropagation()">Mark All</button>
+          </div>
 
           <!-- 7 Days Checkboxes -->
-          <div *ngFor="let day of daysOfWeek; let i = index" class="habit-day">
+          <div *ngFor="let day of getCurrentWeekDates()" class="habit-day">
             <input
               type="checkbox"
               class="custom-checkbox"
-              [checked]="habit.completedDates?.includes(day) ?? false"
-              (change)="toggleDayCompleted(habit, i)"
+              [checked]="isDateCompleted(habit, day)"
+              (change)="toggleDayCompleted(habit, day)"
               (click)="$event.stopPropagation()"
             />
           </div>
@@ -52,5 +109,10 @@
         </div>
       </div>
     </div>
-  }
+
+    <!-- If the filtered array is empty but we do have habits, it means everything is completed -->
+    <div *ngIf="filteredHabits().length === 0" class="alert alert-warning">
+      <span>All habits are completed for this week!</span>
+    </div>
+  </div>
 </div>

@@ -1,9 +1,14 @@
 package bham.team.domain;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -253,5 +258,32 @@ public class Habit implements Serializable {
             ", repeatTimes='" + getRepeatTimes() + "'" +
             ", completedDates='" + getCompletedDates() + "'" +
             "}";
+    }
+
+    /**
+     * Returns the list of completed dates parsed from the JSON string.
+     */
+    public List<String> getCompletedDatesList() {
+        if (this.completedDates == null || this.completedDates.isEmpty()) {
+            return new ArrayList<>();
+        }
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(this.completedDates, new TypeReference<List<String>>() {});
+        } catch (IOException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Sets the completedDates field by converting the given list to a JSON string.
+     */
+    public void setCompletedDatesList(List<String> dates) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            this.completedDates = mapper.writeValueAsString(dates);
+        } catch (IOException e) {
+            this.completedDates = "[]";
+        }
     }
 }

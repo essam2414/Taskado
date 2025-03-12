@@ -34,6 +34,17 @@
   margin-bottom: 20px;
 }
 
+.habit-header-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.habit-filters {
+  display: flex;
+  gap: 12px;
+}
+
 .header-btn {
   display: flex;
   align-items: center;
@@ -55,4 +66,17 @@
   &:hover {
     background: rgba(86, 77, 242, 0.3);
   }
+}
+
+.week-nav {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.progress-container {
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
