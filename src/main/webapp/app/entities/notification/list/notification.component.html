@@ -2,16 +2,22 @@
   <div class="notification-header">
     <div class="notification-header-left">
       <h2 id="page-heading" data-cy="NotificationHeading">Notifications</h2>
+
+      <div class="notification-filters">
+        <button class="btn-filter" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
+          <fa-icon icon="inbox"></fa-icon>
+          All
+        </button>
+        <button class="btn-filter" [class.active]="activeFilter === 'unread'" (click)="setFilter('unread')">
+          <fa-icon icon="envelope"></fa-icon>
+          Unread ({{ getUnreadCount() }})
+        </button>
+      </div>
     </div>
 
-    <button
-      id="jh-create-entity"
-      data-cy="entityCreateButton"
-      class="btn-add jh-create-entity create-notification"
-      [routerLink]="['/notification/new']"
-    >
-      <fa-icon icon="plus"></fa-icon>
-      <span>Create a new Notification</span>
+    <button class="btn-add mark-all-read" (click)="markAllAsRead()" [disabled]="getUnreadCount() === 0">
+      <fa-icon icon="check"></fa-icon>
+      <span>Mark all as read</span>
     </button>
   </div>
 
@@ -27,35 +33,61 @@
 
   @if (notifications && notifications.length > 0) {
     <div class="notifications-list">
-      @for (notification of notifications; track trackId(notification)) {
-        <div class="app-card">
-          <div>
-            {{
-              { null: '', REMINDER: 'REMINDER', DEADLINE: 'DEADLINE', SYSTEM_UPDATE: 'SYSTEM_UPDATE' }[
-                notification.notificationType ?? 'null'
-              ]
-            }}
+      @for (notification of getFilteredNotifications(); track trackId(notification)) {
+        <div class="app-card notification-card" (click)="openNotification(notification); markAsRead(notification)">
+          <div class="notification-unread" *ngIf="!notification.read"></div>
+
+          <div class="notification-left">
+            <div class="notification-icon">
+              <fa-icon icon="{{ getNotificationIcon(notification.notificationType) }}"></fa-icon>
+            </div>
+            <div class="notification-info">
+              <span class="notification-message">{{ notification.message }}</span>
+              <span class="notification-time">{{ getTimeAgo(notification.createdAt?.toString()) }}</span>
+            </div>
           </div>
-          <div>
-            {{ notification.message }}
-          </div>
-          <div>
-            {{ notification.createdAt | formatMediumDatetime }}
-          </div>
-          <div>
-            {{ notification.read }}
-          </div>
-          <div>
-            {{ { null: '', LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' }[notification.priority ?? 'null'] }}
-          </div>
-          <div>
-            {{ { null: '', SENT: 'SENT', PENDING: 'PENDING', FAILED: 'FAILED' }[notification.status ?? 'null'] }}
-          </div>
-          <div>
-            {{ { null: '', EMAIL: 'EMAIL', SMS: 'SMS', PUSH: 'PUSH' }[notification.sentVia ?? 'null'] }}
-          </div>
+          @if (notification.priority) {
+            <div class="notification-tag" [ngClass]="notification.priority">
+              <fa-icon icon="flag"></fa-icon>
+              {{
+                { null: '', LOW: 'Low Priority', MEDIUM: 'Medium Priority', HIGH: 'High Priority', CRITICAL: 'Critical Priority' }[
+                  notification.priority
+                ]
+              }}
+            </div>
+          }
         </div>
       }
     </div>
+
+    <div class="modal-overlay" *ngIf="selectedNotification">
+      <div class="modal-content">
+        <button class="close-btn" (click)="closeModal()">
+          <fa-icon icon="times"></fa-icon>
+        </button>
+
+        <span class="notification-message">{{ selectedNotification.message }}</span>
+        <span class="notification-time">{{ getTimeAgo(selectedNotification.createdAt) }}</span>
+
+        <button
+          class="btn-add mark-unread"
+          (click)="markAsUnread(selectedNotification)"
+          [disabled]="selectedNotification && !selectedNotification.read"
+        >
+          Mark as unread
+          <fa-icon icon="undo"></fa-icon>
+        </button>
+      </div>
+    </div>
   }
+
+  <button
+    id="jh-create-entity"
+    data-cy="entityCreateButton"
+    class="mt-4 btn-add jh-create-entity create-notification"
+    [routerLink]="['/notification/new']"
+  >
+    <fa-icon icon="plus"></fa-icon>
+    <span>Add Notification (Temporary)</span>
+  </button>
 </div>
