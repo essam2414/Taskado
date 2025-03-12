@@ -25,14 +25,16 @@ entity Event {
 
 entity Habit {
   name String required,
+  startDate Instant required,
+  streak Integer,
+  completionRate Float,
+
   repeatType String required,
   repeatInterval Integer,
   repeatDays String,
   repeatTimes String,
-  completed Boolean required,
-  startDate Instant required,
-  streak Integer,
-  completionRate Float
+
+  completedDates TextBlob
 }
 
 enum NotificationType {
