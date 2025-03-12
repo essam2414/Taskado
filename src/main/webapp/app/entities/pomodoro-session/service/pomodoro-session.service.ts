@@ -11,9 +11,9 @@ import { IPomodoroSession, NewPomodoroSession } from '../pomodoro-session.model'
 
 export type PartialUpdatePomodoroSession = Partial<IPomodoroSession> & Pick<IPomodoroSession, 'id'>;
 
-type RestOf<T extends IPomodoroSession | NewPomodoroSession> = Omit<T, 'start' | 'stop'> & {
-  start?: string | null;
-  stop?: string | null;
+type RestOf<T extends IPomodoroSession | NewPomodoroSession> = Omit<T, 'startTime' | 'endTime'> & {
+  startTime?: string | null;
+  endTime?: string | null;
 };
 
 export type RestPomodoroSession = RestOf<IPomodoroSession>;
@@ -107,16 +107,16 @@ export class PomodoroSessionService {
   ): RestOf<T> {
     return {
       ...pomodoroSession,
-      start: pomodoroSession.start?.toJSON() ?? null,
-      stop: pomodoroSession.stop?.toJSON() ?? null,
+      startTime: pomodoroSession.startTime?.toJSON() ?? null,
+      endTime: pomodoroSession.endTime?.toJSON() ?? null,
     };
   }
 
   protected convertDateFromServer(restPomodoroSession: RestPomodoroSession): IPomodoroSession {
     return {
       ...restPomodoroSession,
-      start: restPomodoroSession.start ? dayjs(restPomodoroSession.start) : undefined,
-      stop: restPomodoroSession.stop ? dayjs(restPomodoroSession.stop) : undefined,
+      startTime: restPomodoroSession.startTime ? dayjs(restPomodoroSession.startTime) : undefined,
+      endTime: restPomodoroSession.endTime ? dayjs(restPomodoroSession.endTime) : undefined,
     };
   }
 

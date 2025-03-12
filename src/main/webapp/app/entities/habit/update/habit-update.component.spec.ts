@@ -53,10 +53,10 @@ describe('Habit Management Update Component', () => {
   describe('ngOnInit', () => {
     it('Should call Category query and add missing value', () => {
       const habit: IHabit = { id: 456 };
-      const category: ICategory = { id: 639 };
+      const category: ICategory = { id: 24012 };
       habit.category = category;
 
-      const categoryCollection: ICategory[] = [{ id: 17993 }];
+      const categoryCollection: ICategory[] = [{ id: 28005 }];
       jest.spyOn(categoryService, 'query').mockReturnValue(of(new HttpResponse({ body: categoryCollection })));
       const additionalCategories = [category];
       const expectedCollection: ICategory[] = [...additionalCategories, ...categoryCollection];
@@ -75,10 +75,10 @@ describe('Habit Management Update Component', () => {
 
     it('Should call User query and add missing value', () => {
       const habit: IHabit = { id: 456 };
-      const user: IUser = { id: 20311 };
+      const user: IUser = { id: 28547 };
       habit.user = user;
 
-      const userCollection: IUser[] = [{ id: 8044 }];
+      const userCollection: IUser[] = [{ id: 24390 }];
       jest.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
       const additionalUsers = [user];
       const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
@@ -97,9 +97,9 @@ describe('Habit Management Update Component', () => {
 
     it('Should update editForm', () => {
       const habit: IHabit = { id: 456 };
-      const category: ICategory = { id: 14001 };
+      const category: ICategory = { id: 8907 };
       habit.category = category;
-      const user: IUser = { id: 4248 };
+      const user: IUser = { id: 153 };
       habit.user = user;
 
       activatedRoute.data = of({ habit });

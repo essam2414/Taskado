@@ -1,3 +1,8 @@
+entity Category {
+  name String required unique minlength(3),
+  color String required
+}
+
 entity Habit {
     name String required minLength(5),
     repeatType String required,
@@ -7,4 +12,9 @@ entity Habit {
     startDate Instant required,
     streak Integer default(0) min(0),
     completionRate Float default(0.0) min(0) max(100)
+}
+
+relationship ManyToOne {
+  Habit{category} to Category,
+  Habit{user} to User with builtInEntity
 }

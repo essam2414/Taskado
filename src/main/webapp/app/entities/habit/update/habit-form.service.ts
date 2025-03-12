@@ -27,19 +27,19 @@ type HabitFormRawValue = FormValueOf<IHabit>;
 
 type NewHabitFormRawValue = FormValueOf<NewHabit>;
 
-type HabitFormDefaults = Pick<NewHabit, 'id' | 'completed' | 'startDate'>;
+type HabitFormDefaults = Pick<NewHabit, 'id' | 'startDate'>;
 
 type HabitFormGroupContent = {
   id: FormControl<HabitFormRawValue['id'] | NewHabit['id']>;
   name: FormControl<HabitFormRawValue['name']>;
+  startDate: FormControl<HabitFormRawValue['startDate']>;
+  streak: FormControl<HabitFormRawValue['streak']>;
+  completionRate: FormControl<HabitFormRawValue['completionRate']>;
   repeatType: FormControl<HabitFormRawValue['repeatType']>;
   repeatInterval: FormControl<HabitFormRawValue['repeatInterval']>;
   repeatDays: FormControl<HabitFormRawValue['repeatDays']>;
   repeatTimes: FormControl<HabitFormRawValue['repeatTimes']>;
-  completed: FormControl<HabitFormRawValue['completed']>;
-  startDate: FormControl<HabitFormRawValue['startDate']>;
-  streak: FormControl<HabitFormRawValue['streak']>;
-  completionRate: FormControl<HabitFormRawValue['completionRate']>;
+  completedDates: FormControl<HabitFormRawValue['completedDates']>;
   category: FormControl<HabitFormRawValue['category']>;
   user: FormControl<HabitFormRawValue['user']>;
 };
@@ -64,20 +64,18 @@ export class HabitFormService {
       name: new FormControl(habitRawValue.name, {
         validators: [Validators.required],
       }),
+      startDate: new FormControl(habitRawValue.startDate, {
+        validators: [Validators.required],
+      }),
+      streak: new FormControl(habitRawValue.streak),
+      completionRate: new FormControl(habitRawValue.completionRate),
       repeatType: new FormControl(habitRawValue.repeatType, {
         validators: [Validators.required],
       }),
       repeatInterval: new FormControl(habitRawValue.repeatInterval),
       repeatDays: new FormControl(habitRawValue.repeatDays),
       repeatTimes: new FormControl(habitRawValue.repeatTimes),
-      completed: new FormControl(habitRawValue.completed, {
-        validators: [Validators.required],
-      }),
-      startDate: new FormControl(habitRawValue.startDate, {
-        validators: [Validators.required],
-      }),
-      streak: new FormControl(habitRawValue.streak),
-      completionRate: new FormControl(habitRawValue.completionRate),
+      completedDates: new FormControl(habitRawValue.completedDates),
       category: new FormControl(habitRawValue.category),
       user: new FormControl(habitRawValue.user),
     });
@@ -102,7 +100,6 @@ export class HabitFormService {
 
     return {
       id: null,
-      completed: false,
       startDate: currentTime,
     };
   }

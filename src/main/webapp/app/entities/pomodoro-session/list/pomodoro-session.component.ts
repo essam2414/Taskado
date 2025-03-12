@@ -1,6 +1,6 @@
-import { Component, NgZone, OnInit, inject } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
-import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
+import { Observable, Subscription, combineLatest, filter, tap, interval } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
@@ -11,11 +11,15 @@ import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigati
 import { IPomodoroSession } from '../pomodoro-session.model';
 import { EntityArrayResponseType, PomodoroSessionService } from '../service/pomodoro-session.service';
 import { PomodoroSessionDeleteDialogComponent } from '../delete/pomodoro-session-delete-dialog.component';
+import { NgxDraggableDomModule } from 'ngx-draggable-dom';
+
+export type PomodoroMode = 'pomodoro' | 'shortBreak' | 'longBreak';
 
 @Component({
   standalone: true,
   selector: 'jhi-pomodoro-session',
   templateUrl: './pomodoro-session.component.html',
+  styleUrls: ['../pomodoro-session.scss'],
   imports: [
     RouterModule,
     FormsModule,
@@ -25,17 +29,27 @@ import { PomodoroSessionDeleteDialogComponent } from '../delete/pomodoro-session
     DurationPipe,
     FormatMediumDatetimePipe,
     FormatMediumDatePipe,
-    FormatMediumDatetimePipe,
-    FormatMediumDatetimePipe,
-    FormatMediumDatetimePipe,
+    NgxDraggableDomModule,
   ],
 })
-export class PomodoroSessionComponent implements OnInit {
+export class PomodoroSessionComponent implements OnInit, OnDestroy {
   subscription: Subscription | null = null;
   pomodoroSessions?: IPomodoroSession[];
   isLoading = false;
 
   sortState = sortStateSignal({});
+
+  showSettings = false;
+  completedPomodoros = 0;
+  modeDurations: Record<PomodoroMode, number> = {
+    pomodoro: 1500,
+    shortBreak: 300,
+    longBreak: 900,
+  };
+
+  currentMode: PomodoroMode = 'pomodoro';
+  timerRunning = false;
+  timeRemaining = this.modeDurations[this.currentMode];
 
   public readonly router = inject(Router);
   protected readonly pomodoroSessionService = inject(PomodoroSessionService);
@@ -44,19 +58,86 @@ export class PomodoroSessionComponent implements OnInit {
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
 
-  trackId = (_index: number, item: IPomodoroSession): number => this.pomodoroSessionService.getPomodoroSessionIdentifier(item);
+  private timerSubscription?: Subscription;
+
+  trackId = (item: IPomodoroSession): number => this.pomodoroSessionService.getPomodoroSessionIdentifier(item);
 
   ngOnInit(): void {
-    this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
-      .pipe(
-        tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
-        tap(() => {
-          if (!this.pomodoroSessions || this.pomodoroSessions.length === 0) {
-            this.load();
-          }
-        }),
-      )
-      .subscribe();
+    this.switchMode(this.currentMode);
+  }
+
+  ngOnDestroy(): void {
+    this.timerSubscription?.unsubscribe();
+  }
+
+  get formattedTime(): string {
+    const minutes = Math.floor(this.timeRemaining / 60)
+      .toString()
+      .padStart(2, '0');
+    const seconds = (this.timeRemaining % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  }
+
+  switchMode(mode: PomodoroMode): void {
+    this.currentMode = mode;
+    this.resetTimer();
+  }
+
+  startTimer(): void {
+    if (!this.timerRunning) {
+      this.timerSubscription = interval(1000).subscribe(() => {
+        if (this.timeRemaining > 0) {
+          this.timeRemaining--;
+        } else {
+          this.pauseTimer();
+          this.autoSwitchMode();
+          this.startTimer();
+        }
+      });
+      this.timerRunning = true;
+    }
+  }
+
+  pauseTimer(): void {
+    this.timerSubscription?.unsubscribe();
+    this.timerRunning = false;
+  }
+
+  resetTimer(): void {
+    this.pauseTimer();
+    this.timeRemaining = this.modeDurations[this.currentMode];
+  }
+
+  resetPomodoroCounter(): void {
+    this.completedPomodoros = 0;
+  }
+
+  skipSession(): void {
+    this.pauseTimer();
+    this.autoSwitchMode();
+  }
+
+  autoSwitchMode(): void {
+    if (this.currentMode === 'pomodoro') {
+      this.completedPomodoros++;
+      if (this.completedPomodoros % 4 === 0) {
+        this.switchMode('longBreak');
+      } else {
+        this.switchMode('shortBreak');
+      }
+    } else {
+      this.switchMode('pomodoro');
+    }
+  }
+
+  updateDuration(mode: PomodoroMode, minutes: number): void {
+    const seconds = Math.floor(minutes * 60);
+    if (seconds > 0) {
+      this.modeDurations[mode] = seconds;
+      if (this.currentMode === mode) {
+        this.resetTimer();
+      }
+    }
   }
 
   delete(pomodoroSession: IPomodoroSession): void {

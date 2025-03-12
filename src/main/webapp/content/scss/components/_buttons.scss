@@ -24,12 +24,12 @@ $text-accent: #695cff;
   background-color: transparent;
 
   &:checked {
-    background-color: #564df2;
-    border-color: #564df2;
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
   }
 
   &:hover {
-    border-color: #564df2;
+    border-color: var(--accent-color);
   }
 }
 
@@ -64,14 +64,14 @@ $text-accent: #695cff;
 }
 
 .btn-primary {
-  background-color: $primary;
+  background-color: var(--accent-color);
   color: white;
   box-shadow:
     0px 2px 6px rgba(87, 78, 241, 0.2),
     0px 1px 3px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    background-color: darken($primary, 8%);
+    background-color: color-mix(in srgb, var(--accent-color) 85%, black);
     box-shadow: 0px 4px 10px rgba(87, 78, 241, 0.25);
   }
 }
@@ -87,14 +87,14 @@ $text-accent: #695cff;
 
 .btn-outline {
   background-color: transparent;
-  border: 2px solid $primary;
-  color: $primary;
+  border: 2px solid var(--accent-color);
+  color: var(--accent-color);
   box-sizing: border-box;
   padding: 10px 24px;
 
   &:hover {
-    border: 2px solid $primary;
-    background-color: $primary;
+    border: 2px solid var(--accent-color);
+    background-color: var(--accent-color);
     color: white;
   }
 }
@@ -103,8 +103,10 @@ $text-accent: #695cff;
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
-  color: #6b6b78;
+  color: var(--text-muted);
+  background-color: var(--bg-color-secondary);
   opacity: 0.75;
+  transition: all 0.3s ease;
 
   fa-icon {
     margin-right: 4px;
@@ -112,10 +114,11 @@ $text-accent: #695cff;
 
   &:hover {
     opacity: 1;
+    color: var(--text-secondary);
   }
 
   &.active {
-    background: $primary;
+    background: var(--accent-color);
     color: white;
     font-weight: 500;
     opacity: 1;
@@ -132,16 +135,15 @@ $text-accent: #695cff;
   border-radius: 16px;
   padding: 12px 24px;
 
-  color: $primary;
-  background: rgba(86, 77, 242, 0.15);
+  color: var(--accent-color);
+  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
 
   transition: background 0.3s ease;
 
   &:hover {
-    background: rgba(86, 77, 242, 0.3);
+    background: color-mix(in srgb, var(--accent-color) 30%, transparent);
   }
 }
 
@@ -157,14 +159,13 @@ $text-accent: #695cff;
 
   transition: background 0.3s ease;
 
-  color: $primary;
-  background: rgba(86, 77, 242, 0.15);
+  color: var(--accent-color);
+  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
 
   &:hover {
-    background: rgba(86, 77, 242, 0.3);
+    background: color-mix(in srgb, var(--accent-color) 30%, transparent);
   }
 
   &:disabled {

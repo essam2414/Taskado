@@ -27,13 +27,9 @@
               ]
             }}</span>
           </dd>
-          <dt><span>Timestamp</span></dt>
+          <dt><span>Created At</span></dt>
           <dd>
-            <span>{{ notificationRef.timestamp | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span>Linked Entity Type</span></dt>
-          <dd>
-            <span>{{ notificationRef.linkedEntityType }}</span>
+            <span>{{ notificationRef.createdAt | formatMediumDatetime }}</span>
           </dd>
           <dt><span>Read</span></dt>
           <dd>
@@ -48,26 +44,6 @@
           <dt><span>Status</span></dt>
           <dd>
             <span>{{ { null: '', SENT: 'SENT', PENDING: 'PENDING', FAILED: 'FAILED' }[notificationRef.status ?? 'null'] }}</span>
-          </dd>
-          <dt><span>Expiration Date</span></dt>
-          <dd>
-            <span>{{ notificationRef.expirationDate | formatMediumDatetime }}</span>
-          </dd>
-          <dt><span>Action URL</span></dt>
-          <dd>
-            <span>{{ notificationRef.actionURL }}</span>
-          </dd>
-          <dt><span>Icon</span></dt>
-          <dd>
-            <span>{{ notificationRef.icon }}</span>
-          </dd>
-          <dt><span>Is Recurring</span></dt>
-          <dd>
-            <span>{{ notificationRef.isRecurring }}</span>
-          </dd>
-          <dt><span>Recurrence Pattern</span></dt>
-          <dd>
-            <span>{{ notificationRef.recurrencePattern }}</span>
           </dd>
           <dt><span>Sent Via</span></dt>
           <dd>

@@ -12,6 +12,8 @@ import { Router, RouterModule } from '@angular/router';
 })
 export class HeaderComponent {
   version = '';
+  sidebarOpen = false;
+
   private readonly router = inject(Router);
 
   constructor() {
@@ -22,5 +24,9 @@ export class HeaderComponent {
 
   login(): void {
     this.router.navigate(['/login']);
+  }
+
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
   }
 }

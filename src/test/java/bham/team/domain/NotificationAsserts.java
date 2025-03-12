@@ -49,16 +49,10 @@ public class NotificationAsserts {
             .as("Verify Notification relevant properties")
             .satisfies(e -> assertThat(e.getMessage()).as("check message").isEqualTo(actual.getMessage()))
             .satisfies(e -> assertThat(e.getNotificationType()).as("check notificationType").isEqualTo(actual.getNotificationType()))
-            .satisfies(e -> assertThat(e.getTimestamp()).as("check timestamp").isEqualTo(actual.getTimestamp()))
-            .satisfies(e -> assertThat(e.getLinkedEntityType()).as("check linkedEntityType").isEqualTo(actual.getLinkedEntityType()))
+            .satisfies(e -> assertThat(e.getCreatedAt()).as("check createdAt").isEqualTo(actual.getCreatedAt()))
             .satisfies(e -> assertThat(e.getRead()).as("check read").isEqualTo(actual.getRead()))
             .satisfies(e -> assertThat(e.getPriority()).as("check priority").isEqualTo(actual.getPriority()))
             .satisfies(e -> assertThat(e.getStatus()).as("check status").isEqualTo(actual.getStatus()))
-            .satisfies(e -> assertThat(e.getExpirationDate()).as("check expirationDate").isEqualTo(actual.getExpirationDate()))
-            .satisfies(e -> assertThat(e.getActionURL()).as("check actionURL").isEqualTo(actual.getActionURL()))
-            .satisfies(e -> assertThat(e.getIcon()).as("check icon").isEqualTo(actual.getIcon()))
-            .satisfies(e -> assertThat(e.getIsRecurring()).as("check isRecurring").isEqualTo(actual.getIsRecurring()))
-            .satisfies(e -> assertThat(e.getRecurrencePattern()).as("check recurrencePattern").isEqualTo(actual.getRecurrencePattern()))
             .satisfies(e -> assertThat(e.getSentVia()).as("check sentVia").isEqualTo(actual.getSentVia()));
     }
 
