@@ -1,7 +1,53 @@
 <div>
-  <h2 id="page-heading" data-cy="ProductivityReportHeading">
+  <h2 id="page-heading" data-cy="ProductivityReportHeading" style="display: flex; justify-content: space-between; align-items: center">
     <span>Productivity Insights</span>
+    <div style="display: flex; gap: 10px">
+      <button
+        id="Previous"
+        data-cy="entityPrevButton"
+        class="btn"
+        (click)="navigateReport()"
+        style="
+          padding: 12px 20px;
+          font-size: 16px;
+          font-weight: bold;
+          border-radius: 8px;
+          background-color: #007bff;
+          color: white;
+          border: none;
+          cursor: pointer;
+          transition: 0.3s;
+        "
+      >
+        <span style="font-size: 24px">&#8592;</span> Previous
+      </button>
+      <button
+        id="Next"
+        data-cy="entityNextButton"
+        class="btn"
+        (click)="navigateReport()"
+        style="
+          padding: 12px 20px;
+          font-size: 16px;
+          font-weight: bold;
+          border-radius: 8px;
+          background-color: #007bff;
+          color: white;
+          border: none;
+          cursor: pointer;
+          transition: 0.3s;
+        "
+      >
+        Next <span style="font-size: 24px">&#8594;</span>
+      </button>
+    </div>
   </h2>
+
+  <div *ngIf="errorMessage" class="alert alert-danger" id="error-message" style="margin-top: 10px">
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <hr style="margin-top: 10px; margin-bottom: 20px; border: 1px solid #ccc" />
 
   <jhi-alert-error></jhi-alert-error>
   <jhi-alert></jhi-alert>
