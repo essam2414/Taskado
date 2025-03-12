@@ -15,13 +15,37 @@
           <dd>
             <span>{{ pomodoroSessionRef.id }}</span>
           </dd>
-          <dt><span>Start</span></dt>
+          <dt><span>Name</span></dt>
           <dd>
-            <span>{{ pomodoroSessionRef.start | formatMediumDatetime }}</span>
+            <span>{{ pomodoroSessionRef.name }}</span>
           </dd>
-          <dt><span>Stop</span></dt>
+          <dt><span>Duration</span></dt>
           <dd>
-            <span>{{ pomodoroSessionRef.stop | formatMediumDatetime }}</span>
+            <span>{{ pomodoroSessionRef.duration }}</span>
+          </dd>
+          <dt><span>Break Duration</span></dt>
+          <dd>
+            <span>{{ pomodoroSessionRef.breakDuration }}</span>
+          </dd>
+          <dt><span>Long Break Duration</span></dt>
+          <dd>
+            <span>{{ pomodoroSessionRef.longBreakDuration }}</span>
+          </dd>
+          <dt><span>Cycles</span></dt>
+          <dd>
+            <span>{{ pomodoroSessionRef.cycles }}</span>
+          </dd>
+          <dt><span>Start Time</span></dt>
+          <dd>
+            <span>{{ pomodoroSessionRef.startTime | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>End Time</span></dt>
+          <dd>
+            <span>{{ pomodoroSessionRef.endTime | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Completed</span></dt>
+          <dd>
+            <span>{{ pomodoroSessionRef.completed }}</span>
           </dd>
           <dt><span>User</span></dt>
           <dd>

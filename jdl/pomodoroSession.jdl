@@ -1,7 +1,12 @@
-
 entity PomodoroSession {
-  Start Instant required,
-  Stop Instant,
+  name String,                   // Optional: Users can name their sessions (e.g., "Study Session")
+  duration Integer required,      // Pomodoro session length in minutes (default 25, customizable)
+  breakDuration Integer required, // Short break time in minutes (default 5, customizable)
+  longBreakDuration Integer,      // Long break duration (optional, default 15, after 4 cycles)
+  cycles Integer required,        // Number of Pomodoro cycles before a long break
+  startTime Instant required,     // When the session started
+  endTime Instant,                // When the session ended
+  completed Boolean required      // If the session was completed
 }
 
 relationship ManyToOne {

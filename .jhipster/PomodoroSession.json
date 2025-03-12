@@ -5,13 +5,41 @@
   "applications": "*",
   "fields": [
     {
-      "fieldName": "start",
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "duration",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "breakDuration",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "longBreakDuration",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "cycles",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "startTime",
       "fieldType": "Instant",
       "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "stop",
+      "fieldName": "endTime",
       "fieldType": "Instant"
+    },
+    {
+      "fieldName": "completed",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
     }
   ],
   "name": "PomodoroSession",

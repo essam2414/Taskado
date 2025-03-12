@@ -13,26 +13,96 @@
           </div>
         }
 
-        @let startRef = editForm.get('start')!;
         <div class="mb-3">
-          <label class="form-label" for="field_start">Start</label>
+          <label class="form-label" for="field_name">Name</label>
+          <input type="text" class="form-control" name="name" id="field_name" data-cy="name" formControlName="name" />
+        </div>
+
+        @let durationRef = editForm.get('duration')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_duration">Duration</label>
+          <input type="number" class="form-control" name="duration" id="field_duration" data-cy="duration" formControlName="duration" />
+          @if (durationRef.invalid && (durationRef.dirty || durationRef.touched)) {
+            <div>
+              @if (editForm.get('duration')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('duration')?.errors?.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
+        </div>
+
+        @let breakDurationRef = editForm.get('breakDuration')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_breakDuration">Break Duration</label>
+          <input
+            type="number"
+            class="form-control"
+            name="breakDuration"
+            id="field_breakDuration"
+            data-cy="breakDuration"
+            formControlName="breakDuration"
+          />
+          @if (breakDurationRef.invalid && (breakDurationRef.dirty || breakDurationRef.touched)) {
+            <div>
+              @if (editForm.get('breakDuration')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('breakDuration')?.errors?.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_longBreakDuration">Long Break Duration</label>
+          <input
+            type="number"
+            class="form-control"
+            name="longBreakDuration"
+            id="field_longBreakDuration"
+            data-cy="longBreakDuration"
+            formControlName="longBreakDuration"
+          />
+        </div>
+
+        @let cyclesRef = editForm.get('cycles')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_cycles">Cycles</label>
+          <input type="number" class="form-control" name="cycles" id="field_cycles" data-cy="cycles" formControlName="cycles" />
+          @if (cyclesRef.invalid && (cyclesRef.dirty || cyclesRef.touched)) {
+            <div>
+              @if (editForm.get('cycles')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('cycles')?.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let startTimeRef = editForm.get('startTime')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_startTime">Start Time</label>
           <div class="d-flex">
             <input
-              id="field_start"
-              data-cy="start"
+              id="field_startTime"
+              data-cy="startTime"
               type="datetime-local"
               class="form-control"
-              name="start"
-              formControlName="start"
+              name="startTime"
+              formControlName="startTime"
               placeholder="YYYY-MM-DD HH:mm"
             />
           </div>
-          @if (startRef.invalid && (startRef.dirty || startRef.touched)) {
+          @if (startTimeRef.invalid && (startTimeRef.dirty || startTimeRef.touched)) {
             <div>
-              @if (editForm.get('start')?.errors?.required) {
+              @if (editForm.get('startTime')?.errors?.required) {
                 <small class="form-text text-danger">This field is required.</small>
               }
-              <small class="form-text text-danger" [hidden]="!editForm.get('start')?.errors?.datetimelocal"
+              <small class="form-text text-danger" [hidden]="!editForm.get('startTime')?.errors?.datetimelocal"
                 >This field should be a date and time.</small
               >
             </div>
@@ -40,18 +110,31 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_stop">Stop</label>
+          <label class="form-label" for="field_endTime">End Time</label>
           <div class="d-flex">
             <input
-              id="field_stop"
-              data-cy="stop"
+              id="field_endTime"
+              data-cy="endTime"
               type="datetime-local"
               class="form-control"
-              name="stop"
-              formControlName="stop"
+              name="endTime"
+              formControlName="endTime"
               placeholder="YYYY-MM-DD HH:mm"
             />
           </div>
+        </div>
+
+        @let completedRef = editForm.get('completed')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_completed">Completed</label>
+          <input type="checkbox" class="form-check" name="completed" id="field_completed" data-cy="completed" formControlName="completed" />
+          @if (completedRef.invalid && (completedRef.dirty || completedRef.touched)) {
+            <div>
+              @if (editForm.get('completed')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
         </div>
 
         <div class="mb-3">
