@@ -95,22 +95,70 @@
   }
 
   @if (productivityReports && productivityReports.length > 0) {
-    <div class="app-card" style="width: 450px">
-      <div>
-        <h4 class="mb-3">Your Summary</h4>
-        <div *ngIf="productivityReports[0]">
-          <div class="mb-3"><strong>Tasks Planned:</strong> {{ productivityReports[0].tasksPlanned }}</div>
-          <div class="mb-3"><strong>Tasks Completed:</strong> {{ productivityReports[0].tasksCompleted }}</div>
-          <div class="mb-3">
-            <strong>Tasks Average Completion time:</strong>
-          </div>
-          <div class="mb-3"><strong>Task Efficiency:</strong> {{ productivityReports[0].efficiencyScore }}</div>
-          <div class="mb-3"><strong>Pomodoro Sessions:</strong> {{ productivityReports[0].pomodoroSessionsCompleted }}</div>
-          <div class="mb-3"><strong>Total Focus Time (min):</strong> {{ productivityReports[0].totalFocusTime }}</div>
-          <div class="mb-3">
-            <strong>Habit Score:</strong>
-          </div>
+    <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: nowrap">
+      <!-- Task Card -->
+      <div
+        class="app-card"
+        style="
+          width: 450px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 0;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+        "
+      >
+        <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Tasks</h4>
+        <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
+        <div *ngIf="productivityReports[0]" style="display: flex; flex-direction: column; gap: 10px; padding: 20px">
+          <div style="font-size: 18px"><strong>Tasks Planned:</strong> {{ productivityReports[0].tasksPlanned }}</div>
+          <div style="font-size: 18px"><strong>Tasks Completed:</strong> {{ productivityReports[0].tasksCompleted }}</div>
+          <div style="font-size: 18px"><strong>Average Completion Time:</strong> 15 min</div>
+          <div style="font-size: 18px"><strong>Task Efficiency:</strong> {{ productivityReports[0].efficiencyScore }}</div>
         </div>
+      </div>
+
+      <!-- Pomodoro Card (Focus) -->
+      <div
+        class="app-card"
+        style="
+          width: 450px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 0;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+        "
+      >
+        <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Focus</h4>
+        <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
+        <div *ngIf="productivityReports[0]" style="display: flex; flex-direction: column; gap: 10px; padding: 20px">
+          <div style="font-size: 18px"><strong>Pomodoro Sessions:</strong> {{ productivityReports[0].pomodoroSessionsCompleted }}</div>
+          <div style="font-size: 18px"><strong>Total Focus Time (min):</strong> {{ productivityReports[0].totalFocusTime }}</div>
+        </div>
+      </div>
+
+      <!-- Suggestions Card -->
+      <div
+        class="app-card"
+        style="
+          width: 450px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 0;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+        "
+      >
+        <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Suggestions</h4>
+        <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
+        <div *ngIf="productivityReports[0]" style="display: flex; flex-direction: column; gap: 10px; padding: 20px"></div>
       </div>
     </div>
   }
