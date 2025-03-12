@@ -2,16 +2,22 @@
   <div class="notification-header">
     <div class="notification-header-left">
       <h2 id="page-heading" data-cy="NotificationHeading">Notifications</h2>
+
+      <div class="notification-filters">
+        <button class="btn-filter" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
+          <fa-icon icon="inbox"></fa-icon>
+          All
+        </button>
+        <button class="btn-filter" [class.active]="activeFilter === 'unread'" (click)="setFilter('unread')">
+          <fa-icon icon="envelope"></fa-icon>
+          Unread ({{ getUnreadCount() }})
+        </button>
+      </div>
     </div>
 
-    <button
-      id="jh-create-entity"
-      data-cy="entityCreateButton"
-      class="btn-add jh-create-entity create-notification"
-      [routerLink]="['/notification/new']"
-    >
-      <fa-icon icon="plus"></fa-icon>
-      <span>Create a new Notification</span>
+    <button class="btn-add mark-all-read" (click)="markAllAsRead()" [disabled]="getUnreadCount() === 0">
+      <fa-icon icon="check"></fa-icon>
+      <span>Mark all as read</span>
     </button>
   </div>
 
@@ -26,119 +32,62 @@
   }
 
   @if (notifications && notifications.length > 0) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
-          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span>ID</span>
+    <div class="notifications-list">
+      @for (notification of getFilteredNotifications(); track trackId(notification)) {
+        <div class="app-card notification-card" (click)="openNotification(notification); markAsRead(notification)">
+          <div class="notification-unread" *ngIf="!notification.read"></div>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="message">
-              <div class="d-flex">
-                <span>Message</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="notificationType">
-              <div class="d-flex">
-                <span>Notification Type</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="createdAt">
-              <div class="d-flex">
-                <span>Created At</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="read">
-              <div class="d-flex">
-                <span>Read</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="priority">
-              <div class="d-flex">
-                <span>Priority</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="status">
-              <div class="d-flex">
-                <span>Status</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="sentVia">
-              <div class="d-flex">
-                <span>Sent Via</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="user.id">
-              <div class="d-flex">
-                <span>User</span>
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (notification of notifications; track trackId(notification)) {
-            <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/notification', notification.id, 'view']">{{ notification.id }}</a>
-              </td>
-              <td>{{ notification.message }}</td>
-              <td>
-                {{
-                  { null: '', REMINDER: 'REMINDER', DEADLINE: 'DEADLINE', SYSTEM_UPDATE: 'SYSTEM_UPDATE' }[
-                    notification.notificationType ?? 'null'
-                  ]
-                }}
-              </td>
-              <td>{{ notification.createdAt | formatMediumDatetime }}</td>
-              <td>{{ notification.read }}</td>
-              <td>{{ { null: '', LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' }[notification.priority ?? 'null'] }}</td>
-              <td>{{ { null: '', SENT: 'SENT', PENDING: 'PENDING', FAILED: 'FAILED' }[notification.status ?? 'null'] }}</td>
-              <td>{{ { null: '', EMAIL: 'EMAIL', SMS: 'SMS', PUSH: 'PUSH' }[notification.sentVia ?? 'null'] }}</td>
-              <td>
-                {{ notification.user?.id }}
-              </td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/notification', notification.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline">View</span>
-                  </a>
-
-                  <a [routerLink]="['/notification', notification.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline">Edit</span>
-                  </a>
-
-                  <button type="submit" (click)="delete(notification)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
+          <div class="notification-left">
+            <div class="notification-icon">
+              <fa-icon icon="{{ getNotificationIcon(notification.notificationType) }}"></fa-icon>
+            </div>
+            <div class="notification-info">
+              <span class="notification-message">{{ notification.message }}</span>
+              <span class="notification-time">{{ getTimeAgo(notification.createdAt?.toString()) }}</span>
+            </div>
+          </div>
+          @if (notification.priority) {
+            <div class="notification-tag" [ngClass]="notification.priority">
+              <fa-icon icon="flag"></fa-icon>
+              {{
+                { null: '', LOW: 'Low Priority', MEDIUM: 'Medium Priority', HIGH: 'High Priority', CRITICAL: 'Critical Priority' }[
+                  notification.priority
+                ]
+              }}
+            </div>
           }
-        </tbody>
-      </table>
+        </div>
+      }
+    </div>
+
+    <div class="modal-overlay" *ngIf="selectedNotification">
+      <div class="modal-content">
+        <button class="close-btn" (click)="closeModal()">
+          <fa-icon icon="times"></fa-icon>
+        </button>
+
+        <span class="notification-message">{{ selectedNotification.message }}</span>
+        <span class="notification-time">{{ getTimeAgo(selectedNotification.createdAt) }}</span>
+
+        <button
+          class="btn-add mark-unread"
+          (click)="markAsUnread(selectedNotification)"
+          [disabled]="selectedNotification && !selectedNotification.read"
+        >
+          Mark as unread
+          <fa-icon icon="undo"></fa-icon>
+        </button>
+      </div>
     </div>
   }
+
+  <button
+    id="jh-create-entity"
+    data-cy="entityCreateButton"
+    class="mt-4 btn-add jh-create-entity create-notification"
+    [routerLink]="['/notification/new']"
+  >
+    <fa-icon icon="plus"></fa-icon>
+    <span>Add Notification (Temporary)</span>
+  </button>
 </div>
