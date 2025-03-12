@@ -19,21 +19,27 @@ type PomodoroSessionFormGroupInput = IPomodoroSession | PartialWithRequiredKeyOf
 /**
  * Type that converts some properties for forms.
  */
-type FormValueOf<T extends IPomodoroSession | NewPomodoroSession> = Omit<T, 'start' | 'stop'> & {
-  start?: string | null;
-  stop?: string | null;
+type FormValueOf<T extends IPomodoroSession | NewPomodoroSession> = Omit<T, 'startTime' | 'endTime'> & {
+  startTime?: string | null;
+  endTime?: string | null;
 };
 
 type PomodoroSessionFormRawValue = FormValueOf<IPomodoroSession>;
 
 type NewPomodoroSessionFormRawValue = FormValueOf<NewPomodoroSession>;
 
-type PomodoroSessionFormDefaults = Pick<NewPomodoroSession, 'id' | 'start' | 'stop'>;
+type PomodoroSessionFormDefaults = Pick<NewPomodoroSession, 'id' | 'startTime' | 'endTime' | 'completed'>;
 
 type PomodoroSessionFormGroupContent = {
   id: FormControl<PomodoroSessionFormRawValue['id'] | NewPomodoroSession['id']>;
-  start: FormControl<PomodoroSessionFormRawValue['start']>;
-  stop: FormControl<PomodoroSessionFormRawValue['stop']>;
+  name: FormControl<PomodoroSessionFormRawValue['name']>;
+  duration: FormControl<PomodoroSessionFormRawValue['duration']>;
+  breakDuration: FormControl<PomodoroSessionFormRawValue['breakDuration']>;
+  longBreakDuration: FormControl<PomodoroSessionFormRawValue['longBreakDuration']>;
+  cycles: FormControl<PomodoroSessionFormRawValue['cycles']>;
+  startTime: FormControl<PomodoroSessionFormRawValue['startTime']>;
+  endTime: FormControl<PomodoroSessionFormRawValue['endTime']>;
+  completed: FormControl<PomodoroSessionFormRawValue['completed']>;
   user: FormControl<PomodoroSessionFormRawValue['user']>;
 };
 
@@ -54,10 +60,24 @@ export class PomodoroSessionFormService {
           validators: [Validators.required],
         },
       ),
-      start: new FormControl(pomodoroSessionRawValue.start, {
+      name: new FormControl(pomodoroSessionRawValue.name),
+      duration: new FormControl(pomodoroSessionRawValue.duration, {
         validators: [Validators.required],
       }),
-      stop: new FormControl(pomodoroSessionRawValue.stop),
+      breakDuration: new FormControl(pomodoroSessionRawValue.breakDuration, {
+        validators: [Validators.required],
+      }),
+      longBreakDuration: new FormControl(pomodoroSessionRawValue.longBreakDuration),
+      cycles: new FormControl(pomodoroSessionRawValue.cycles, {
+        validators: [Validators.required],
+      }),
+      startTime: new FormControl(pomodoroSessionRawValue.startTime, {
+        validators: [Validators.required],
+      }),
+      endTime: new FormControl(pomodoroSessionRawValue.endTime),
+      completed: new FormControl(pomodoroSessionRawValue.completed, {
+        validators: [Validators.required],
+      }),
       user: new FormControl(pomodoroSessionRawValue.user),
     });
   }
@@ -83,8 +103,9 @@ export class PomodoroSessionFormService {
 
     return {
       id: null,
-      start: currentTime,
-      stop: currentTime,
+      startTime: currentTime,
+      endTime: currentTime,
+      completed: false,
     };
   }
 
@@ -93,8 +114,8 @@ export class PomodoroSessionFormService {
   ): IPomodoroSession | NewPomodoroSession {
     return {
       ...rawPomodoroSession,
-      start: dayjs(rawPomodoroSession.start, DATE_TIME_FORMAT),
-      stop: dayjs(rawPomodoroSession.stop, DATE_TIME_FORMAT),
+      startTime: dayjs(rawPomodoroSession.startTime, DATE_TIME_FORMAT),
+      endTime: dayjs(rawPomodoroSession.endTime, DATE_TIME_FORMAT),
     };
   }
 
@@ -103,8 +124,8 @@ export class PomodoroSessionFormService {
   ): PomodoroSessionFormRawValue | PartialWithRequiredKeyOf<NewPomodoroSessionFormRawValue> {
     return {
       ...pomodoroSession,
-      start: pomodoroSession.start ? pomodoroSession.start.format(DATE_TIME_FORMAT) : undefined,
-      stop: pomodoroSession.stop ? pomodoroSession.stop.format(DATE_TIME_FORMAT) : undefined,
+      startTime: pomodoroSession.startTime ? pomodoroSession.startTime.format(DATE_TIME_FORMAT) : undefined,
+      endTime: pomodoroSession.endTime ? pomodoroSession.endTime.format(DATE_TIME_FORMAT) : undefined,
     };
   }
 }

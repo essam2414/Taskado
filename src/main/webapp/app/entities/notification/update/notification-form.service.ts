@@ -19,31 +19,24 @@ type NotificationFormGroupInput = INotification | PartialWithRequiredKeyOf<NewNo
 /**
  * Type that converts some properties for forms.
  */
-type FormValueOf<T extends INotification | NewNotification> = Omit<T, 'timestamp' | 'expirationDate'> & {
-  timestamp?: string | null;
-  expirationDate?: string | null;
+type FormValueOf<T extends INotification | NewNotification> = Omit<T, 'createdAt'> & {
+  createdAt?: string | null;
 };
 
 type NotificationFormRawValue = FormValueOf<INotification>;
 
 type NewNotificationFormRawValue = FormValueOf<NewNotification>;
 
-type NotificationFormDefaults = Pick<NewNotification, 'id' | 'timestamp' | 'read' | 'expirationDate' | 'isRecurring'>;
+type NotificationFormDefaults = Pick<NewNotification, 'id' | 'createdAt' | 'read'>;
 
 type NotificationFormGroupContent = {
   id: FormControl<NotificationFormRawValue['id'] | NewNotification['id']>;
   message: FormControl<NotificationFormRawValue['message']>;
   notificationType: FormControl<NotificationFormRawValue['notificationType']>;
-  timestamp: FormControl<NotificationFormRawValue['timestamp']>;
-  linkedEntityType: FormControl<NotificationFormRawValue['linkedEntityType']>;
+  createdAt: FormControl<NotificationFormRawValue['createdAt']>;
   read: FormControl<NotificationFormRawValue['read']>;
   priority: FormControl<NotificationFormRawValue['priority']>;
   status: FormControl<NotificationFormRawValue['status']>;
-  expirationDate: FormControl<NotificationFormRawValue['expirationDate']>;
-  actionURL: FormControl<NotificationFormRawValue['actionURL']>;
-  icon: FormControl<NotificationFormRawValue['icon']>;
-  isRecurring: FormControl<NotificationFormRawValue['isRecurring']>;
-  recurrencePattern: FormControl<NotificationFormRawValue['recurrencePattern']>;
   sentVia: FormControl<NotificationFormRawValue['sentVia']>;
   user: FormControl<NotificationFormRawValue['user']>;
 };
@@ -71,10 +64,9 @@ export class NotificationFormService {
       notificationType: new FormControl(notificationRawValue.notificationType, {
         validators: [Validators.required],
       }),
-      timestamp: new FormControl(notificationRawValue.timestamp, {
+      createdAt: new FormControl(notificationRawValue.createdAt, {
         validators: [Validators.required],
       }),
-      linkedEntityType: new FormControl(notificationRawValue.linkedEntityType),
       read: new FormControl(notificationRawValue.read, {
         validators: [Validators.required],
       }),
@@ -84,13 +76,6 @@ export class NotificationFormService {
       status: new FormControl(notificationRawValue.status, {
         validators: [Validators.required],
       }),
-      expirationDate: new FormControl(notificationRawValue.expirationDate),
-      actionURL: new FormControl(notificationRawValue.actionURL),
-      icon: new FormControl(notificationRawValue.icon),
-      isRecurring: new FormControl(notificationRawValue.isRecurring, {
-        validators: [Validators.required],
-      }),
-      recurrencePattern: new FormControl(notificationRawValue.recurrencePattern),
       sentVia: new FormControl(notificationRawValue.sentVia, {
         validators: [Validators.required],
       }),
@@ -117,10 +102,8 @@ export class NotificationFormService {
 
     return {
       id: null,
-      timestamp: currentTime,
+      createdAt: currentTime,
       read: false,
-      expirationDate: currentTime,
-      isRecurring: false,
     };
   }
 
@@ -129,8 +112,7 @@ export class NotificationFormService {
   ): INotification | NewNotification {
     return {
       ...rawNotification,
-      timestamp: dayjs(rawNotification.timestamp, DATE_TIME_FORMAT),
-      expirationDate: dayjs(rawNotification.expirationDate, DATE_TIME_FORMAT),
+      createdAt: dayjs(rawNotification.createdAt, DATE_TIME_FORMAT),
     };
   }
 
@@ -139,8 +121,7 @@ export class NotificationFormService {
   ): NotificationFormRawValue | PartialWithRequiredKeyOf<NewNotificationFormRawValue> {
     return {
       ...notification,
-      timestamp: notification.timestamp ? notification.timestamp.format(DATE_TIME_FORMAT) : undefined,
-      expirationDate: notification.expirationDate ? notification.expirationDate.format(DATE_TIME_FORMAT) : undefined,
+      createdAt: notification.createdAt ? notification.createdAt.format(DATE_TIME_FORMAT) : undefined,
     };
   }
 }

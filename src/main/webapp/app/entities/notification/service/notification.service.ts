@@ -11,9 +11,8 @@ import { INotification, NewNotification } from '../notification.model';
 
 export type PartialUpdateNotification = Partial<INotification> & Pick<INotification, 'id'>;
 
-type RestOf<T extends INotification | NewNotification> = Omit<T, 'timestamp' | 'expirationDate'> & {
-  timestamp?: string | null;
-  expirationDate?: string | null;
+type RestOf<T extends INotification | NewNotification> = Omit<T, 'createdAt'> & {
+  createdAt?: string | null;
 };
 
 export type RestNotification = RestOf<INotification>;
@@ -103,16 +102,14 @@ export class NotificationService {
   protected convertDateFromClient<T extends INotification | NewNotification | PartialUpdateNotification>(notification: T): RestOf<T> {
     return {
       ...notification,
-      timestamp: notification.timestamp?.toJSON() ?? null,
-      expirationDate: notification.expirationDate?.toJSON() ?? null,
+      createdAt: notification.createdAt?.toJSON() ?? null,
     };
   }
 
   protected convertDateFromServer(restNotification: RestNotification): INotification {
     return {
       ...restNotification,
-      timestamp: restNotification.timestamp ? dayjs(restNotification.timestamp) : undefined,
-      expirationDate: restNotification.expirationDate ? dayjs(restNotification.expirationDate) : undefined,
+      createdAt: restNotification.createdAt ? dayjs(restNotification.createdAt) : undefined,
     };
   }
 

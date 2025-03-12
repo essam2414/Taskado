@@ -9,16 +9,10 @@ export interface INotification {
   id: number;
   message?: string | null;
   notificationType?: keyof typeof NotificationType | null;
-  timestamp?: dayjs.Dayjs | null;
-  linkedEntityType?: string | null;
+  createdAt?: dayjs.Dayjs | null;
   read?: boolean | null;
   priority?: keyof typeof Priority | null;
   status?: keyof typeof NotificationStatus | null;
-  expirationDate?: dayjs.Dayjs | null;
-  actionURL?: string | null;
-  icon?: string | null;
-  isRecurring?: boolean | null;
-  recurrencePattern?: string | null;
   sentVia?: keyof typeof NotificationChannel | null;
   user?: Pick<IUser, 'id'> | null;
 }

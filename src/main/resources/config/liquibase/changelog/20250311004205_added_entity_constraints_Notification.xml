@@ -8,7 +8,7 @@
     <!--
         Added the constraints for entity Notification.
     -->
-    <changeSet id="20250203140952-2" author="jhipster">
+    <changeSet id="20250311004205-2" author="jhipster">
 
         <addForeignKeyConstraint baseColumnNames="user_id"
                                  baseTableName="notification"

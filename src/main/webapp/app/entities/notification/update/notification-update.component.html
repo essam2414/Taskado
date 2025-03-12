@@ -52,42 +52,30 @@
           }
         </div>
 
-        @let timestampRef = editForm.get('timestamp')!;
+        @let createdAtRef = editForm.get('createdAt')!;
         <div class="mb-3">
-          <label class="form-label" for="field_timestamp">Timestamp</label>
+          <label class="form-label" for="field_createdAt">Created At</label>
           <div class="d-flex">
             <input
-              id="field_timestamp"
-              data-cy="timestamp"
+              id="field_createdAt"
+              data-cy="createdAt"
               type="datetime-local"
               class="form-control"
-              name="timestamp"
-              formControlName="timestamp"
+              name="createdAt"
+              formControlName="createdAt"
               placeholder="YYYY-MM-DD HH:mm"
             />
           </div>
-          @if (timestampRef.invalid && (timestampRef.dirty || timestampRef.touched)) {
+          @if (createdAtRef.invalid && (createdAtRef.dirty || createdAtRef.touched)) {
             <div>
-              @if (editForm.get('timestamp')?.errors?.required) {
+              @if (editForm.get('createdAt')?.errors?.required) {
                 <small class="form-text text-danger">This field is required.</small>
               }
-              <small class="form-text text-danger" [hidden]="!editForm.get('timestamp')?.errors?.datetimelocal"
+              <small class="form-text text-danger" [hidden]="!editForm.get('createdAt')?.errors?.datetimelocal"
                 >This field should be a date and time.</small
               >
             </div>
           }
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_linkedEntityType">Linked Entity Type</label>
-          <input
-            type="text"
-            class="form-control"
-            name="linkedEntityType"
-            id="field_linkedEntityType"
-            data-cy="linkedEntityType"
-            formControlName="linkedEntityType"
-          />
         </div>
 
         @let readRef = editForm.get('read')!;
@@ -141,63 +129,6 @@
               }
             </div>
           }
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_expirationDate">Expiration Date</label>
-          <div class="d-flex">
-            <input
-              id="field_expirationDate"
-              data-cy="expirationDate"
-              type="datetime-local"
-              class="form-control"
-              name="expirationDate"
-              formControlName="expirationDate"
-              placeholder="YYYY-MM-DD HH:mm"
-            />
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_actionURL">Action URL</label>
-          <input type="text" class="form-control" name="actionURL" id="field_actionURL" data-cy="actionURL" formControlName="actionURL" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_icon">Icon</label>
-          <input type="text" class="form-control" name="icon" id="field_icon" data-cy="icon" formControlName="icon" />
-        </div>
-
-        @let isRecurringRef = editForm.get('isRecurring')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_isRecurring">Is Recurring</label>
-          <input
-            type="checkbox"
-            class="form-check"
-            name="isRecurring"
-            id="field_isRecurring"
-            data-cy="isRecurring"
-            formControlName="isRecurring"
-          />
-          @if (isRecurringRef.invalid && (isRecurringRef.dirty || isRecurringRef.touched)) {
-            <div>
-              @if (editForm.get('isRecurring')?.errors?.required) {
-                <small class="form-text text-danger">This field is required.</small>
-              }
-            </div>
-          }
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_recurrencePattern">Recurrence Pattern</label>
-          <input
-            type="text"
-            class="form-control"
-            name="recurrencePattern"
-            id="field_recurrencePattern"
-            data-cy="recurrencePattern"
-            formControlName="recurrencePattern"
-          />
         </div>
 
         @let sentViaRef = editForm.get('sentVia')!;
