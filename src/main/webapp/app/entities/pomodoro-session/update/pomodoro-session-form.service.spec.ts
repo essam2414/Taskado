@@ -20,8 +20,14 @@ describe('PomodoroSession Form Service', () => {
         expect(formGroup.controls).toEqual(
           expect.objectContaining({
             id: expect.any(Object),
-            start: expect.any(Object),
-            stop: expect.any(Object),
+            name: expect.any(Object),
+            duration: expect.any(Object),
+            breakDuration: expect.any(Object),
+            longBreakDuration: expect.any(Object),
+            cycles: expect.any(Object),
+            startTime: expect.any(Object),
+            endTime: expect.any(Object),
+            completed: expect.any(Object),
             user: expect.any(Object),
           }),
         );
@@ -33,8 +39,14 @@ describe('PomodoroSession Form Service', () => {
         expect(formGroup.controls).toEqual(
           expect.objectContaining({
             id: expect.any(Object),
-            start: expect.any(Object),
-            stop: expect.any(Object),
+            name: expect.any(Object),
+            duration: expect.any(Object),
+            breakDuration: expect.any(Object),
+            longBreakDuration: expect.any(Object),
+            cycles: expect.any(Object),
+            startTime: expect.any(Object),
+            endTime: expect.any(Object),
+            completed: expect.any(Object),
             user: expect.any(Object),
           }),
         );

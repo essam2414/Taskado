@@ -93,8 +93,14 @@ entity ProductivityReport {
 }
 
 entity PomodoroSession {
-  start Instant required,
-  stop Instant,
+  name String,
+  duration Integer required,
+  breakDuration Integer required,
+  longBreakDuration Integer,
+  cycles Integer required,
+  startTime Instant required,
+  endTime Instant,
+  completed Boolean required
 }
 
 entity Note {
