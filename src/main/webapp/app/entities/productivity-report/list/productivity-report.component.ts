@@ -35,10 +35,18 @@ export class ProductivityReportComponent implements OnInit {
   isLoading = false;
 
   errorMessage: string | null = null;
+  successMessage: string | null = null;
 
   sortState = sortStateSignal({});
 
   public chart: Chart | null = null;
+
+  // Default values before report generation
+  tasksPlanned: number | string = 'N/A';
+  tasksCompleted: number | string = 'N/A';
+  pomodoroSessionsCompleted: number | string = 'N/A';
+  totalFocusTime: number | string = 'N/A';
+  efficiencyScore: number | string = 'N/A';
 
   public readonly router = inject(Router);
   protected readonly productivityReportService = inject(ProductivityReportService);
@@ -127,6 +135,25 @@ export class ProductivityReportComponent implements OnInit {
     setTimeout(() => {
       this.errorMessage = null;
     }, 2500);
+  }
+
+  generateReport(): void {
+    if (!this.productivityReports || this.productivityReports.length === 0) {
+      this.errorMessage = 'Not Enough Data Available';
+      setTimeout(() => (this.errorMessage = null), 2500);
+      return;
+    }
+
+    // Load the first report into the UI
+    const report = this.productivityReports[0];
+    this.tasksPlanned = report.tasksPlanned ?? 'N/A';
+    this.tasksCompleted = report.tasksCompleted ?? 'N/A';
+    this.pomodoroSessionsCompleted = report.pomodoroSessionsCompleted ?? 'N/A';
+    this.totalFocusTime = report.totalFocusTime ?? 'N/A';
+    this.efficiencyScore = report.efficiencyScore ?? 'N/A';
+
+    this.successMessage = '✅ Report Generated Successfully!';
+    setTimeout(() => (this.successMessage = null), 2500);
   }
 
   delete(productivityReport: IProductivityReport): void {
