@@ -124,11 +124,29 @@ public class PomodoroSessionResource {
         Optional<PomodoroSession> result = pomodoroSessionRepository
             .findById(pomodoroSession.getId())
             .map(existingPomodoroSession -> {
-                if (pomodoroSession.getStart() != null) {
-                    existingPomodoroSession.setStart(pomodoroSession.getStart());
+                if (pomodoroSession.getName() != null) {
+                    existingPomodoroSession.setName(pomodoroSession.getName());
                 }
-                if (pomodoroSession.getStop() != null) {
-                    existingPomodoroSession.setStop(pomodoroSession.getStop());
+                if (pomodoroSession.getDuration() != null) {
+                    existingPomodoroSession.setDuration(pomodoroSession.getDuration());
+                }
+                if (pomodoroSession.getBreakDuration() != null) {
+                    existingPomodoroSession.setBreakDuration(pomodoroSession.getBreakDuration());
+                }
+                if (pomodoroSession.getLongBreakDuration() != null) {
+                    existingPomodoroSession.setLongBreakDuration(pomodoroSession.getLongBreakDuration());
+                }
+                if (pomodoroSession.getCycles() != null) {
+                    existingPomodoroSession.setCycles(pomodoroSession.getCycles());
+                }
+                if (pomodoroSession.getStartTime() != null) {
+                    existingPomodoroSession.setStartTime(pomodoroSession.getStartTime());
+                }
+                if (pomodoroSession.getEndTime() != null) {
+                    existingPomodoroSession.setEndTime(pomodoroSession.getEndTime());
+                }
+                if (pomodoroSession.getCompleted() != null) {
+                    existingPomodoroSession.setCompleted(pomodoroSession.getCompleted());
                 }
 
                 return existingPomodoroSession;

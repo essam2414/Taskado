@@ -38,6 +38,15 @@ class HabitResourceIT {
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
+    private static final Instant DEFAULT_START_DATE = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_START_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final Integer DEFAULT_STREAK = 1;
+    private static final Integer UPDATED_STREAK = 2;
+
+    private static final Float DEFAULT_COMPLETION_RATE = 1F;
+    private static final Float UPDATED_COMPLETION_RATE = 2F;
+
     private static final String DEFAULT_REPEAT_TYPE = "AAAAAAAAAA";
     private static final String UPDATED_REPEAT_TYPE = "BBBBBBBBBB";
 
@@ -50,17 +59,8 @@ class HabitResourceIT {
     private static final String DEFAULT_REPEAT_TIMES = "AAAAAAAAAA";
     private static final String UPDATED_REPEAT_TIMES = "BBBBBBBBBB";
 
-    private static final Boolean DEFAULT_COMPLETED = false;
-    private static final Boolean UPDATED_COMPLETED = true;
-
-    private static final Instant DEFAULT_START_DATE = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_START_DATE = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-
-    private static final Integer DEFAULT_STREAK = 1;
-    private static final Integer UPDATED_STREAK = 2;
-
-    private static final Float DEFAULT_COMPLETION_RATE = 1F;
-    private static final Float UPDATED_COMPLETION_RATE = 2F;
+    private static final String DEFAULT_COMPLETED_DATES = "AAAAAAAAAA";
+    private static final String UPDATED_COMPLETED_DATES = "BBBBBBBBBB";
 
     private static final String ENTITY_API_URL = "/api/habits";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -96,14 +96,14 @@ class HabitResourceIT {
     public static Habit createEntity() {
         return new Habit()
             .name(DEFAULT_NAME)
+            .startDate(DEFAULT_START_DATE)
+            .streak(DEFAULT_STREAK)
+            .completionRate(DEFAULT_COMPLETION_RATE)
             .repeatType(DEFAULT_REPEAT_TYPE)
             .repeatInterval(DEFAULT_REPEAT_INTERVAL)
             .repeatDays(DEFAULT_REPEAT_DAYS)
             .repeatTimes(DEFAULT_REPEAT_TIMES)
-            .completed(DEFAULT_COMPLETED)
-            .startDate(DEFAULT_START_DATE)
-            .streak(DEFAULT_STREAK)
-            .completionRate(DEFAULT_COMPLETION_RATE);
+            .completedDates(DEFAULT_COMPLETED_DATES);
     }
 
     /**
@@ -115,14 +115,14 @@ class HabitResourceIT {
     public static Habit createUpdatedEntity() {
         return new Habit()
             .name(UPDATED_NAME)
+            .startDate(UPDATED_START_DATE)
+            .streak(UPDATED_STREAK)
+            .completionRate(UPDATED_COMPLETION_RATE)
             .repeatType(UPDATED_REPEAT_TYPE)
             .repeatInterval(UPDATED_REPEAT_INTERVAL)
             .repeatDays(UPDATED_REPEAT_DAYS)
             .repeatTimes(UPDATED_REPEAT_TIMES)
-            .completed(UPDATED_COMPLETED)
-            .startDate(UPDATED_START_DATE)
-            .streak(UPDATED_STREAK)
-            .completionRate(UPDATED_COMPLETION_RATE);
+            .completedDates(UPDATED_COMPLETED_DATES);
     }
 
     @BeforeEach
@@ -195,42 +195,26 @@ class HabitResourceIT {
 
     @Test
     @Transactional
-    void checkRepeatTypeIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        // set the field null
-        habit.setRepeatType(null);
-
-        // Create the Habit, which fails.
-
-        restHabitMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(habit)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    void checkCompletedIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        // set the field null
-        habit.setCompleted(null);
-
-        // Create the Habit, which fails.
-
-        restHabitMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(habit)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
     void checkStartDateIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
         habit.setStartDate(null);
+
+        // Create the Habit, which fails.
+
+        restHabitMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(habit)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkRepeatTypeIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        habit.setRepeatType(null);
 
         // Create the Habit, which fails.
 
@@ -254,14 +238,14 @@ class HabitResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(habit.getId().intValue())))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+            .andExpect(jsonPath("$.[*].startDate").value(hasItem(DEFAULT_START_DATE.toString())))
+            .andExpect(jsonPath("$.[*].streak").value(hasItem(DEFAULT_STREAK)))
+            .andExpect(jsonPath("$.[*].completionRate").value(hasItem(DEFAULT_COMPLETION_RATE.doubleValue())))
             .andExpect(jsonPath("$.[*].repeatType").value(hasItem(DEFAULT_REPEAT_TYPE)))
             .andExpect(jsonPath("$.[*].repeatInterval").value(hasItem(DEFAULT_REPEAT_INTERVAL)))
             .andExpect(jsonPath("$.[*].repeatDays").value(hasItem(DEFAULT_REPEAT_DAYS)))
             .andExpect(jsonPath("$.[*].repeatTimes").value(hasItem(DEFAULT_REPEAT_TIMES)))
-            .andExpect(jsonPath("$.[*].completed").value(hasItem(DEFAULT_COMPLETED.booleanValue())))
-            .andExpect(jsonPath("$.[*].startDate").value(hasItem(DEFAULT_START_DATE.toString())))
-            .andExpect(jsonPath("$.[*].streak").value(hasItem(DEFAULT_STREAK)))
-            .andExpect(jsonPath("$.[*].completionRate").value(hasItem(DEFAULT_COMPLETION_RATE.doubleValue())));
+            .andExpect(jsonPath("$.[*].completedDates").value(hasItem(DEFAULT_COMPLETED_DATES.toString())));
     }
 
     @Test
@@ -277,14 +261,14 @@ class HabitResourceIT {
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(habit.getId().intValue()))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
+            .andExpect(jsonPath("$.startDate").value(DEFAULT_START_DATE.toString()))
+            .andExpect(jsonPath("$.streak").value(DEFAULT_STREAK))
+            .andExpect(jsonPath("$.completionRate").value(DEFAULT_COMPLETION_RATE.doubleValue()))
             .andExpect(jsonPath("$.repeatType").value(DEFAULT_REPEAT_TYPE))
             .andExpect(jsonPath("$.repeatInterval").value(DEFAULT_REPEAT_INTERVAL))
             .andExpect(jsonPath("$.repeatDays").value(DEFAULT_REPEAT_DAYS))
             .andExpect(jsonPath("$.repeatTimes").value(DEFAULT_REPEAT_TIMES))
-            .andExpect(jsonPath("$.completed").value(DEFAULT_COMPLETED.booleanValue()))
-            .andExpect(jsonPath("$.startDate").value(DEFAULT_START_DATE.toString()))
-            .andExpect(jsonPath("$.streak").value(DEFAULT_STREAK))
-            .andExpect(jsonPath("$.completionRate").value(DEFAULT_COMPLETION_RATE.doubleValue()));
+            .andExpect(jsonPath("$.completedDates").value(DEFAULT_COMPLETED_DATES.toString()));
     }
 
     @Test
@@ -308,14 +292,14 @@ class HabitResourceIT {
         em.detach(updatedHabit);
         updatedHabit
             .name(UPDATED_NAME)
+            .startDate(UPDATED_START_DATE)
+            .streak(UPDATED_STREAK)
+            .completionRate(UPDATED_COMPLETION_RATE)
             .repeatType(UPDATED_REPEAT_TYPE)
             .repeatInterval(UPDATED_REPEAT_INTERVAL)
             .repeatDays(UPDATED_REPEAT_DAYS)
             .repeatTimes(UPDATED_REPEAT_TIMES)
-            .completed(UPDATED_COMPLETED)
-            .startDate(UPDATED_START_DATE)
-            .streak(UPDATED_STREAK)
-            .completionRate(UPDATED_COMPLETION_RATE);
+            .completedDates(UPDATED_COMPLETED_DATES);
 
         restHabitMockMvc
             .perform(
@@ -391,8 +375,13 @@ class HabitResourceIT {
         Habit partialUpdatedHabit = new Habit();
         partialUpdatedHabit.setId(habit.getId());
 
-        partialUpdatedHabit.repeatInterval(UPDATED_REPEAT_INTERVAL).completed(UPDATED_COMPLETED).streak(UPDATED_STREAK);
-
+        partialUpdatedHabit
+            .name(UPDATED_NAME)
+            .streak(UPDATED_STREAK)
+            .completionRate(UPDATED_COMPLETION_RATE)
+            .repeatInterval(UPDATED_REPEAT_INTERVAL)
+            .completedDates(UPDATED_COMPLETED_DATES);
+      
         restHabitMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedHabit.getId())
@@ -421,14 +410,14 @@ class HabitResourceIT {
 
         partialUpdatedHabit
             .name(UPDATED_NAME)
+            .startDate(UPDATED_START_DATE)
+            .streak(UPDATED_STREAK)
+            .completionRate(UPDATED_COMPLETION_RATE)
             .repeatType(UPDATED_REPEAT_TYPE)
             .repeatInterval(UPDATED_REPEAT_INTERVAL)
             .repeatDays(UPDATED_REPEAT_DAYS)
             .repeatTimes(UPDATED_REPEAT_TIMES)
-            .completed(UPDATED_COMPLETED)
-            .startDate(UPDATED_START_DATE)
-            .streak(UPDATED_STREAK)
-            .completionRate(UPDATED_COMPLETION_RATE);
+            .completedDates(UPDATED_COMPLETED_DATES);
 
         restHabitMockMvc
             .perform(

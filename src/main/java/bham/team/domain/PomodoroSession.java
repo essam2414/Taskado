@@ -25,12 +25,34 @@ public class PomodoroSession implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @NotNull
-    @Column(name = "start", nullable = false)
-    private Instant start;
+    @Column(name = "name")
+    private String name;
 
-    @Column(name = "stop")
-    private Instant stop;
+    @NotNull
+    @Column(name = "duration", nullable = false)
+    private Integer duration;
+
+    @NotNull
+    @Column(name = "break_duration", nullable = false)
+    private Integer breakDuration;
+
+    @Column(name = "long_break_duration")
+    private Integer longBreakDuration;
+
+    @NotNull
+    @Column(name = "cycles", nullable = false)
+    private Integer cycles;
+
+    @NotNull
+    @Column(name = "start_time", nullable = false)
+    private Instant startTime;
+
+    @Column(name = "end_time")
+    private Instant endTime;
+
+    @NotNull
+    @Column(name = "completed", nullable = false)
+    private Boolean completed;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
@@ -54,30 +76,108 @@ public class PomodoroSession implements Serializable {
         this.id = id;
     }
 
-    public Instant getStart() {
-        return this.start;
+    public String getName() {
+        return this.name;
     }
 
-    public PomodoroSession start(Instant start) {
-        this.setStart(start);
+    public PomodoroSession name(String name) {
+        this.setName(name);
         return this;
     }
 
-    public void setStart(Instant start) {
-        this.start = start;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Instant getStop() {
-        return this.stop;
+    public Integer getDuration() {
+        return this.duration;
     }
 
-    public PomodoroSession stop(Instant stop) {
-        this.setStop(stop);
+    public PomodoroSession duration(Integer duration) {
+        this.setDuration(duration);
         return this;
     }
 
-    public void setStop(Instant stop) {
-        this.stop = stop;
+    public void setDuration(Integer duration) {
+        this.duration = duration;
+    }
+
+    public Integer getBreakDuration() {
+        return this.breakDuration;
+    }
+
+    public PomodoroSession breakDuration(Integer breakDuration) {
+        this.setBreakDuration(breakDuration);
+        return this;
+    }
+
+    public void setBreakDuration(Integer breakDuration) {
+        this.breakDuration = breakDuration;
+    }
+
+    public Integer getLongBreakDuration() {
+        return this.longBreakDuration;
+    }
+
+    public PomodoroSession longBreakDuration(Integer longBreakDuration) {
+        this.setLongBreakDuration(longBreakDuration);
+        return this;
+    }
+
+    public void setLongBreakDuration(Integer longBreakDuration) {
+        this.longBreakDuration = longBreakDuration;
+    }
+
+    public Integer getCycles() {
+        return this.cycles;
+    }
+
+    public PomodoroSession cycles(Integer cycles) {
+        this.setCycles(cycles);
+        return this;
+    }
+
+    public void setCycles(Integer cycles) {
+        this.cycles = cycles;
+    }
+
+    public Instant getStartTime() {
+        return this.startTime;
+    }
+
+    public PomodoroSession startTime(Instant startTime) {
+        this.setStartTime(startTime);
+        return this;
+    }
+
+    public void setStartTime(Instant startTime) {
+        this.startTime = startTime;
+    }
+
+    public Instant getEndTime() {
+        return this.endTime;
+    }
+
+    public PomodoroSession endTime(Instant endTime) {
+        this.setEndTime(endTime);
+        return this;
+    }
+
+    public void setEndTime(Instant endTime) {
+        this.endTime = endTime;
+    }
+
+    public Boolean getCompleted() {
+        return this.completed;
+    }
+
+    public PomodoroSession completed(Boolean completed) {
+        this.setCompleted(completed);
+        return this;
+    }
+
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
     }
 
     public User getUser() {
@@ -130,8 +230,14 @@ public class PomodoroSession implements Serializable {
     public String toString() {
         return "PomodoroSession{" +
             "id=" + getId() +
-            ", start='" + getStart() + "'" +
-            ", stop='" + getStop() + "'" +
+            ", name='" + getName() + "'" +
+            ", duration=" + getDuration() +
+            ", breakDuration=" + getBreakDuration() +
+            ", longBreakDuration=" + getLongBreakDuration() +
+            ", cycles=" + getCycles() +
+            ", startTime='" + getStartTime() + "'" +
+            ", endTime='" + getEndTime() + "'" +
+            ", completed='" + getCompleted() + "'" +
             "}";
     }
 }

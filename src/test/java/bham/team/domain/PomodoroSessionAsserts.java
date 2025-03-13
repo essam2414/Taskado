@@ -47,8 +47,14 @@ public class PomodoroSessionAsserts {
     public static void assertPomodoroSessionUpdatableFieldsEquals(PomodoroSession expected, PomodoroSession actual) {
         assertThat(expected)
             .as("Verify PomodoroSession relevant properties")
-            .satisfies(e -> assertThat(e.getStart()).as("check start").isEqualTo(actual.getStart()))
-            .satisfies(e -> assertThat(e.getStop()).as("check stop").isEqualTo(actual.getStop()));
+            .satisfies(e -> assertThat(e.getName()).as("check name").isEqualTo(actual.getName()))
+            .satisfies(e -> assertThat(e.getDuration()).as("check duration").isEqualTo(actual.getDuration()))
+            .satisfies(e -> assertThat(e.getBreakDuration()).as("check breakDuration").isEqualTo(actual.getBreakDuration()))
+            .satisfies(e -> assertThat(e.getLongBreakDuration()).as("check longBreakDuration").isEqualTo(actual.getLongBreakDuration()))
+            .satisfies(e -> assertThat(e.getCycles()).as("check cycles").isEqualTo(actual.getCycles()))
+            .satisfies(e -> assertThat(e.getStartTime()).as("check startTime").isEqualTo(actual.getStartTime()))
+            .satisfies(e -> assertThat(e.getEndTime()).as("check endTime").isEqualTo(actual.getEndTime()))
+            .satisfies(e -> assertThat(e.getCompleted()).as("check completed").isEqualTo(actual.getCompleted()));
     }
 
     /**

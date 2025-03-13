@@ -15,32 +15,32 @@ public class HabitTestSamples {
         return new Habit()
             .id(1L)
             .name("name1")
+            .streak(1)
             .repeatType("repeatType1")
             .repeatInterval(1)
             .repeatDays("repeatDays1")
-            .repeatTimes("repeatTimes1")
-            .streak(1);
+            .repeatTimes("repeatTimes1");
     }
 
     public static Habit getHabitSample2() {
         return new Habit()
             .id(2L)
             .name("name2")
+            .streak(2)
             .repeatType("repeatType2")
             .repeatInterval(2)
             .repeatDays("repeatDays2")
-            .repeatTimes("repeatTimes2")
-            .streak(2);
+            .repeatTimes("repeatTimes2");
     }
 
     public static Habit getHabitRandomSampleGenerator() {
         return new Habit()
             .id(longCount.incrementAndGet())
             .name(UUID.randomUUID().toString())
+            .streak(intCount.incrementAndGet())
             .repeatType(UUID.randomUUID().toString())
             .repeatInterval(intCount.incrementAndGet())
             .repeatDays(UUID.randomUUID().toString())
-            .repeatTimes(UUID.randomUUID().toString())
-            .streak(intCount.incrementAndGet());
+            .repeatTimes(UUID.randomUUID().toString());
     }
 }

@@ -1,12 +1,17 @@
 package bham.team.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -32,6 +37,16 @@ public class Habit implements Serializable {
     private String name;
 
     @NotNull
+    @Column(name = "start_date", nullable = false)
+    private Instant startDate;
+
+    @Column(name = "streak")
+    private Integer streak;
+
+    @Column(name = "completion_rate")
+    private Float completionRate;
+
+    @NotNull
     @Column(name = "repeat_type", nullable = false)
     private String repeatType;
 
@@ -44,19 +59,9 @@ public class Habit implements Serializable {
     @Column(name = "repeat_times")
     private String repeatTimes;
 
-    @NotNull
-    @Column(name = "completed", nullable = false)
-    private Boolean completed;
-
-    @NotNull
-    @Column(name = "start_date", nullable = false)
-    private Instant startDate;
-
-    @Column(name = "streak")
-    private Integer streak;
-
-    @Column(name = "completion_rate")
-    private Float completionRate;
+    @Lob
+    @Column(name = "completed_dates")
+    private String completedDates;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Category category;
@@ -95,6 +100,45 @@ public class Habit implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Instant getStartDate() {
+        return this.startDate;
+    }
+
+    public Habit startDate(Instant startDate) {
+        this.setStartDate(startDate);
+        return this;
+    }
+
+    public void setStartDate(Instant startDate) {
+        this.startDate = startDate;
+    }
+
+    public Integer getStreak() {
+        return this.streak;
+    }
+
+    public Habit streak(Integer streak) {
+        this.setStreak(streak);
+        return this;
+    }
+
+    public void setStreak(Integer streak) {
+        this.streak = streak;
+    }
+
+    public Float getCompletionRate() {
+        return this.completionRate;
+    }
+
+    public Habit completionRate(Float completionRate) {
+        this.setCompletionRate(completionRate);
+        return this;
+    }
+
+    public void setCompletionRate(Float completionRate) {
+        this.completionRate = completionRate;
     }
 
     public String getRepeatType() {
@@ -149,56 +193,17 @@ public class Habit implements Serializable {
         this.repeatTimes = repeatTimes;
     }
 
-    public Boolean getCompleted() {
-        return this.completed;
+    public String getCompletedDates() {
+        return this.completedDates;
     }
 
-    public Habit completed(Boolean completed) {
-        this.setCompleted(completed);
+    public Habit completedDates(String completedDates) {
+        this.setCompletedDates(completedDates);
         return this;
     }
 
-    public void setCompleted(Boolean completed) {
-        this.completed = completed;
-    }
-
-    public Instant getStartDate() {
-        return this.startDate;
-    }
-
-    public Habit startDate(Instant startDate) {
-        this.setStartDate(startDate);
-        return this;
-    }
-
-    public void setStartDate(Instant startDate) {
-        this.startDate = startDate;
-    }
-
-    public Integer getStreak() {
-        return this.streak;
-    }
-
-    public Habit streak(Integer streak) {
-        this.setStreak(streak);
-        return this;
-    }
-
-    public void setStreak(Integer streak) {
-        this.streak = streak;
-    }
-
-    public Float getCompletionRate() {
-        return this.completionRate;
-    }
-
-    public Habit completionRate(Float completionRate) {
-        this.setCompletionRate(completionRate);
-        return this;
-    }
-
-    public void setCompletionRate(Float completionRate) {
-        this.completionRate = completionRate;
+    public void setCompletedDates(String completedDates) {
+        this.completedDates = completedDates;
     }
 
     public Category getCategory() {
@@ -283,14 +288,41 @@ public class Habit implements Serializable {
         return "Habit{" +
             "id=" + getId() +
             ", name='" + getName() + "'" +
+            ", startDate='" + getStartDate() + "'" +
+            ", streak=" + getStreak() +
+            ", completionRate=" + getCompletionRate() +
             ", repeatType='" + getRepeatType() + "'" +
             ", repeatInterval=" + getRepeatInterval() +
             ", repeatDays='" + getRepeatDays() + "'" +
             ", repeatTimes='" + getRepeatTimes() + "'" +
-            ", completed='" + getCompleted() + "'" +
-            ", startDate='" + getStartDate() + "'" +
-            ", streak=" + getStreak() +
-            ", completionRate=" + getCompletionRate() +
+            ", completedDates='" + getCompletedDates() + "'" +
             "}";
+    }
+
+    /**
+     * Returns the list of completed dates parsed from the JSON string.
+     */
+    public List<String> getCompletedDatesList() {
+        if (this.completedDates == null || this.completedDates.isEmpty()) {
+            return new ArrayList<>();
+        }
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(this.completedDates, new TypeReference<List<String>>() {});
+        } catch (IOException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Sets the completedDates field by converting the given list to a JSON string.
+     */
+    public void setCompletedDatesList(List<String> dates) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            this.completedDates = mapper.writeValueAsString(dates);
+        } catch (IOException e) {
+            this.completedDates = "[]";
+        }
     }
 }

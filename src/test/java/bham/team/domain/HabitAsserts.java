@@ -48,14 +48,14 @@ public class HabitAsserts {
         assertThat(expected)
             .as("Verify Habit relevant properties")
             .satisfies(e -> assertThat(e.getName()).as("check name").isEqualTo(actual.getName()))
+            .satisfies(e -> assertThat(e.getStartDate()).as("check startDate").isEqualTo(actual.getStartDate()))
+            .satisfies(e -> assertThat(e.getStreak()).as("check streak").isEqualTo(actual.getStreak()))
+            .satisfies(e -> assertThat(e.getCompletionRate()).as("check completionRate").isEqualTo(actual.getCompletionRate()))
             .satisfies(e -> assertThat(e.getRepeatType()).as("check repeatType").isEqualTo(actual.getRepeatType()))
             .satisfies(e -> assertThat(e.getRepeatInterval()).as("check repeatInterval").isEqualTo(actual.getRepeatInterval()))
             .satisfies(e -> assertThat(e.getRepeatDays()).as("check repeatDays").isEqualTo(actual.getRepeatDays()))
             .satisfies(e -> assertThat(e.getRepeatTimes()).as("check repeatTimes").isEqualTo(actual.getRepeatTimes()))
-            .satisfies(e -> assertThat(e.getCompleted()).as("check completed").isEqualTo(actual.getCompleted()))
-            .satisfies(e -> assertThat(e.getStartDate()).as("check startDate").isEqualTo(actual.getStartDate()))
-            .satisfies(e -> assertThat(e.getStreak()).as("check streak").isEqualTo(actual.getStreak()))
-            .satisfies(e -> assertThat(e.getCompletionRate()).as("check completionRate").isEqualTo(actual.getCompletionRate()));
+            .satisfies(e -> assertThat(e.getCompletedDates()).as("check completedDates").isEqualTo(actual.getCompletedDates()));
     }
 
     /**

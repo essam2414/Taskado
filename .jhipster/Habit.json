@@ -10,6 +10,19 @@
       "fieldValidateRules": ["required"]
     },
     {
+      "fieldName": "startDate",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "streak",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "completionRate",
+      "fieldType": "Float"
+    },
+    {
       "fieldName": "repeatType",
       "fieldType": "String",
       "fieldValidateRules": ["required"]
@@ -27,22 +40,8 @@
       "fieldType": "String"
     },
     {
-      "fieldName": "completed",
-      "fieldType": "Boolean",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "startDate",
-      "fieldType": "Instant",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "streak",
-      "fieldType": "Integer"
-    },
-    {
-      "fieldName": "completionRate",
-      "fieldType": "Float"
+      "fieldName": "completedDates",
+      "fieldType": "TextBlob"
     }
   ],
   "name": "Habit",

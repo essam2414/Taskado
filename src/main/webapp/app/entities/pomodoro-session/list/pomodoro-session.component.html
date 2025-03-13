@@ -1,37 +1,98 @@
-<div class="pomodoro-container text-center my-4">
-  <h2>Pomodoro Timer</h2>
-
-  <div class="btn-group mb-4" role="group">
-    <button
-      class="btn"
-      [ngClass]="{ 'btn-danger': currentMode === 'pomodoro', 'btn-outline-danger': currentMode !== 'pomodoro' }"
-      (click)="switchMode('pomodoro')"
-    >
-      Pomodoro
-    </button>
-    <button
-      class="btn"
-      [ngClass]="{ 'btn-success': currentMode === 'shortBreak', 'btn-outline-success': currentMode !== 'shortBreak' }"
-      (click)="switchMode('shortBreak')"
-    >
-      Short Break
-    </button>
-    <button
-      class="btn"
-      [ngClass]="{ 'btn-primary': currentMode === 'longBreak', 'btn-outline-primary': currentMode !== 'longBreak' }"
-      (click)="switchMode('longBreak')"
-    >
-      Long Break
-    </button>
+<div>
+  <div class="entity-header">
+    <div class="entity-header-left">
+      <h2 id="page-heading" data-cy="PomodoroSessionHeading">Focus Timer</h2>
+    </div>
   </div>
 
-  <div class="timer-display mx-auto my-4 border rounded-circle bg-danger text-white d-flex align-items-center justify-content-center">
-    <span class="display-3">{{ formattedTime }}</span>
-  </div>
+  <div class="pomodoro-container">
+    <div class="btn-group mb-4" role="group">
+      <button
+        class="btn"
+        [ngClass]="{ 'btn-primary': currentMode === 'pomodoro', 'btn-outline-primary': currentMode !== 'pomodoro' }"
+        (click)="switchMode('pomodoro')"
+      >
+        Pomodoro
+      </button>
+      <button
+        class="btn"
+        [ngClass]="{ 'btn-success': currentMode === 'shortBreak', 'btn-outline-success': currentMode !== 'shortBreak' }"
+        (click)="switchMode('shortBreak')"
+      >
+        Short Break
+      </button>
+      <button
+        class="btn"
+        [ngClass]="{ 'btn-info': currentMode === 'longBreak', 'btn-outline-info': currentMode !== 'longBreak' }"
+        (click)="switchMode('longBreak')"
+      >
+        Long Break
+      </button>
+    </div>
 
-  <div class="timer-controls">
-    <button class="btn btn-primary mx-2" (click)="startTimer()" [disabled]="timerRunning">Start</button>
-    <button class="btn btn-warning mx-2" (click)="pauseTimer()" [disabled]="!timerRunning">Pause</button>
-    <button class="btn btn-secondary mx-2" (click)="resetTimer()">Reset</button>
+    <div class="timer-display">
+      <span class="display-3">{{ formattedTime }}</span>
+    </div>
+
+    <p class="fw-bold">Completed Pomodoros: {{ completedPomodoros }}</p>
+    <button class="btn btn-secondary mx-auto d-block mb-4" (click)="resetPomodoroCounter()">Reset Pomodoro Counter</button>
+
+    <div class="timer-controls mb-3">
+      <button class="btn btn-primary mx-2" (click)="startTimer()" [disabled]="timerRunning">Start</button>
+      <button class="btn btn-warning mx-2" (click)="pauseTimer()" [disabled]="!timerRunning">Pause</button>
+      <button class="btn btn-secondary mx-2" (click)="resetTimer()">Reset</button>
+      <button class="btn btn-outline-danger mx-2" (click)="skipSession()">Skip</button>
+    </div>
+
+    <button class="btn btn-secondary mx-auto d-block mb-4" (click)="showSettings = !showSettings">⚙️ <strong>Settings</strong></button>
+
+    <div class="modal fade show d-block" tabindex="-1" *ngIf="showSettings">
+      <div ngxDraggable class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Settings</h5>
+            <button type="button" class="btn-close" aria-label="Close" (click)="showSettings = false"></button>
+          </div>
+          <div class="modal-body">
+            <h6 class="modal-subtitle text-center mb-3">Time (Minutes)</h6>
+
+            <div class="row text-center">
+              <div class="col">
+                <label class="form-label">Pomodoro</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  [ngModel]="modeDurations.pomodoro / 60"
+                  (ngModelChange)="updateDuration('pomodoro', $event)"
+                />
+              </div>
+              <div class="col">
+                <label class="form-label">Short Break</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  [ngModel]="modeDurations.shortBreak / 60"
+                  (ngModelChange)="updateDuration('shortBreak', $event)"
+                />
+              </div>
+              <div class="col">
+                <label class="form-label">Long Break</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  [ngModel]="modeDurations.longBreak / 60"
+                  (ngModelChange)="updateDuration('longBreak', $event)"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" (click)="showSettings = false">Apply</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-backdrop fade show" *ngIf="showSettings"></div>
   </div>
 </div>

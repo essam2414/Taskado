@@ -31,6 +31,34 @@
           <dd>
             <span>{{ habitRef.completionRate }}</span>
           </dd>
+          <dt><span>Repeat Type</span></dt>
+          <dd>
+            <span>{{ habitRef.repeatType }}</span>
+          </dd>
+          <dt><span>Repeat Interval</span></dt>
+          <dd>
+            <span>{{ habitRef.repeatInterval }}</span>
+          </dd>
+          <dt><span>Repeat Days</span></dt>
+          <dd>
+            <span>{{ habitRef.repeatDays }}</span>
+          </dd>
+          <dt><span>Repeat Times</span></dt>
+          <dd>
+            <span>{{ habitRef.repeatTimes }}</span>
+          </dd>
+          <dt><span>Completed Dates</span></dt>
+          <dd>
+            <span>{{ habitRef.completedDates }}</span>
+          </dd>
+          <dt><span>Category</span></dt>
+          <dd>
+            @if (habit()!.category) {
+              <div>
+                <a [routerLink]="['/category', habit()!.category?.id, 'view']">{{ habitRef.category?.id }}</a>
+              </div>
+            }
+          </dd>
           <dt><span>User</span></dt>
           <dd>
             <span>{{ habitRef.user?.id }}</span>

@@ -35,11 +35,29 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class PomodoroSessionResourceIT {
 
-    private static final Instant DEFAULT_START = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_START = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    private static final String DEFAULT_NAME = "AAAAAAAAAA";
+    private static final String UPDATED_NAME = "BBBBBBBBBB";
 
-    private static final Instant DEFAULT_STOP = Instant.ofEpochMilli(0L);
-    private static final Instant UPDATED_STOP = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+    private static final Integer DEFAULT_DURATION = 1;
+    private static final Integer UPDATED_DURATION = 2;
+
+    private static final Integer DEFAULT_BREAK_DURATION = 1;
+    private static final Integer UPDATED_BREAK_DURATION = 2;
+
+    private static final Integer DEFAULT_LONG_BREAK_DURATION = 1;
+    private static final Integer UPDATED_LONG_BREAK_DURATION = 2;
+
+    private static final Integer DEFAULT_CYCLES = 1;
+    private static final Integer UPDATED_CYCLES = 2;
+
+    private static final Instant DEFAULT_START_TIME = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_START_TIME = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final Instant DEFAULT_END_TIME = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_END_TIME = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final Boolean DEFAULT_COMPLETED = false;
+    private static final Boolean UPDATED_COMPLETED = true;
 
     private static final String ENTITY_API_URL = "/api/pomodoro-sessions";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -73,7 +91,15 @@ class PomodoroSessionResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static PomodoroSession createEntity() {
-        return new PomodoroSession().start(DEFAULT_START).stop(DEFAULT_STOP);
+        return new PomodoroSession()
+            .name(DEFAULT_NAME)
+            .duration(DEFAULT_DURATION)
+            .breakDuration(DEFAULT_BREAK_DURATION)
+            .longBreakDuration(DEFAULT_LONG_BREAK_DURATION)
+            .cycles(DEFAULT_CYCLES)
+            .startTime(DEFAULT_START_TIME)
+            .endTime(DEFAULT_END_TIME)
+            .completed(DEFAULT_COMPLETED);
     }
 
     /**
@@ -83,7 +109,15 @@ class PomodoroSessionResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static PomodoroSession createUpdatedEntity() {
-        return new PomodoroSession().start(UPDATED_START).stop(UPDATED_STOP);
+        return new PomodoroSession()
+            .name(UPDATED_NAME)
+            .duration(UPDATED_DURATION)
+            .breakDuration(UPDATED_BREAK_DURATION)
+            .longBreakDuration(UPDATED_LONG_BREAK_DURATION)
+            .cycles(UPDATED_CYCLES)
+            .startTime(UPDATED_START_TIME)
+            .endTime(UPDATED_END_TIME)
+            .completed(UPDATED_COMPLETED);
     }
 
     @BeforeEach
@@ -140,10 +174,74 @@ class PomodoroSessionResourceIT {
 
     @Test
     @Transactional
-    void checkStartIsRequired() throws Exception {
+    void checkDurationIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
-        pomodoroSession.setStart(null);
+        pomodoroSession.setDuration(null);
+
+        // Create the PomodoroSession, which fails.
+
+        restPomodoroSessionMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(pomodoroSession)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkBreakDurationIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        pomodoroSession.setBreakDuration(null);
+
+        // Create the PomodoroSession, which fails.
+
+        restPomodoroSessionMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(pomodoroSession)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkCyclesIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        pomodoroSession.setCycles(null);
+
+        // Create the PomodoroSession, which fails.
+
+        restPomodoroSessionMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(pomodoroSession)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkStartTimeIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        pomodoroSession.setStartTime(null);
+
+        // Create the PomodoroSession, which fails.
+
+        restPomodoroSessionMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(pomodoroSession)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkCompletedIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        pomodoroSession.setCompleted(null);
 
         // Create the PomodoroSession, which fails.
 
@@ -166,8 +264,14 @@ class PomodoroSessionResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(pomodoroSession.getId().intValue())))
-            .andExpect(jsonPath("$.[*].start").value(hasItem(DEFAULT_START.toString())))
-            .andExpect(jsonPath("$.[*].stop").value(hasItem(DEFAULT_STOP.toString())));
+            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
+            .andExpect(jsonPath("$.[*].duration").value(hasItem(DEFAULT_DURATION)))
+            .andExpect(jsonPath("$.[*].breakDuration").value(hasItem(DEFAULT_BREAK_DURATION)))
+            .andExpect(jsonPath("$.[*].longBreakDuration").value(hasItem(DEFAULT_LONG_BREAK_DURATION)))
+            .andExpect(jsonPath("$.[*].cycles").value(hasItem(DEFAULT_CYCLES)))
+            .andExpect(jsonPath("$.[*].startTime").value(hasItem(DEFAULT_START_TIME.toString())))
+            .andExpect(jsonPath("$.[*].endTime").value(hasItem(DEFAULT_END_TIME.toString())))
+            .andExpect(jsonPath("$.[*].completed").value(hasItem(DEFAULT_COMPLETED.booleanValue())));
     }
 
     @Test
@@ -182,8 +286,14 @@ class PomodoroSessionResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(pomodoroSession.getId().intValue()))
-            .andExpect(jsonPath("$.start").value(DEFAULT_START.toString()))
-            .andExpect(jsonPath("$.stop").value(DEFAULT_STOP.toString()));
+            .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
+            .andExpect(jsonPath("$.duration").value(DEFAULT_DURATION))
+            .andExpect(jsonPath("$.breakDuration").value(DEFAULT_BREAK_DURATION))
+            .andExpect(jsonPath("$.longBreakDuration").value(DEFAULT_LONG_BREAK_DURATION))
+            .andExpect(jsonPath("$.cycles").value(DEFAULT_CYCLES))
+            .andExpect(jsonPath("$.startTime").value(DEFAULT_START_TIME.toString()))
+            .andExpect(jsonPath("$.endTime").value(DEFAULT_END_TIME.toString()))
+            .andExpect(jsonPath("$.completed").value(DEFAULT_COMPLETED.booleanValue()));
     }
 
     @Test
@@ -205,7 +315,15 @@ class PomodoroSessionResourceIT {
         PomodoroSession updatedPomodoroSession = pomodoroSessionRepository.findById(pomodoroSession.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedPomodoroSession are not directly saved in db
         em.detach(updatedPomodoroSession);
-        updatedPomodoroSession.start(UPDATED_START).stop(UPDATED_STOP);
+        updatedPomodoroSession
+            .name(UPDATED_NAME)
+            .duration(UPDATED_DURATION)
+            .breakDuration(UPDATED_BREAK_DURATION)
+            .longBreakDuration(UPDATED_LONG_BREAK_DURATION)
+            .cycles(UPDATED_CYCLES)
+            .startTime(UPDATED_START_TIME)
+            .endTime(UPDATED_END_TIME)
+            .completed(UPDATED_COMPLETED);
 
         restPomodoroSessionMockMvc
             .perform(
@@ -285,7 +403,13 @@ class PomodoroSessionResourceIT {
         PomodoroSession partialUpdatedPomodoroSession = new PomodoroSession();
         partialUpdatedPomodoroSession.setId(pomodoroSession.getId());
 
-        partialUpdatedPomodoroSession.stop(UPDATED_STOP);
+        partialUpdatedPomodoroSession
+            .name(UPDATED_NAME)
+            .duration(UPDATED_DURATION)
+            .longBreakDuration(UPDATED_LONG_BREAK_DURATION)
+            .cycles(UPDATED_CYCLES)
+            .endTime(UPDATED_END_TIME)
+            .completed(UPDATED_COMPLETED);
 
         restPomodoroSessionMockMvc
             .perform(
@@ -316,7 +440,15 @@ class PomodoroSessionResourceIT {
         PomodoroSession partialUpdatedPomodoroSession = new PomodoroSession();
         partialUpdatedPomodoroSession.setId(pomodoroSession.getId());
 
-        partialUpdatedPomodoroSession.start(UPDATED_START).stop(UPDATED_STOP);
+        partialUpdatedPomodoroSession
+            .name(UPDATED_NAME)
+            .duration(UPDATED_DURATION)
+            .breakDuration(UPDATED_BREAK_DURATION)
+            .longBreakDuration(UPDATED_LONG_BREAK_DURATION)
+            .cycles(UPDATED_CYCLES)
+            .startTime(UPDATED_START_TIME)
+            .endTime(UPDATED_END_TIME)
+            .completed(UPDATED_COMPLETED);
 
         restPomodoroSessionMockMvc
             .perform(

@@ -47,11 +47,15 @@ import {
   faInbox,
   faCalendarDay,
   faEllipsisVertical,
+  faChevronLeft,
+  faChevronRight,
   faPalette,
+  faEnvelope,
+  faBell,
+  faUndo,
+  faHammer,
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
-
-import { faBell } from '@fortawesome/free-regular-svg-icons';
 
 export const fontAwesomeIcons = [
   faArrowLeft,
@@ -103,6 +107,11 @@ export const fontAwesomeIcons = [
   faInbox,
   faCalendarDay,
   faEllipsisVertical,
+  faChevronLeft,
+  faChevronRight,
   faPalette,
+  faEnvelope,
+  faUndo,
+  faHammer,
   // jhipster-needle-add-icon-import
 ];

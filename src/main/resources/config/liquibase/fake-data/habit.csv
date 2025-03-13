@@ -1,11 +1,11 @@
-id;name;repeat_type;repeat_interval;repeat_days;repeat_times;completed;start_date;streak;completion_rate
-1;clueless;disappointment;12213;brave vacantly;before apropos;true;2025-02-01T08:05:29;6890;11981.71
-2;fine uh-huh;reluctantly vision since;3795;whoa over;license;true;2025-02-01T08:37:59;23921;25716.53
-3;stingy midst;sign;1948;blah;rule whether;false;2025-01-31T22:29:08;31068;17037.09
-4;vibrant;underneath reword;20846;ownership sign lest;tabletop quaintly when;true;2025-02-01T09:51:27;24661;26943.03
-5;elegantly;anti;24843;well-documented;baa weep psst;true;2025-02-01T10:52:20;24883;16286.15
-6;which since;beneath flight;32159;pulp;inwardly;false;2025-02-01T11:14:00;22414;3288.89
-7;out hm oh;duh;6145;whether;ack numb pertinent;false;2025-02-01T08:14:28;23812;14768.87
-8;unit after;overcook or victoriously;4899;gee;unless;true;2025-01-31T17:57:16;5834;16919.41
-9;depart what phew;pfft;3539;sardonic boo deliberately;altruistic;true;2025-02-01T01:53:08;6546;13424.75
-10;deceivingly about cork;dependent wasteful;4024;scholarship frantically;gut including;false;2025-01-31T21:09:14;3243;16786.96
+id;name;start_date;streak;completion_rate;repeat_type;repeat_interval;repeat_days;repeat_times;completed_dates
+1;clueless;2025-01-31T21:58:29;3191;29091.09;providence;7081;whose status rejigger;deflate sediment;../fake-data/blob/hipster.txt
+2;fort ecliptic;2025-01-31T21:48:09;21729;1669.87;slope excepting;19228;near intellect SUV;ouch lonely case;../fake-data/blob/hipster.txt
+3;why;2025-02-01T13:35:54;12278;32243.84;convection;17587;whether meh lawful;attribute substantial ownership;../fake-data/blob/hipster.txt
+4;suffice;2025-01-31T17:44:45;18541;16847.11;hospitalization wretched;376;mooch;so aha scale;../fake-data/blob/hipster.txt
+5;well-documented;2025-02-01T10:27:45;24584;16900.05;urgently untried;19907;nicely which;psst beneath flight;../fake-data/blob/hipster.txt
+6;elevation whereas slather;2025-01-31T21:13:49;24093;20528.11;though colligate;23088;who youthfully;whose miserably;../fake-data/blob/hipster.txt
+7;oof knowledgeable;2025-02-01T01:52:42;31944;17860.2;swing tackle;32388;yin;since;../fake-data/blob/hipster.txt
+8;ew;2025-01-31T19:58:37;6250;19982.17;unless;9816;inasmuch;euphonium;../fake-data/blob/hipster.txt
+9;what stigmatize;2025-01-31T21:19:31;8062;3539.06;sardonic boo deliberately;1128;before secrecy verbally;brightly step-mother dead;../fake-data/blob/hipster.txt
+10;ugh reclassify;2025-02-01T04:34:13;5230;2157.69;reflate;14081;including ew;pish beneath unto;../fake-data/blob/hipster.txt

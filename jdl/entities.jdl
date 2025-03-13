@@ -25,14 +25,16 @@ entity Event {
 
 entity Habit {
   name String required,
+  startDate Instant required,
+  streak Integer,
+  completionRate Float,
+
   repeatType String required,
   repeatInterval Integer,
   repeatDays String,
   repeatTimes String,
-  completed Boolean required,
-  startDate Instant required,
-  streak Integer,
-  completionRate Float
+
+  completedDates TextBlob
 }
 
 enum NotificationType {
@@ -81,8 +83,14 @@ entity Reminder {
 }
 
 entity PomodoroSession {
-  start Instant required,
-  stop Instant,
+  name String,
+  duration Integer required,
+  breakDuration Integer required,
+  longBreakDuration Integer,
+  cycles Integer required,
+  startTime Instant required,
+  endTime Instant,
+  completed Boolean required
 }
 
 entity Note {
