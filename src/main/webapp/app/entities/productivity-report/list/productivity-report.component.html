@@ -55,26 +55,24 @@
       </button>
 
       <!-- Report Date -->
-      @if (productivityReports && productivityReports.length > 0) {
-        <span
-          *ngIf="productivityReports[0]"
-          style="
-            font-size: 18px;
-            font-weight: bold;
-            color: #007bff;
-            padding: 10px 20px;
-            border-radius: 6px;
-            text-align: center;
-            border: 2px solid #007bff;
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-            height: 44px;
-          "
-        >
-          📅 {{ productivityReports[0].timestamp | formatMediumDate }}
-        </span>
-      }
+      <span
+        id="reportDate"
+        style="
+          font-size: 18px;
+          font-weight: bold;
+          color: #007bff;
+          padding: 10px 20px;
+          border-radius: 6px;
+          text-align: center;
+          border: 2px solid #007bff;
+          background: #f8f9fa;
+          display: flex;
+          align-items: center;
+          height: 44px;
+        "
+      >
+        📅 {{ timestamp ?? 'Unselected' }}
+      </span>
 
       <!-- Next Button -->
       <button
