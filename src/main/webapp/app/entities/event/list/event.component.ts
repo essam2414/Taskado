@@ -1,4 +1,4 @@
-import { Component, NgZone, OnInit, inject } from '@angular/core';
+import { Component, NgZone, OnInit, inject, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
 import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -36,7 +36,7 @@ interface CalendarEvent {
     FormatMediumDatePipe,
   ],
 })
-export class EventComponent implements OnInit {
+export class EventComponent implements OnInit, OnDestroy {
   selectedDate: Date | null = null;
   currentDate = new Date();
   daysInMonth = 0;

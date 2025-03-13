@@ -12,6 +12,8 @@ import { IProductivityReport } from '../productivity-report.model';
 import { EntityArrayResponseType, ProductivityReportService } from '../service/productivity-report.service';
 import { ProductivityReportDeleteDialogComponent } from '../delete/productivity-report-delete-dialog.component';
 
+import { Chart } from 'chart.js/auto';
+
 @Component({
   standalone: true,
   selector: 'jhi-productivity-report',
@@ -36,6 +38,8 @@ export class ProductivityReportComponent implements OnInit {
 
   sortState = sortStateSignal({});
 
+  public chart: Chart | null = null;
+
   public readonly router = inject(Router);
   protected readonly productivityReportService = inject(ProductivityReportService);
   protected readonly activatedRoute = inject(ActivatedRoute);
@@ -55,7 +59,65 @@ export class ProductivityReportComponent implements OnInit {
           }
         }),
       )
-      .subscribe();
+      .subscribe({
+        next: () => {
+          setTimeout(() => this.loadChart(), 1000); // Ensure chart loads AFTER data is available
+        },
+      });
+  }
+
+  loadChart(): void {
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        console.error('⚠️ Failed to get chart context!');
+        return;
+      }
+
+      // Destroy previous chart instance if it exists
+      if (this.chart) {
+        this.chart.destroy();
+      }
+
+      if (!this.productivityReports || this.productivityReports.length === 0) {
+        console.warn('⚠️ No data available for the chart.');
+        return;
+      }
+
+      const report = this.productivityReports[0]; // First report data
+
+      this.chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Tasks Planned', 'Tasks Completed', 'Pomodoro Sessions', 'Efficiency Score'],
+          datasets: [
+            {
+              label: 'Productivity Metrics',
+              data: [
+                report.tasksPlanned ?? 0,
+                report.tasksCompleted ?? 0,
+                report.pomodoroSessionsCompleted ?? 0,
+                report.efficiencyScore ?? 0,
+              ],
+              backgroundColor: ['#007bff', '#28a745', '#ff6384', '#ffc107'],
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true },
+          },
+          scales: {
+            y: { beginAtZero: true },
+          },
+        },
+      });
+    }, 500); // Delay to ensure Angular updates the DOM
   }
 
   navigateReport(): void {

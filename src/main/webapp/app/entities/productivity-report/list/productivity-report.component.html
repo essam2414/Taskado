@@ -163,5 +163,9 @@
         </div>
       </div>
     </div>
+
+    <div *ngIf="productivityReports && productivityReports.length > 0" style="max-width: 600px; margin: auto; margin-top: 20px">
+      <canvas #chartCanvas></canvas>
+    </div>
   }
 </div>
