@@ -69,7 +69,7 @@ export class ProductivityReportComponent implements OnInit {
       )
       .subscribe({
         next: () => {
-          setTimeout(() => this.loadChart(), 1000); // Ensure chart loads AFTER data is available
+          setTimeout(() => this.loadChart(), 100); // Ensure chart loads AFTER data is available
         },
       });
   }
