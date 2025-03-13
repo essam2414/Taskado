@@ -12,7 +12,7 @@ import { IProductivityReport } from '../productivity-report.model';
 import { EntityArrayResponseType, ProductivityReportService } from '../service/productivity-report.service';
 import { ProductivityReportDeleteDialogComponent } from '../delete/productivity-report-delete-dialog.component';
 
-import { Chart } from 'chart.js/auto';
+import { Chart, ChartDataset } from 'chart.js/auto';
 
 @Component({
   standalone: true,
@@ -77,8 +77,8 @@ export class ProductivityReportComponent implements OnInit {
   loadChart(): void {
     setTimeout(() => {
       const canvas = document.querySelector('canvas') as HTMLCanvasElement;
-
       const ctx = canvas.getContext('2d');
+
       if (!ctx) {
         console.error('⚠️ Failed to get chart context!');
         return;
@@ -89,12 +89,8 @@ export class ProductivityReportComponent implements OnInit {
         this.chart.destroy();
       }
 
-      if (!this.productivityReports || this.productivityReports.length === 0) {
-        console.warn('⚠️ No data available for the chart.');
-        return;
-      }
-
-      const report = this.productivityReports[0]; // First report data
+      // Initial values set to zero
+      const initialData = [0, 0, 0, 0];
 
       this.chart = new Chart(ctx, {
         type: 'bar',
@@ -103,12 +99,7 @@ export class ProductivityReportComponent implements OnInit {
           datasets: [
             {
               label: 'Productivity Metrics',
-              data: [
-                report.tasksPlanned ?? 0,
-                report.tasksCompleted ?? 0,
-                report.pomodoroSessionsCompleted ?? 0,
-                report.efficiencyScore ?? 0,
-              ],
+              data: initialData,
               backgroundColor: ['#007bff', '#28a745', '#ff6384', '#ffc107'],
               borderWidth: 1,
             },
@@ -151,6 +142,20 @@ export class ProductivityReportComponent implements OnInit {
     this.pomodoroSessionsCompleted = report.pomodoroSessionsCompleted ?? 'N/A';
     this.totalFocusTime = report.totalFocusTime ?? 'N/A';
     this.efficiencyScore = report.efficiencyScore ?? 'N/A';
+
+    // Update chart data dynamically if the chart exists
+    if (this.chart) {
+      this.chart.data.datasets[0].data = [
+        report.tasksPlanned ?? 0,
+        report.tasksCompleted ?? 0,
+        report.pomodoroSessionsCompleted ?? 0,
+        report.efficiencyScore ?? 0,
+      ] as ChartDataset<'bar'>['data']; // Explicitly cast to correct type
+
+      this.chart.update(); // Refresh the chart with new data
+    } else {
+      console.warn('⚠️ Chart is not initialized.');
+    }
 
     this.successMessage = '✅ Report Generated Successfully!';
     setTimeout(() => (this.successMessage = null), 2500);
