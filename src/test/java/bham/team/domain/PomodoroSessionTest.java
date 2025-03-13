@@ -1,6 +1,7 @@
 package bham.team.domain;
 
 import static bham.team.domain.PomodoroSessionTestSamples.*;
+import static bham.team.domain.ProductivityReportTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import bham.team.web.rest.TestUtil;
@@ -20,5 +21,17 @@ class PomodoroSessionTest {
 
         pomodoroSession2 = getPomodoroSessionSample2();
         assertThat(pomodoroSession1).isNotEqualTo(pomodoroSession2);
+    }
+
+    @Test
+    void productivityReportTest() {
+        PomodoroSession pomodoroSession = getPomodoroSessionRandomSampleGenerator();
+        ProductivityReport productivityReportBack = getProductivityReportRandomSampleGenerator();
+
+        pomodoroSession.setProductivityReport(productivityReportBack);
+        assertThat(pomodoroSession.getProductivityReport()).isEqualTo(productivityReportBack);
+
+        pomodoroSession.productivityReport(null);
+        assertThat(pomodoroSession.getProductivityReport()).isNull();
     }
 }

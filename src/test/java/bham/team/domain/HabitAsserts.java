@@ -67,6 +67,9 @@ public class HabitAsserts {
     public static void assertHabitUpdatableRelationshipsEquals(Habit expected, Habit actual) {
         assertThat(expected)
             .as("Verify Habit relationships")
-            .satisfies(e -> assertThat(e.getCategory()).as("check category").isEqualTo(actual.getCategory()));
+            .satisfies(e -> assertThat(e.getCategory()).as("check category").isEqualTo(actual.getCategory()))
+            .satisfies(e ->
+                assertThat(e.getProductivityReports()).as("check productivityReports").isEqualTo(actual.getProductivityReports())
+            );
     }
 }

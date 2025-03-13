@@ -1,41 +1,46 @@
 {
   "annotations": {
-    "changelogDate": "20250204150624"
+    "changelogDate": "20250311020617",
+    "service": "serviceClass"
   },
   "applications": "*",
   "fields": [
     {
       "fieldName": "tasksPlanned",
-      "fieldType": "Integer"
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "0"
     },
     {
       "fieldName": "tasksCompleted",
-      "fieldType": "Integer"
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "0"
     },
     {
-      "fieldName": "taskAvgCompletionTime",
-      "fieldType": "Float"
+      "fieldName": "pomodoroSessionsCompleted",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required", "min"],
+      "fieldValidateRulesMin": "0"
     },
     {
-      "fieldName": "taskEfficiency",
-      "fieldType": "Float"
-    },
-    {
-      "fieldName": "pomodoroSessions",
-      "fieldType": "Integer"
+      "fieldName": "totalFocusTime",
+      "fieldType": "Float",
+      "fieldValidateRules": ["min"],
+      "fieldValidateRulesMin": "0"
     },
     {
       "fieldName": "distractionsCount",
-      "fieldType": "Integer"
+      "fieldType": "Integer",
+      "fieldValidateRules": ["min"],
+      "fieldValidateRulesMin": "0"
     },
     {
-      "fieldName": "focusTime",
-      "fieldType": "Float"
-    },
-    {
-      "fieldName": "focusScore",
+      "fieldName": "efficiencyScore",
       "fieldType": "Float",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["min", "max"],
+      "fieldValidateRulesMax": "100",
+      "fieldValidateRulesMin": "0"
     },
     {
       "fieldName": "timestamp",
@@ -46,11 +51,29 @@
   "name": "ProductivityReport",
   "relationships": [
     {
+      "otherEntityName": "pomodoroSession",
+      "relationshipName": "pomodoroSessions",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
       "otherEntityName": "user",
       "relationshipName": "user",
       "relationshipSide": "left",
       "relationshipType": "many-to-one",
       "relationshipWithBuiltInEntity": true
+    },
+    {
+      "otherEntityName": "task",
+      "relationshipName": "completedTasks",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-many"
+    },
+    {
+      "otherEntityName": "habit",
+      "relationshipName": "completedHabits",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-many"
     }
   ],
   "searchEngine": "no"

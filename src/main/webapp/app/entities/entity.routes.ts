@@ -27,11 +27,6 @@ const routes: Routes = [
     loadChildren: () => import('./pomodoro-session/pomodoro-session.routes'),
   },
   {
-    path: 'productivity-report',
-    data: { pageTitle: 'ProductivityReports' },
-    loadChildren: () => import('./productivity-report/productivity-report.routes'),
-  },
-  {
     path: 'category',
     data: { pageTitle: 'Categories' },
     loadChildren: () => import('./category/category.routes'),
@@ -50,6 +45,11 @@ const routes: Routes = [
     path: 'reminder',
     data: { pageTitle: 'Reminders' },
     loadChildren: () => import('./reminder/reminder.routes'),
+  },
+  {
+    path: 'productivity-report',
+    data: { pageTitle: 'ProductivityReports' },
+    loadChildren: () => import('./productivity-report/productivity-report.routes'),
   },
   /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
 ];

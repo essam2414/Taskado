@@ -32,6 +32,8 @@ export class ProductivityReportComponent implements OnInit {
   productivityReports?: IProductivityReport[];
   isLoading = false;
 
+  errorMessage: string | null = null;
+
   sortState = sortStateSignal({});
 
   public readonly router = inject(Router);
@@ -54,6 +56,15 @@ export class ProductivityReportComponent implements OnInit {
         }),
       )
       .subscribe();
+  }
+
+  navigateReport(): void {
+    this.errorMessage = 'No Reports Available';
+
+    // Automatically remove the error message after 3 seconds
+    setTimeout(() => {
+      this.errorMessage = null;
+    }, 2500);
   }
 
   delete(productivityReport: IProductivityReport): void {
@@ -101,6 +112,7 @@ export class ProductivityReportComponent implements OnInit {
   protected queryBackend(): Observable<EntityArrayResponseType> {
     this.isLoading = true;
     const queryObject: any = {
+      eagerload: true,
       sort: this.sortService.buildSortParam(this.sortState()),
     };
     return this.productivityReportService.query(queryObject).pipe(tap(() => (this.isLoading = false)));

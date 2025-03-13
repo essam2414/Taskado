@@ -82,18 +82,6 @@ entity Reminder {
   linkedEntityId Long
 }
 
-entity ProductivityReport {
-  tasksPlanned Integer,
-  tasksCompleted Integer,
-  taskAvgCompletionTime Float,
-  taskEfficiency Float,
-  pomodoroSessions Integer,
-  distractionsCount Integer,
-  focusTime Float,
-  focusScore Float required,
-  timestamp Instant required
-}
-
 entity PomodoroSession {
   name String,
   duration Integer required,
@@ -110,6 +98,26 @@ entity Note {
   content TextBlob required,
   createdAt Instant required,
   updatedAt Instant
+}
+
+@service(serviceClass)
+entity ProductivityReport {
+  tasksPlanned Integer required min(0),        // How many tasks were planned
+  tasksCompleted Integer required min(0),      // How many tasks were completed
+  pomodoroSessionsCompleted Integer required min(0), // Pomodoro cycles finished
+  totalFocusTime Float min(0),                 // Total time spent in focus (in hours)
+  distractionsCount Integer min(0),            // Number of distractions recorded
+  efficiencyScore Float min(0) max(100),       // Performance score (calculated from tasks & focus)
+  timestamp Instant required                   // When report was generated
+}
+
+relationship OneToMany {
+  ProductivityReport{pomodoroSessions} to PomodoroSession
+}
+
+relationship ManyToMany {
+  ProductivityReport{completedTasks} to Task,
+  ProductivityReport{completedHabits} to Habit
 }
 
 relationship ManyToOne {

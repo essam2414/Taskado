@@ -13,6 +13,7 @@
           </div>
         }
 
+        @let tasksPlannedRef = editForm.get('tasksPlanned')!;
         <div class="mb-3">
           <label class="form-label" for="field_tasksPlanned">Tasks Planned</label>
           <input
@@ -23,8 +24,22 @@
             data-cy="tasksPlanned"
             formControlName="tasksPlanned"
           />
+          @if (tasksPlannedRef.invalid && (tasksPlannedRef.dirty || tasksPlannedRef.touched)) {
+            <div>
+              @if (editForm.get('tasksPlanned')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (editForm.get('tasksPlanned')?.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('tasksPlanned')?.errors?.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
         </div>
 
+        @let tasksCompletedRef = editForm.get('tasksCompleted')!;
         <div class="mb-3">
           <label class="form-label" for="field_tasksCompleted">Tasks Completed</label>
           <input
@@ -35,44 +50,71 @@
             data-cy="tasksCompleted"
             formControlName="tasksCompleted"
           />
+          @if (tasksCompletedRef.invalid && (tasksCompletedRef.dirty || tasksCompletedRef.touched)) {
+            <div>
+              @if (editForm.get('tasksCompleted')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (editForm.get('tasksCompleted')?.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('tasksCompleted')?.errors?.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
         </div>
 
+        @let pomodoroSessionsCompletedRef = editForm.get('pomodoroSessionsCompleted')!;
         <div class="mb-3">
-          <label class="form-label" for="field_taskAvgCompletionTime">Task Avg Completion Time</label>
+          <label class="form-label" for="field_pomodoroSessionsCompleted">Pomodoro Sessions Completed</label>
           <input
             type="number"
             class="form-control"
-            name="taskAvgCompletionTime"
-            id="field_taskAvgCompletionTime"
-            data-cy="taskAvgCompletionTime"
-            formControlName="taskAvgCompletionTime"
+            name="pomodoroSessionsCompleted"
+            id="field_pomodoroSessionsCompleted"
+            data-cy="pomodoroSessionsCompleted"
+            formControlName="pomodoroSessionsCompleted"
           />
+          @if (pomodoroSessionsCompletedRef.invalid && (pomodoroSessionsCompletedRef.dirty || pomodoroSessionsCompletedRef.touched)) {
+            <div>
+              @if (editForm.get('pomodoroSessionsCompleted')?.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              @if (editForm.get('pomodoroSessionsCompleted')?.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('pomodoroSessionsCompleted')?.errors?.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
         </div>
 
+        @let totalFocusTimeRef = editForm.get('totalFocusTime')!;
         <div class="mb-3">
-          <label class="form-label" for="field_taskEfficiency">Task Efficiency</label>
+          <label class="form-label" for="field_totalFocusTime">Total Focus Time</label>
           <input
             type="number"
             class="form-control"
-            name="taskEfficiency"
-            id="field_taskEfficiency"
-            data-cy="taskEfficiency"
-            formControlName="taskEfficiency"
+            name="totalFocusTime"
+            id="field_totalFocusTime"
+            data-cy="totalFocusTime"
+            formControlName="totalFocusTime"
           />
+          @if (totalFocusTimeRef.invalid && (totalFocusTimeRef.dirty || totalFocusTimeRef.touched)) {
+            <div>
+              @if (editForm.get('totalFocusTime')?.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('totalFocusTime')?.errors?.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
         </div>
 
-        <div class="mb-3">
-          <label class="form-label" for="field_pomodoroSessions">Pomodoro Sessions</label>
-          <input
-            type="number"
-            class="form-control"
-            name="pomodoroSessions"
-            id="field_pomodoroSessions"
-            data-cy="pomodoroSessions"
-            formControlName="pomodoroSessions"
-          />
-        </div>
-
+        @let distractionsCountRef = editForm.get('distractionsCount')!;
         <div class="mb-3">
           <label class="form-label" for="field_distractionsCount">Distractions Count</label>
           <input
@@ -83,30 +125,38 @@
             data-cy="distractionsCount"
             formControlName="distractionsCount"
           />
+          @if (distractionsCountRef.invalid && (distractionsCountRef.dirty || distractionsCountRef.touched)) {
+            <div>
+              @if (editForm.get('distractionsCount')?.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('distractionsCount')?.errors?.number"
+                >This field should be a number.</small
+              >
+            </div>
+          }
         </div>
 
+        @let efficiencyScoreRef = editForm.get('efficiencyScore')!;
         <div class="mb-3">
-          <label class="form-label" for="field_focusTime">Focus Time</label>
-          <input type="number" class="form-control" name="focusTime" id="field_focusTime" data-cy="focusTime" formControlName="focusTime" />
-        </div>
-
-        @let focusScoreRef = editForm.get('focusScore')!;
-        <div class="mb-3">
-          <label class="form-label" for="field_focusScore">Focus Score</label>
+          <label class="form-label" for="field_efficiencyScore">Efficiency Score</label>
           <input
             type="number"
             class="form-control"
-            name="focusScore"
-            id="field_focusScore"
-            data-cy="focusScore"
-            formControlName="focusScore"
+            name="efficiencyScore"
+            id="field_efficiencyScore"
+            data-cy="efficiencyScore"
+            formControlName="efficiencyScore"
           />
-          @if (focusScoreRef.invalid && (focusScoreRef.dirty || focusScoreRef.touched)) {
+          @if (efficiencyScoreRef.invalid && (efficiencyScoreRef.dirty || efficiencyScoreRef.touched)) {
             <div>
-              @if (editForm.get('focusScore')?.errors?.required) {
-                <small class="form-text text-danger">This field is required.</small>
+              @if (editForm.get('efficiencyScore')?.errors?.min) {
+                <small class="form-text text-danger">This field should be at least 0.</small>
               }
-              <small class="form-text text-danger" [hidden]="!editForm.get('focusScore')?.errors?.number"
+              @if (editForm.get('efficiencyScore')?.errors?.max) {
+                <small class="form-text text-danger">This field cannot be more than 100.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!editForm.get('efficiencyScore')?.errors?.number"
                 >This field should be a number.</small
               >
             </div>
@@ -145,6 +195,40 @@
             <option [ngValue]="null"></option>
             @for (userOption of usersSharedCollection; track $index) {
               <option [ngValue]="userOption">{{ userOption.id }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="field_completedTasks">Completed Tasks</label>
+          <select
+            class="form-control"
+            id="field_completedTasks"
+            data-cy="completedTasks"
+            multiple
+            name="completedTasks"
+            formControlName="completedTasks"
+            [compareWith]="compareTask"
+          >
+            @for (taskOption of tasksSharedCollection; track $index) {
+              <option [ngValue]="taskOption">{{ taskOption.id }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="field_completedHabits">Completed Habits</label>
+          <select
+            class="form-control"
+            id="field_completedHabits"
+            data-cy="completedHabits"
+            multiple
+            name="completedHabits"
+            formControlName="completedHabits"
+            [compareWith]="compareHabit"
+          >
+            @for (habitOption of habitsSharedCollection; track $index) {
+              <option [ngValue]="habitOption">{{ habitOption.id }}</option>
             }
           </select>
         </div>

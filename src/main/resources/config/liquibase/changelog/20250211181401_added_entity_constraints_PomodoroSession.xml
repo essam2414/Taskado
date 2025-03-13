@@ -16,5 +16,12 @@
                                  referencedColumnNames="id"
                                  referencedTableName="jhi_user"
                                  />
+
+        <addForeignKeyConstraint baseColumnNames="productivity_report_id"
+                                 baseTableName="pomodoro_session"
+                                 constraintName="fk_pomodoro_session__productivity_report_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="productivity_report"
+                                 />
     </changeSet>
 </databaseChangeLog>

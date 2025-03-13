@@ -64,6 +64,8 @@ public class PomodoroSessionAsserts {
      * @param actual the actual entity
      */
     public static void assertPomodoroSessionUpdatableRelationshipsEquals(PomodoroSession expected, PomodoroSession actual) {
-        // empty method
+        assertThat(expected)
+            .as("Verify PomodoroSession relationships")
+            .satisfies(e -> assertThat(e.getProductivityReport()).as("check productivityReport").isEqualTo(actual.getProductivityReport()));
     }
 }

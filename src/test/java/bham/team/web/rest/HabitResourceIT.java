@@ -381,7 +381,7 @@ class HabitResourceIT {
             .completionRate(UPDATED_COMPLETION_RATE)
             .repeatInterval(UPDATED_REPEAT_INTERVAL)
             .completedDates(UPDATED_COMPLETED_DATES);
-
+      
         restHabitMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedHabit.getId())

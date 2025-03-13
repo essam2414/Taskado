@@ -1,5 +1,6 @@
 package bham.team.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -55,6 +56,10 @@ public class PomodoroSession implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "pomodoroSessions", "user", "completedTasks", "completedHabits" }, allowSetters = true)
+    private ProductivityReport productivityReport;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -185,6 +190,19 @@ public class PomodoroSession implements Serializable {
 
     public PomodoroSession user(User user) {
         this.setUser(user);
+        return this;
+    }
+
+    public ProductivityReport getProductivityReport() {
+        return this.productivityReport;
+    }
+
+    public void setProductivityReport(ProductivityReport productivityReport) {
+        this.productivityReport = productivityReport;
+    }
+
+    public PomodoroSession productivityReport(ProductivityReport productivityReport) {
+        this.setProductivityReport(productivityReport);
         return this;
     }
 

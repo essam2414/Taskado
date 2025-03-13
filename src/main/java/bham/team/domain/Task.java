@@ -1,10 +1,13 @@
 package bham.team.domain;
 
 import bham.team.domain.enumeration.Priority;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -48,11 +51,16 @@ public class Task implements Serializable {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "completedTasks")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "pomodoroSessions", "user", "completedTasks", "completedHabits" }, allowSetters = true)
+    private Set<ProductivityReport> productivityReports = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -183,6 +191,37 @@ public class Task implements Serializable {
 
     public Task user(User user) {
         this.setUser(user);
+        return this;
+    }
+
+    public Set<ProductivityReport> getProductivityReports() {
+        return this.productivityReports;
+    }
+
+    public void setProductivityReports(Set<ProductivityReport> productivityReports) {
+        if (this.productivityReports != null) {
+            this.productivityReports.forEach(i -> i.removeCompletedTasks(this));
+        }
+        if (productivityReports != null) {
+            productivityReports.forEach(i -> i.addCompletedTasks(this));
+        }
+        this.productivityReports = productivityReports;
+    }
+
+    public Task productivityReports(Set<ProductivityReport> productivityReports) {
+        this.setProductivityReports(productivityReports);
+        return this;
+    }
+
+    public Task addProductivityReport(ProductivityReport productivityReport) {
+        this.productivityReports.add(productivityReport);
+        productivityReport.getCompletedTasks().add(this);
+        return this;
+    }
+
+    public Task removeProductivityReport(ProductivityReport productivityReport) {
+        this.productivityReports.remove(productivityReport);
+        productivityReport.getCompletedTasks().remove(this);
         return this;
     }
 

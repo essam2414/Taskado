@@ -1,5 +1,6 @@
 package bham.team.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
@@ -7,6 +8,8 @@ import jakarta.validation.constraints.*;
 import java.io.IOException;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.List;
 import org.hibernate.annotations.Cache;
@@ -65,6 +68,11 @@ public class Habit implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "completedHabits")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "pomodoroSessions", "user", "completedTasks", "completedHabits" }, allowSetters = true)
+    private Set<ProductivityReport> productivityReports = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -221,6 +229,37 @@ public class Habit implements Serializable {
 
     public Habit user(User user) {
         this.setUser(user);
+        return this;
+    }
+
+    public Set<ProductivityReport> getProductivityReports() {
+        return this.productivityReports;
+    }
+
+    public void setProductivityReports(Set<ProductivityReport> productivityReports) {
+        if (this.productivityReports != null) {
+            this.productivityReports.forEach(i -> i.removeCompletedHabits(this));
+        }
+        if (productivityReports != null) {
+            productivityReports.forEach(i -> i.addCompletedHabits(this));
+        }
+        this.productivityReports = productivityReports;
+    }
+
+    public Habit productivityReports(Set<ProductivityReport> productivityReports) {
+        this.setProductivityReports(productivityReports);
+        return this;
+    }
+
+    public Habit addProductivityReport(ProductivityReport productivityReport) {
+        this.productivityReports.add(productivityReport);
+        productivityReport.getCompletedHabits().add(this);
+        return this;
+    }
+
+    public Habit removeProductivityReport(ProductivityReport productivityReport) {
+        this.productivityReports.remove(productivityReport);
+        productivityReport.getCompletedHabits().remove(this);
         return this;
     }
 
