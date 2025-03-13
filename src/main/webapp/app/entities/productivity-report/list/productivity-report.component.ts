@@ -12,6 +12,8 @@ import { IProductivityReport } from '../productivity-report.model';
 import { EntityArrayResponseType, ProductivityReportService } from '../service/productivity-report.service';
 import { ProductivityReportDeleteDialogComponent } from '../delete/productivity-report-delete-dialog.component';
 
+import { Chart, ChartDataset } from 'chart.js/auto';
+
 @Component({
   standalone: true,
   selector: 'jhi-productivity-report',
@@ -33,8 +35,18 @@ export class ProductivityReportComponent implements OnInit {
   isLoading = false;
 
   errorMessage: string | null = null;
+  successMessage: string | null = null;
 
   sortState = sortStateSignal({});
+
+  public chart: Chart | null = null;
+
+  // Default values before report generation
+  tasksPlanned: number | string = 'N/A';
+  tasksCompleted: number | string = 'N/A';
+  pomodoroSessionsCompleted: number | string = 'N/A';
+  totalFocusTime: number | string = 'N/A';
+  efficiencyScore: number | string = 'N/A';
 
   public readonly router = inject(Router);
   protected readonly productivityReportService = inject(ProductivityReportService);
@@ -55,7 +67,56 @@ export class ProductivityReportComponent implements OnInit {
           }
         }),
       )
-      .subscribe();
+      .subscribe({
+        next: () => {
+          setTimeout(() => this.loadChart(), 100); // Ensure chart loads AFTER data is available
+        },
+      });
+  }
+
+  loadChart(): void {
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        console.error('⚠️ Failed to get chart context!');
+        return;
+      }
+
+      // Destroy previous chart instance if it exists
+      if (this.chart) {
+        this.chart.destroy();
+      }
+
+      // Initial values set to zero
+      const initialData = [0, 0, 0, 0];
+
+      this.chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Tasks Planned', 'Tasks Completed', 'Pomodoro Sessions', 'Efficiency Score'],
+          datasets: [
+            {
+              label: 'Productivity Metrics',
+              data: initialData,
+              backgroundColor: ['#007bff', '#28a745', '#ff6384', '#ffc107'],
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true },
+          },
+          scales: {
+            y: { beginAtZero: true },
+          },
+        },
+      });
+    }, 500); // Delay to ensure Angular updates the DOM
   }
 
   navigateReport(): void {
@@ -65,6 +126,39 @@ export class ProductivityReportComponent implements OnInit {
     setTimeout(() => {
       this.errorMessage = null;
     }, 2500);
+  }
+
+  generateReport(): void {
+    if (!this.productivityReports || this.productivityReports.length === 0) {
+      this.errorMessage = 'Not Enough Data Available';
+      setTimeout(() => (this.errorMessage = null), 2500);
+      return;
+    }
+
+    // Load the first report into the UI
+    const report = this.productivityReports[0];
+    this.tasksPlanned = report.tasksPlanned ?? 'N/A';
+    this.tasksCompleted = report.tasksCompleted ?? 'N/A';
+    this.pomodoroSessionsCompleted = report.pomodoroSessionsCompleted ?? 'N/A';
+    this.totalFocusTime = report.totalFocusTime ?? 'N/A';
+    this.efficiencyScore = report.efficiencyScore ?? 'N/A';
+
+    // Update chart data dynamically if the chart exists
+    if (this.chart) {
+      this.chart.data.datasets[0].data = [
+        report.tasksPlanned ?? 0,
+        report.tasksCompleted ?? 0,
+        report.pomodoroSessionsCompleted ?? 0,
+        report.efficiencyScore ?? 0,
+      ] as ChartDataset<'bar'>['data']; // Explicitly cast to correct type
+
+      this.chart.update(); // Refresh the chart with new data
+    } else {
+      console.warn('⚠️ Chart is not initialized.');
+    }
+
+    this.successMessage = '✅ Report Generated Successfully!';
+    setTimeout(() => (this.successMessage = null), 2500);
   }
 
   delete(productivityReport: IProductivityReport): void {

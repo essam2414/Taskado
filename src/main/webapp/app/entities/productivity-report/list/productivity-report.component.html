@@ -3,6 +3,31 @@
     <span>Productivity Insights</span>
 
     <div style="display: flex; align-items: center; gap: 20px">
+      <!-- Generate Report Button -->
+      <button
+        id="generateReport"
+        class="btn"
+        (click)="generateReport()"
+        style="
+          padding: 12px 20px;
+          font-size: 16px;
+          font-weight: bold;
+          border-radius: 6px;
+          background-color: #28a745;
+          color: white;
+          border: none;
+          cursor: pointer;
+          transition: background 0.3s;
+          display: flex;
+          align-items: center;
+          height: 44px;
+        "
+        onmouseover="this.style.backgroundColor='#218838'"
+        onmouseout="this.style.backgroundColor='#28a745'"
+      >
+        ➕ Generate Report
+      </button>
+
       <!-- Previous Button -->
       <button
         id="Previous"
@@ -83,6 +108,10 @@
     <span>{{ errorMessage }}</span>
   </div>
 
+  <div *ngIf="successMessage" class="alert alert-success" id="success-message" style="margin-top: 10px">
+    <span>{{ successMessage }}</span>
+  </div>
+
   <hr style="margin-top: 10px; margin-bottom: 20px; border: 1px solid #ccc" />
 
   <jhi-alert-error></jhi-alert-error>
@@ -94,7 +123,8 @@
     </div>
   }
 
-  @if (productivityReports && productivityReports.length > 0) {
+  <div style="display: flex; gap: 20px; align-items: flex-start">
+    <!-- Left Side: Cards -->
     <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
       <!-- Task Card -->
       <div
@@ -112,11 +142,11 @@
       >
         <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Tasks</h4>
         <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
-        <div *ngIf="productivityReports[0]" style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
-          <strong>Tasks Planned: {{ productivityReports[0].tasksPlanned }} </strong>
-          <strong>Tasks Completed: {{ productivityReports[0].tasksCompleted }} </strong>
-          <strong>Average Completion Time: 15 min </strong>
-          <strong>Task Efficiency: {{ productivityReports[0].efficiencyScore }} </strong>
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
+          <strong>Tasks Planned: {{ tasksPlanned ?? 'N/A' }} </strong>
+          <strong>Tasks Completed: {{ tasksCompleted ?? 'N/A' }} </strong>
+          <strong>Average Completion Time: UNDER MAINTENANCE </strong>
+          <strong>Task Efficiency: {{ efficiencyScore ?? 'N/A' }} </strong>
         </div>
       </div>
 
@@ -136,9 +166,9 @@
       >
         <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Focus</h4>
         <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
-        <div *ngIf="productivityReports[0]" style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
-          <strong>Pomodoro Sessions: {{ productivityReports[0].pomodoroSessionsCompleted }} </strong>
-          <strong>Total Focus Time (min): {{ productivityReports[0].totalFocusTime }} </strong>
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
+          <strong>Pomodoro Sessions: {{ pomodoroSessionsCompleted ?? 'N/A' }} </strong>
+          <strong>Total Focus Time (min): {{ totalFocusTime ?? 'N/A' }} </strong>
         </div>
       </div>
 
@@ -158,10 +188,15 @@
       >
         <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Suggestions</h4>
         <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
-        <div *ngIf="productivityReports[0]" style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
-          <strong>Currently Unavailable </strong>
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
+          <strong>Currently Unavailable</strong>
         </div>
       </div>
     </div>
-  }
+
+    <!-- Right Side: Graph -->
+    <div *ngIf="productivityReports && productivityReports.length > 0" style="flex: 1; display: flex; justify-content: center">
+      <canvas #chartCanvas style="height: 625px !important; width: 100%"></canvas>
+    </div>
+  </div>
 </div>
