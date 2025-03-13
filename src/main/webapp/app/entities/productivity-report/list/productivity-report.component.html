@@ -95,7 +95,7 @@
   }
 
   @if (productivityReports && productivityReports.length > 0) {
-    <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: nowrap">
+    <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
       <!-- Task Card -->
       <div
         class="app-card"
@@ -112,11 +112,11 @@
       >
         <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Tasks</h4>
         <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
-        <div *ngIf="productivityReports[0]" style="display: flex; flex-direction: column; gap: 10px; padding: 20px">
-          <div style="font-size: 18px"><strong>Tasks Planned:</strong> {{ productivityReports[0].tasksPlanned }}</div>
-          <div style="font-size: 18px"><strong>Tasks Completed:</strong> {{ productivityReports[0].tasksCompleted }}</div>
-          <div style="font-size: 18px"><strong>Average Completion Time:</strong> 15 min</div>
-          <div style="font-size: 18px"><strong>Task Efficiency:</strong> {{ productivityReports[0].efficiencyScore }}</div>
+        <div *ngIf="productivityReports[0]" style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
+          <strong>Tasks Planned: {{ productivityReports[0].tasksPlanned }} </strong>
+          <strong>Tasks Completed: {{ productivityReports[0].tasksCompleted }} </strong>
+          <strong>Average Completion Time: 15 min </strong>
+          <strong>Task Efficiency: {{ productivityReports[0].efficiencyScore }} </strong>
         </div>
       </div>
 
@@ -136,9 +136,9 @@
       >
         <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Focus</h4>
         <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
-        <div *ngIf="productivityReports[0]" style="display: flex; flex-direction: column; gap: 10px; padding: 20px">
-          <div style="font-size: 18px"><strong>Pomodoro Sessions:</strong> {{ productivityReports[0].pomodoroSessionsCompleted }}</div>
-          <div style="font-size: 18px"><strong>Total Focus Time (min):</strong> {{ productivityReports[0].totalFocusTime }}</div>
+        <div *ngIf="productivityReports[0]" style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
+          <strong>Pomodoro Sessions: {{ productivityReports[0].pomodoroSessionsCompleted }} </strong>
+          <strong>Total Focus Time (min): {{ productivityReports[0].totalFocusTime }} </strong>
         </div>
       </div>
 
@@ -158,7 +158,9 @@
       >
         <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Suggestions</h4>
         <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
-        <div *ngIf="productivityReports[0]" style="display: flex; flex-direction: column; gap: 10px; padding: 20px"></div>
+        <div *ngIf="productivityReports[0]" style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
+          <strong>Currently Unavailable </strong>
+        </div>
       </div>
     </div>
   }
