@@ -123,76 +123,80 @@
     </div>
   }
 
-  <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
-    <!-- Task Card -->
-    <div
-      class="app-card"
-      style="
-        width: 450px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 0;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-      "
-    >
-      <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Tasks</h4>
-      <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
-      <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
-        <strong>Tasks Planned: {{ tasksPlanned ?? 'N/A' }} </strong>
-        <strong>Tasks Completed: {{ tasksCompleted ?? 'N/A' }} </strong>
-        <strong>Average Completion Time: UNDER MAINTENANCE </strong>
-        <strong>Task Efficiency: {{ efficiencyScore ?? 'N/A' }} </strong>
+  <div style="display: flex; gap: 20px; align-items: flex-start">
+    <!-- Left Side: Cards -->
+    <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
+      <!-- Task Card -->
+      <div
+        class="app-card"
+        style="
+          width: 450px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 0;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+        "
+      >
+        <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Tasks</h4>
+        <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
+          <strong>Tasks Planned: {{ tasksPlanned ?? 'N/A' }} </strong>
+          <strong>Tasks Completed: {{ tasksCompleted ?? 'N/A' }} </strong>
+          <strong>Average Completion Time: UNDER MAINTENANCE </strong>
+          <strong>Task Efficiency: {{ efficiencyScore ?? 'N/A' }} </strong>
+        </div>
+      </div>
+
+      <!-- Pomodoro Card (Focus) -->
+      <div
+        class="app-card"
+        style="
+          width: 450px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 0;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+        "
+      >
+        <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Focus</h4>
+        <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
+          <strong>Pomodoro Sessions: {{ pomodoroSessionsCompleted ?? 'N/A' }} </strong>
+          <strong>Total Focus Time (min): {{ totalFocusTime ?? 'N/A' }} </strong>
+        </div>
+      </div>
+
+      <!-- Suggestions Card -->
+      <div
+        class="app-card"
+        style="
+          width: 450px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 0;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+        "
+      >
+        <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Suggestions</h4>
+        <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
+          <strong>Currently Unavailable</strong>
+        </div>
       </div>
     </div>
 
-    <!-- Pomodoro Card (Focus) -->
-    <div
-      class="app-card"
-      style="
-        width: 450px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 0;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-      "
-    >
-      <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Focus</h4>
-      <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
-      <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
-        <strong>Pomodoro Sessions: {{ pomodoroSessionsCompleted ?? 'N/A' }} </strong>
-        <strong>Total Focus Time (min): {{ totalFocusTime ?? 'N/A' }} </strong>
-      </div>
+    <!-- Right Side: Graph -->
+    <div *ngIf="productivityReports && productivityReports.length > 0" style="flex: 1; display: flex; justify-content: center">
+      <canvas #chartCanvas style="height: 625px !important; width: 100%"></canvas>
     </div>
-
-    <!-- Suggestions Card -->
-    <div
-      class="app-card"
-      style="
-        width: 450px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 0;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-      "
-    >
-      <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Suggestions</h4>
-      <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
-      <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
-        <strong>Currently Unavailable</strong>
-      </div>
-    </div>
-  </div>
-
-  <div *ngIf="productivityReports && productivityReports.length > 0" style="max-width: 600px; margin: auto; margin-top: 20px">
-    <canvas #chartCanvas></canvas>
   </div>
 </div>
