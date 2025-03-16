@@ -16,7 +16,7 @@
       </div>
     </div>
 
-    <button id="jh-create-entity" data-cy="entityCreateButton" class="btn-add jh-create-entity create-task" [routerLink]="['/task/new']">
+    <button id="jh-create-entity" data-cy="entityCreateButton" class="btn-add jh-create-entity create-task" (click)="addTask()">
       <fa-icon icon="plus"></fa-icon>
       <span>New task</span>
     </button>
@@ -26,10 +26,12 @@
 
   <jhi-alert></jhi-alert>
 
-  <div class="task-list">
+  <div cdkDropList class="task-list" (cdkDropListDropped)="drop($event)">
     <h3 class="task-subtitle">{{ activeFilterLabel }}</h3>
+
     @for (task of getFilteredTasks(); track trackId(task)) {
       <div
+        cdkDrag
         class="app-card"
         [class.completed]="task.completed"
         [class.non-clickable]="task.completed"
@@ -76,7 +78,7 @@
           </div>
         </div>
 
-        <div class="task-date">
+        <div class="task-date" [ngClass]="isTaskPast(task.dueDate) ? 'past-task' : ''">
           <span>{{ formatTaskDate(task.dueDate) }}</span>
         </div>
 
@@ -102,17 +104,10 @@
         class="task-input"
         [(ngModel)]="newTaskTitle"
         placeholder="Start typing to add a task..."
-        (keyup.enter)="addTask()"
+        (keyup.enter)="addTask(newTaskTitle)"
       />
 
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn-add-icon jh-create-entity create-task"
-        [routerLink]="['/task/new']"
-        [queryParams]="{ title: newTaskTitle }"
-        [disabled]="!newTaskTitle.trim()"
-      >
+      <button class="btn-add-icon jh-create-entity create-task" (click)="addTask(newTaskTitle)" [disabled]="!newTaskTitle.trim()">
         <fa-icon icon="plus"></fa-icon>
       </button>
     </div>

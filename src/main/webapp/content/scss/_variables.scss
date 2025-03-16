@@ -32,14 +32,23 @@ $sidebar-hover-bg: rgba(0, 0, 0, 0.05);
   --primary-color: #564df2;
   --accent-color: var(--primary-color);
 
-  --secondary-color: #ff89a4;
-  --success-color: #46c598;
-  --warning-color: #ffa559;
-  --error-color: var(--secondary-color);
-
   --sidebar-hover-bg: rgba(0, 0, 0, 0.07);
   --navmenu-text: #888;
   --navmenu-hover-text: #2c2c38;
+
+  --hover-bg: #ebebeb;
+
+  --success-color: #11b364;
+  --danger-color: #f04438;
+  --warning-color: #f79009;
+  --info-color: #1363ff;
+
+  --alert-success-bg: #eafaf1;
+  --alert-danger-bg: #fde8e8;
+  --alert-warning-bg: #fff8e5;
+  --alert-info-bg: #e7f3fe;
+
+  --notification-bg: #1d1d1d;
 }
 
 [data-theme='dark'] {
@@ -53,6 +62,15 @@ $sidebar-hover-bg: rgba(0, 0, 0, 0.05);
   --text-secondary: #b0b0b0;
   --text-muted: #8a8a8a;
 
+  --hover-bg: #191919;
+
   --sidebar-color: var(--default-sidebar-color-dark);
   --sidebar-hover-bg: rgba(255, 255, 255, 0.08);
+
+  --alert-success-bg: var(--card-bg);
+  --alert-danger-bg: var(--card-bg);
+  --alert-warning-bg: var(--card-bg);
+  --alert-info-bg: var(--card-bg);
+
+  --notification-bg: #222831;
 }

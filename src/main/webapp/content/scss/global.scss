@@ -9,6 +9,8 @@
 @import 'components/forms';
 @import 'variables';
 @import 'components/layout';
+@import 'components/modal';
+@import 'components/alerts';
 
 html,
 body {
@@ -90,13 +92,6 @@ button {
 Bootstrap tweaks
 ===============================================================*/
 
-body,
-h1,
-h2,
-h3,
-h4 {
-}
-
 a:hover {
   /* make sure browsers use the pointer cursor for anchors, even with no href */
   cursor: pointer;
@@ -166,48 +161,6 @@ Generic styles
 .hand,
 [jhisortby] {
   cursor: pointer;
-}
-
-/* ==========================================================================
-Custom alerts for notification
-========================================================================== */
-.alerts {
-  .alert {
-    text-overflow: ellipsis;
-    pre {
-      background: none;
-      border: none;
-      font: inherit;
-      color: inherit;
-      padding: 0;
-      margin: 0;
-    }
-    .popover pre {
-      font-size: 10px;
-    }
-  }
-  .jhi-toast {
-    position: fixed;
-    width: 100%;
-    &.left {
-      left: 5px;
-    }
-    &.right {
-      right: 5px;
-    }
-    &.top {
-      top: 55px;
-    }
-    &.bottom {
-      bottom: 55px;
-    }
-  }
-}
-
-@media screen and (min-width: 480px) {
-  .alerts .jhi-toast {
-    width: 50%;
-  }
 }
 
 /* ==========================================================================

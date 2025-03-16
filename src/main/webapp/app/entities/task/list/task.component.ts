@@ -12,6 +12,9 @@ import { ITask } from '../task.model';
 import { EntityArrayResponseType, TaskService } from '../service/task.service';
 import { TaskDeleteDialogComponent } from '../delete/task-delete-dialog.component';
 import dayjs from 'dayjs/esm';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+
+import { TaskModalComponent } from '../modal/task-modal.component';
 
 @Component({
   standalone: true,
@@ -67,6 +70,29 @@ export class TaskComponent implements OnInit {
       .subscribe();
   }
 
+  drop(event: CdkDragDrop<ITask[]>): void {
+    if (!this.tasks || event.previousIndex === event.currentIndex) return;
+
+    moveItemInArray(this.tasks, event.previousIndex, event.currentIndex);
+    this.saveTaskOrder();
+  }
+
+  saveTaskOrder(): void {
+    if (this.tasks) {
+      localStorage.setItem('taskOrder', JSON.stringify(this.tasks.map(task => task.id)));
+    }
+  }
+
+  loadTaskOrder(): void {
+    const storedOrder = localStorage.getItem('taskOrder');
+    if (storedOrder) {
+      const order = JSON.parse(storedOrder);
+      if (this.tasks) {
+        this.tasks.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+      }
+    }
+  }
+
   setFilter(selectedFilter: string): void {
     this.activeFilter = selectedFilter;
   }
@@ -88,7 +114,7 @@ export class TaskComponent implements OnInit {
   }
 
   delete(task: ITask): void {
-    const modalRef = this.modalService.open(TaskDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+    const modalRef = this.modalService.open(TaskDeleteDialogComponent, { centered: true, size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.task = task;
     modalRef.closed
       .pipe(
@@ -119,20 +145,53 @@ export class TaskComponent implements OnInit {
 
   formatTaskDate(dueDate: dayjs.Dayjs | string | null | undefined): string {
     if (!dueDate) return '';
+
     const date = dayjs(dueDate);
     const now = dayjs();
+
+    if (date.isSame(now, 'day')) {
+      return 'Today ' + date.format('HH:mm');
+    } else if (date.isSame(now.add(1, 'day'), 'day')) {
+      return 'Tomorrow ' + date.format('HH:mm');
+    } else if (date.isAfter(now) && date.diff(now, 'days') < 6) {
+      return date.format('dddd HH:mm'); // ✅ Fixed: Removed unnecessary template literal
+    }
+
     const isNextYear = date.year() > now.year();
     return date.format(`D MMM${isNextYear ? ' YYYY' : ''} HH:mm`);
   }
 
-  addTask(): void {
-    if (this.newTaskTitle.trim()) {
-      this.router.navigate(['/task/new'], { queryParams: { title: this.newTaskTitle } });
-    }
+  isTaskPast(dueDate: dayjs.Dayjs | string | null | undefined): boolean {
+    if (!dueDate) return false;
+    return dayjs(dueDate).isBefore(dayjs(), 'minute');
+  }
+
+  addTask(title?: string): void {
+    const taskTitle = title?.trim() ?? ''; // Use provided title or empty string
+
+    const modalRef = this.modalService.open(TaskModalComponent, { centered: true, size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.task = { title: taskTitle, completed: false } as ITask;
+
+    modalRef.closed.subscribe(result => {
+      if (result) {
+        this.tasks?.push(result);
+        this.newTaskTitle = ''; // Clear input field after adding from bottom input
+      }
+    });
   }
 
   editTask(task: ITask): void {
-    this.router.navigate(['/task', task.id, 'edit']);
+    const modalRef = this.modalService.open(TaskModalComponent, { centered: true, size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.task = { ...task }; // Pass a copy of the task
+
+    modalRef.closed.subscribe(result => {
+      if (result) {
+        const index = this.tasks?.findIndex(t => t.id === result.id);
+        if (index !== undefined && index !== -1) {
+          this.tasks![index] = result; // Update the task in the list
+        }
+      }
+    });
   }
 
   load(): void {
@@ -154,11 +213,16 @@ export class TaskComponent implements OnInit {
   protected onResponseSuccess(response: EntityArrayResponseType): void {
     const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
     this.tasks = this.refineData(dataFromBody);
+
+    // Restore order from localStorage after fetching tasks
+    this.loadTaskOrder();
   }
 
   protected refineData(data: ITask[]): ITask[] {
     const { predicate, order } = this.sortState();
     let sortedData = predicate && order ? data.sort(this.sortService.startSort({ predicate, order })) : data;
+
+    // Move completed tasks to the bottom
     sortedData = sortedData.sort((a, b) => Number(a.completed) - Number(b.completed));
     return sortedData;
   }
