@@ -55,6 +55,7 @@ export class TaskComponent implements OnInit {
   openMenuTaskId: number | null = null;
 
   settingsOpen = false;
+  filtersOpen = false;
   sections: ISection[] = [];
   collapsedSections: Record<number, boolean> = {};
 
@@ -116,6 +117,10 @@ export class TaskComponent implements OnInit {
 
   get activeFilterLabel(): string {
     return this.filters.find(f => f.value === this.activeFilter)?.label ?? '';
+  }
+
+  get activeFilterIcon(): string {
+    return this.filters.find(f => f.value === this.activeFilter)?.icon ?? 'filter';
   }
 
   shouldHideTask(task: ITask): boolean {
@@ -339,6 +344,10 @@ export class TaskComponent implements OnInit {
         tap(() => this.load()),
       )
       .subscribe();
+  }
+
+  toggleFilters(): void {
+    this.filtersOpen = !this.filtersOpen;
   }
 
   navigateToWithComponentValues(event: SortState): void {

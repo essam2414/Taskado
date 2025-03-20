@@ -1,9 +1,10 @@
 <div>
-  <div class="task-header">
-    <div class="task-header-left">
+  <div class="entity-header">
+    <div class="entity-header-left">
       <h2 id="page-heading" data-cy="TaskHeading">Tasks</h2>
 
-      <div class="task-filters">
+      <!-- Normal filter buttons for desktop -->
+      <div class="desktop-only entity-filters">
         <button
           *ngFor="let filter of filters"
           class="btn-filter"
@@ -14,11 +15,39 @@
           {{ filter.label }}
         </button>
       </div>
+
+      <!-- Dropdown filters for mobile -->
+      <div class="mobile-only entity-filters-dropdown dropdown dropdown-select" [class.open]="filtersOpen">
+        <button class="dropdown-btn" (click)="toggleFilters()">
+          <div><fa-icon class="filter-icon" [icon]="activeFilterIcon"></fa-icon> {{ activeFilterLabel }}</div>
+          <fa-icon [icon]="'chevron-down'"></fa-icon>
+        </button>
+
+        <div class="dropdown-menu">
+          <button
+            *ngFor="let filter of filters"
+            class="dropdown-item"
+            [class.active]="activeFilter === filter.value"
+            (click)="setFilter(filter.value)"
+          >
+            {{ filter.label }}
+          </button>
+        </div>
+      </div>
     </div>
 
-    <button id="jh-create-entity" data-cy="entityCreateButton" class="btn-add jh-create-entity create-task" (click)="addTask()">
+    <button
+      id="jh-create-entity"
+      data-cy="entityCreateButton"
+      class="btn-add jh-create-entity create-task desktop-only"
+      (click)="addTask()"
+    >
       <fa-icon icon="plus"></fa-icon>
       <span>New task</span>
+    </button>
+
+    <button class="btn-add-icon jh-create-entity create-task mobile-only" (click)="addTask()">
+      <fa-icon icon="plus"></fa-icon>
     </button>
   </div>
 

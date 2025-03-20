@@ -11,6 +11,7 @@
   min-height: 100vh;
   transition: margin-left 0.3s ease-in-out;
   padding: clamp(20px, 5vw, 60px);
+  padding-top: max(75px, 5vw); /* Ensures top padding, min 56px */
   padding-bottom: 0;
 }
 
