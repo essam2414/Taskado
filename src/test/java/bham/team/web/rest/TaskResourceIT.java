@@ -57,6 +57,9 @@ class TaskResourceIT {
     private static final Instant DEFAULT_UPDATED_AT = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_UPDATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
+    private static final Integer DEFAULT_ORDER = 1;
+    private static final Integer UPDATED_ORDER = 2;
+
     private static final String ENTITY_API_URL = "/api/tasks";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -96,7 +99,8 @@ class TaskResourceIT {
             .priority(DEFAULT_PRIORITY)
             .completed(DEFAULT_COMPLETED)
             .createdAt(DEFAULT_CREATED_AT)
-            .updatedAt(DEFAULT_UPDATED_AT);
+            .updatedAt(DEFAULT_UPDATED_AT)
+            .order(DEFAULT_ORDER);
     }
 
     /**
@@ -113,7 +117,8 @@ class TaskResourceIT {
             .priority(UPDATED_PRIORITY)
             .completed(UPDATED_COMPLETED)
             .createdAt(UPDATED_CREATED_AT)
-            .updatedAt(UPDATED_UPDATED_AT);
+            .updatedAt(UPDATED_UPDATED_AT)
+            .order(UPDATED_ORDER);
     }
 
     @BeforeEach
@@ -202,7 +207,8 @@ class TaskResourceIT {
             .andExpect(jsonPath("$.[*].priority").value(hasItem(DEFAULT_PRIORITY.toString())))
             .andExpect(jsonPath("$.[*].completed").value(hasItem(DEFAULT_COMPLETED.booleanValue())))
             .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
-            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())));
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].order").value(hasItem(DEFAULT_ORDER)));
     }
 
     @Test
@@ -223,7 +229,8 @@ class TaskResourceIT {
             .andExpect(jsonPath("$.priority").value(DEFAULT_PRIORITY.toString()))
             .andExpect(jsonPath("$.completed").value(DEFAULT_COMPLETED.booleanValue()))
             .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
-            .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()));
+            .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()))
+            .andExpect(jsonPath("$.order").value(DEFAULT_ORDER));
     }
 
     @Test
@@ -252,7 +259,8 @@ class TaskResourceIT {
             .priority(UPDATED_PRIORITY)
             .completed(UPDATED_COMPLETED)
             .createdAt(UPDATED_CREATED_AT)
-            .updatedAt(UPDATED_UPDATED_AT);
+            .updatedAt(UPDATED_UPDATED_AT)
+            .order(UPDATED_ORDER);
 
         restTaskMockMvc
             .perform(
@@ -328,7 +336,7 @@ class TaskResourceIT {
         Task partialUpdatedTask = new Task();
         partialUpdatedTask.setId(task.getId());
 
-        partialUpdatedTask.title(UPDATED_TITLE).dueDate(UPDATED_DUE_DATE).completed(UPDATED_COMPLETED).updatedAt(UPDATED_UPDATED_AT);
+        partialUpdatedTask.title(UPDATED_TITLE).priority(UPDATED_PRIORITY).order(UPDATED_ORDER);
 
         restTaskMockMvc
             .perform(
@@ -363,7 +371,8 @@ class TaskResourceIT {
             .priority(UPDATED_PRIORITY)
             .completed(UPDATED_COMPLETED)
             .createdAt(UPDATED_CREATED_AT)
-            .updatedAt(UPDATED_UPDATED_AT);
+            .updatedAt(UPDATED_UPDATED_AT)
+            .order(UPDATED_ORDER);
 
         restTaskMockMvc
             .perform(

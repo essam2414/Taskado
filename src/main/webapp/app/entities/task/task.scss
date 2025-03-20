@@ -23,6 +23,7 @@
   font-weight: 500;
   font-size: 28px;
   color: var(--text-secondary);
+  margin-top: 24px;
 }
 
 .task-list {
@@ -30,6 +31,8 @@
   flex-direction: column;
   margin-top: 24px;
   gap: 12px;
+
+  min-height: 50px;
 }
 
 .completed:hover {
@@ -183,7 +186,7 @@
   margin-right: 8px;
 }
 
-.dropdown-action {
+.task-dropdown {
   position: absolute;
   top: 12px;
   right: 12px;
@@ -196,13 +199,109 @@
   transition: opacity 0.2s ease-in-out;
 }
 
-.app-card:hover .dropdown-action,
-.dropdown-action.open {
+.app-card:hover .task-dropdown,
+.task-dropdown.open {
   opacity: 1;
 }
 
+.task-list-header {
+  position: relative;
+}
+
+.task-settings {
+  position: absolute;
+  top: 0;
+  right: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dropdown-menu {
+  top: 100%;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 12px;
+  margin-top: 32px;
+
+  fa-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    border-radius: 4px;
+    transition: background 0.2s ease-in;
+
+    &:hover {
+      background-color: var(--hover-bg);
+    }
+  }
+
+  .section-title {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    button {
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+  }
+
+  .delete-section {
+    border: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+
+    svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--text-secondary);
+      transition: fill 0.2s ease-in;
+    }
+
+    &:hover svg {
+      fill: var(--danger-color);
+    }
+  }
+
+  &:hover .delete-section {
+    opacity: 1;
+  }
+}
+
+.section-title-input {
+  font-size: 16px;
+  font-weight: bold;
+  background: transparent;
+  width: 100%;
+  border: none;
+  color: var(--text-secondary);
+  padding: 6px 10px;
+  border-radius: 4px;
+
+  &:focus {
+    border: 1px solid var(--primary-color); /* Highlight color */
+    outline: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle glow */
+  }
+}
+
 .past-task {
-  color: var(--error-color);
+  color: var(--danger-color);
 }
 
 .cdk-drag-placeholder {

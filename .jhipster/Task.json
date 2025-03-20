@@ -33,6 +33,10 @@
     {
       "fieldName": "updatedAt",
       "fieldType": "Instant"
+    },
+    {
+      "fieldName": "order",
+      "fieldType": "Integer"
     }
   ],
   "name": "Task",
@@ -49,6 +53,13 @@
       "relationshipSide": "left",
       "relationshipType": "many-to-one",
       "relationshipWithBuiltInEntity": true
+    },
+    {
+      "otherEntityName": "section",
+      "otherEntityRelationshipName": "tasks",
+      "relationshipName": "section",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
     }
   ],
   "searchEngine": "no"

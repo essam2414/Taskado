@@ -2,6 +2,7 @@ import { Component, HostListener, NgZone, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
 import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { HttpResponse } from '@angular/common/http';
 
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
@@ -12,8 +13,10 @@ import { ITask } from '../task.model';
 import { EntityArrayResponseType, TaskService } from '../service/task.service';
 import { TaskDeleteDialogComponent } from '../delete/task-delete-dialog.component';
 import dayjs from 'dayjs/esm';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-
+import { CdkDrag, CdkDragDrop, CdkDropList, CdkDropListGroup, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { ISection, NewSection } from 'app/entities/section/section.model';
+import { SectionService } from 'app/entities/section/service/section.service';
+import { SectionDeleteDialogComponent } from 'app/entities/section/delete/section-delete-dialog.component';
 import { TaskModalComponent } from '../modal/task-modal.component';
 
 @Component({
@@ -30,11 +33,14 @@ import { TaskModalComponent } from '../modal/task-modal.component';
     DurationPipe,
     FormatMediumDatetimePipe,
     FormatMediumDatePipe,
+    CdkDrag,
+    CdkDropList,
+    CdkDropListGroup,
   ],
 })
 export class TaskComponent implements OnInit {
   subscription: Subscription | null = null;
-  tasks?: ITask[];
+  tasks: ITask[] = [];
   isLoading = false;
   newTaskTitle = '';
 
@@ -48,11 +54,22 @@ export class TaskComponent implements OnInit {
   sortState = sortStateSignal({});
   openMenuTaskId: number | null = null;
 
+  settingsOpen = false;
+  sections: ISection[] = [];
+  collapsedSections: Record<number, boolean> = {};
+
+  editingSectionId: number | null = null;
+  originalSectionName = '';
+
+  unsectionedTasks: ITask[] = [];
+  sectionsMap: Record<number, ITask[]> = {};
+
   public readonly router = inject(Router);
   protected readonly taskService = inject(TaskService);
   protected readonly activatedRoute = inject(ActivatedRoute);
   protected readonly sortService = inject(SortService);
   protected modalService = inject(NgbModal);
+  protected sectionService = inject(SectionService);
   protected ngZone = inject(NgZone);
 
   trackId = (item: ITask): number => this.taskService.getTaskIdentifier(item);
@@ -62,7 +79,7 @@ export class TaskComponent implements OnInit {
       .pipe(
         tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
         tap(() => {
-          if (!this.tasks || this.tasks.length === 0) {
+          if (this.tasks.length === 0) {
             this.load();
           }
         }),
@@ -70,64 +87,131 @@ export class TaskComponent implements OnInit {
       .subscribe();
   }
 
-  drop(event: CdkDragDrop<ITask[]>): void {
-    if (!this.tasks || event.previousIndex === event.currentIndex) return;
+  drop(event: CdkDragDrop<ITask[]>, targetSection: ISection | null): void {
+    const draggedTask = event.item.data as ITask;
 
-    moveItemInArray(this.tasks, event.previousIndex, event.currentIndex);
-    this.saveTaskOrder();
-  }
+    const previousArray = draggedTask.section?.id ? this.sectionsMap[draggedTask.section.id] : this.unsectionedTasks;
+    const targetArray = targetSection?.id ? this.sectionsMap[targetSection.id] : this.unsectionedTasks;
 
-  saveTaskOrder(): void {
-    if (this.tasks) {
-      localStorage.setItem('taskOrder', JSON.stringify(this.tasks.map(task => task.id)));
+    if (event.previousContainer === event.container) {
+      if (event.currentIndex === event.previousIndex) return;
+      moveItemInArray(targetArray, event.previousIndex, event.currentIndex);
+    } else {
+      transferArrayItem(previousArray, targetArray, event.previousIndex, event.currentIndex);
+
+      draggedTask.section = targetSection ? targetSection : null;
     }
-  }
 
-  loadTaskOrder(): void {
-    const storedOrder = localStorage.getItem('taskOrder');
-    if (storedOrder) {
-      const order = JSON.parse(storedOrder);
-      if (this.tasks) {
-        this.tasks.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
-      }
-    }
+    const updatedTasks = [...previousArray, ...targetArray].map((task, idx) => ({
+      ...task,
+      order: idx + 1,
+    }));
+
+    updatedTasks.forEach(task => this.taskService.update(task).subscribe());
   }
 
   setFilter(selectedFilter: string): void {
     this.activeFilter = selectedFilter;
   }
 
-  getFilteredTasks(): ITask[] {
-    if (!this.tasks) return [];
-
-    if (this.activeFilter === 'today') {
-      return this.tasks.filter(task => task.dueDate && dayjs(task.dueDate).isSame(dayjs(), 'day') && !task.completed);
-    }
-    if (this.activeFilter === 'completed') {
-      return this.tasks.filter(task => task.completed);
-    }
-    return this.tasks.filter(task => !task.completed);
-  }
-
   get activeFilterLabel(): string {
     return this.filters.find(f => f.value === this.activeFilter)?.label ?? '';
   }
 
-  delete(task: ITask): void {
-    const modalRef = this.modalService.open(TaskDeleteDialogComponent, { centered: true, size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.task = task;
-    modalRef.closed
-      .pipe(
-        filter(reason => reason === ITEM_DELETED_EVENT),
-        tap(() => this.load()),
-      )
-      .subscribe();
+  shouldHideTask(task: ITask): boolean {
+    if (this.activeFilter === 'today') {
+      const isToday = task.dueDate && dayjs(task.dueDate).isSame(dayjs(), 'day');
+      return !(isToday && !task.completed);
+    }
+    if (this.activeFilter === 'completed') {
+      return !task.completed;
+    }
+    if (this.activeFilter === 'inbox') {
+      return !!task.completed;
+    }
+
+    return false;
+  }
+
+  toggleSection(section: ISection): void {
+    this.collapsedSections[section.id] = !this.collapsedSections[section.id];
+  }
+
+  addSection(): void {
+    const newSection: NewSection = { id: null, name: 'New Section' };
+
+    this.sectionService.create(newSection).subscribe({
+      next: (res: HttpResponse<ISection>) => {
+        const created = res.body;
+        if (created) {
+          this.sections.push({
+            ...created,
+          });
+          this.buildSectionsMap();
+
+          setTimeout(() => {
+            const sectionElements = document.querySelectorAll('.section-header');
+            const lastSection = sectionElements[sectionElements.length - 1] as HTMLElement;
+            lastSection.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }
+      },
+    });
+    this.settingsOpen = false;
+  }
+
+  startEditing(section: ISection): void {
+    this.editingSectionId = section.id;
+    this.originalSectionName = section.name ?? '';
+  }
+
+  stopEditing(): void {
+    if (this.editingSectionId !== null) {
+      const section = this.sections.find(s => s.id === this.editingSectionId);
+      if (section) {
+        this.saveSection(section);
+      }
+    }
+  }
+
+  saveSection(section: ISection, event?: Event): void {
+    if (event) {
+      (event.target as HTMLInputElement).blur();
+    }
+
+    if (!section.name?.trim()) {
+      section.name = this.originalSectionName;
+      return;
+    }
+
+    if (section.name === this.originalSectionName) {
+      this.editingSectionId = null;
+      return;
+    }
+
+    this.sectionService.update(section).subscribe(() => {
+      this.editingSectionId = null;
+    });
+  }
+
+  cancelEdit(section: ISection): void {
+    section.name = this.originalSectionName;
+    this.editingSectionId = null;
+  }
+
+  loadSections(): void {
+    this.sectionService.query().subscribe({
+      next: (res: HttpResponse<ISection[]>) => {
+        this.sections = res.body ?? [];
+        this.buildSectionsMap();
+      },
+    });
   }
 
   toggleCompleted(task: ITask): void {
     task.completed = !task.completed;
     this.taskService.update(task).subscribe(() => {
-      this.tasks = this.refineData([...(this.tasks ?? [])]);
+      this.tasks = this.refineData([...this.tasks]);
     });
   }
 
@@ -135,11 +219,21 @@ export class TaskComponent implements OnInit {
     this.openMenuTaskId = this.openMenuTaskId === taskId ? null : taskId;
   }
 
+  toggleSettings(): void {
+    this.settingsOpen = !this.settingsOpen;
+  }
+
   @HostListener('document:click', ['$event'])
-  closeMenu(event: Event): void {
-    const clickedInside = (event.target as HTMLElement).closest('.task-menu');
-    if (!clickedInside) {
-      this.openMenuTaskId = null; // Close menu
+  closeDropdowns(event: Event): void {
+    const clickedInsideSettings = (event.target as HTMLElement).closest('.task-settings');
+    const clickedInsideMenu = (event.target as HTMLElement).closest('.task-dropdown');
+
+    if (!clickedInsideSettings) {
+      this.settingsOpen = false;
+    }
+
+    if (!clickedInsideMenu) {
+      this.openMenuTaskId = null; // Close task-specific dropdown
     }
   }
 
@@ -173,33 +267,78 @@ export class TaskComponent implements OnInit {
     modalRef.componentInstance.task = { title: taskTitle, completed: false } as ITask;
 
     modalRef.closed.subscribe(result => {
+      console.warn(result);
       if (result) {
-        this.tasks?.push(result);
+        this.tasks.push(result);
         this.newTaskTitle = ''; // Clear input field after adding from bottom input
+        this.buildSectionsMap();
       }
     });
   }
 
   editTask(task: ITask): void {
     const modalRef = this.modalService.open(TaskModalComponent, { centered: true, size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.task = { ...task }; // Pass a copy of the task
+    modalRef.componentInstance.task = { ...task };
 
     modalRef.closed.subscribe(result => {
       if (result) {
-        const index = this.tasks?.findIndex(t => t.id === result.id);
-        if (index !== undefined && index !== -1) {
-          this.tasks![index] = result; // Update the task in the list
+        const index = this.tasks.findIndex(t => t.id === result.id);
+        if (index !== -1) {
+          this.tasks[index] = result;
         }
       }
     });
+  }
+
+  buildSectionsMap(): void {
+    this.unsectionedTasks = [];
+    this.sectionsMap = {};
+
+    for (const section of this.sections) {
+      this.sectionsMap[section.id] = [];
+    }
+
+    for (const task of this.tasks) {
+      if (!task.section?.id) {
+        this.unsectionedTasks.push(task);
+      } else {
+        this.sectionsMap[task.section.id].push(task);
+      }
+    }
   }
 
   load(): void {
     this.queryBackend().subscribe({
       next: (res: EntityArrayResponseType) => {
         this.onResponseSuccess(res);
+        this.loadSections();
       },
     });
+  }
+
+  delete(task: ITask): void {
+    const modalRef = this.modalService.open(TaskDeleteDialogComponent, { centered: true, size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.task = task;
+    modalRef.closed
+      .pipe(
+        filter(reason => reason === ITEM_DELETED_EVENT),
+        tap(() => this.load()),
+      )
+      .subscribe();
+  }
+
+  deleteSection(section: ISection): void {
+    const taskCount = this.sectionsMap[section.id].length;
+
+    const modalRef = this.modalService.open(SectionDeleteDialogComponent, { centered: true, size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.section = section;
+    modalRef.componentInstance.taskCount = taskCount;
+    modalRef.closed
+      .pipe(
+        filter(reason => reason === ITEM_DELETED_EVENT),
+        tap(() => this.load()),
+      )
+      .subscribe();
   }
 
   navigateToWithComponentValues(event: SortState): void {
@@ -213,17 +352,11 @@ export class TaskComponent implements OnInit {
   protected onResponseSuccess(response: EntityArrayResponseType): void {
     const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
     this.tasks = this.refineData(dataFromBody);
-
-    // Restore order from localStorage after fetching tasks
-    this.loadTaskOrder();
   }
 
   protected refineData(data: ITask[]): ITask[] {
-    const { predicate, order } = this.sortState();
-    let sortedData = predicate && order ? data.sort(this.sortService.startSort({ predicate, order })) : data;
+    const sortedData = data.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-    // Move completed tasks to the bottom
-    sortedData = sortedData.sort((a, b) => Number(a.completed) - Number(b.completed));
     return sortedData;
   }
 

@@ -23,5 +23,12 @@
                                  referencedColumnNames="id"
                                  referencedTableName="jhi_user"
                                  />
+
+        <addForeignKeyConstraint baseColumnNames="section_id"
+                                 baseTableName="task"
+                                 constraintName="fk_task__section_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="section"
+                                 />
     </changeSet>
 </databaseChangeLog>

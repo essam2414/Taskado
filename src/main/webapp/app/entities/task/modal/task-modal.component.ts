@@ -71,7 +71,6 @@ export class TaskModalComponent implements OnInit {
     } else {
       this.subscribeToSaveResponse(this.taskService.create(task));
     }
-    this.close();
   }
 
   togglePriorityDropdown(): void {
@@ -121,13 +120,17 @@ export class TaskModalComponent implements OnInit {
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<ITask>>): void {
     result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
-      next: () => this.onSaveSuccess(),
+      next: response => {
+        if (response.body) {
+          this.onSaveSuccess(response.body);
+        } // ✅ Pass the saved task to onSaveSuccess()
+      },
       error: () => this.onSaveError(),
     });
   }
 
-  protected onSaveSuccess(): void {
-    // this.previousState();
+  protected onSaveSuccess(task: ITask): void {
+    this.activeModal.close(task);
   }
 
   protected onSaveError(): void {
