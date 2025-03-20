@@ -13,12 +13,6 @@ import { EventDeleteDialogComponent } from '../delete/event-delete-dialog.compon
 import dayjs from 'dayjs';
 import { CommonModule } from '@angular/common';
 
-// for frontend to display events in calendar
-interface CalendarEvent {
-  date: string;
-  title: string;
-}
-
 @Component({
   standalone: true,
   selector: 'jhi-event',
@@ -45,7 +39,7 @@ export class EventComponent implements OnInit, OnDestroy {
   subscription: Subscription | null = null;
   events?: IEvent[] = []; //
   isLoading = false;
-  weekDays: { date: Date; events: CalendarEvent[] }[] = [];
+  weekDays: { date: Date; events: IEvent[] }[] = [];
   hours = Array.from({ length: 24 }, (_, i) => i);
   weekStartDate: Date = new Date();
   weekEndDate?: Date;
@@ -119,9 +113,11 @@ export class EventComponent implements OnInit, OnDestroy {
 
     this.initializeWeekView();
     this.renderCalendar(); // Render the calendar after initializing
-    this.loadEvents(); // events show up on calendar
+    this.load(); // events show up on calendar
     window.addEventListener('resize', this.adjustCalendarSize);
     this.adjustCalendarSize();
+
+    this.fetchEvents();
   }
 
   adjustCalendarSize = (): void => {
@@ -237,16 +233,11 @@ export class EventComponent implements OnInit, OnDestroy {
     );
   }
 
-  getEventsForDay(day: number | null | undefined): CalendarEvent[] {
+  getEventsForDay(day: number | null | undefined): IEvent[] {
     if (day === null || day === undefined || !this.events) return [];
     const dateStr = dayjs(new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), day)).format('YYYY-MM-DD');
 
-    return this.events
-      .filter(event => dayjs(event.eventDate).format('YYYY-MM-DD') === dateStr)
-      .map(event => ({
-        date: dayjs(event.eventDate).format('YYYY-MM-DD'),
-        title: event.title ?? 'Untitled Event',
-      }));
+    return this.events.filter(event => dayjs(event.eventDate).format('YYYY-MM-DD') === dateStr);
   }
 
   changeDay(direction: number): void {
@@ -256,33 +247,23 @@ export class EventComponent implements OnInit, OnDestroy {
     }
   }
 
-  getEventsForHour(hour: number, date: Date): CalendarEvent[] {
+  getEventsForHour(hour: number, date: Date): IEvent[] {
     return (
-      this.events
-        ?.filter(event => {
-          if (!event.startTime) return false;
-
-          const eventDate = dayjs(event.startTime).toDate();
-
-          return (
-            eventDate.getFullYear() === date.getFullYear() &&
-            eventDate.getMonth() === date.getMonth() &&
-            eventDate.getDate() === date.getDate() &&
-            eventDate.getHours() === hour
-          );
-        })
-        .map(event => ({
-          date: dayjs(event.startTime).format('YYYY-MM-DD'),
-          title: event.title ?? 'Untitled Event',
-        })) ?? []
+      this.events?.filter(event => {
+        if (!event.startTime) return false;
+        const eventDate = dayjs(event.startTime).toDate();
+        return (
+          eventDate.getFullYear() === date.getFullYear() &&
+          eventDate.getMonth() === date.getMonth() &&
+          eventDate.getDate() === date.getDate() &&
+          eventDate.getHours() === hour
+        );
+      }) ?? []
     );
   }
 
-  loadEvents(): void {
-    const savedEvents = localStorage.getItem('calendarEvents');
-    if (savedEvents) {
-      this.events = JSON.parse(savedEvents);
-    }
+  editEvent(event: IEvent): void {
+    this.router.navigate(['/event', event.id, 'edit']);
   }
 
   protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
@@ -321,6 +302,12 @@ export class EventComponent implements OnInit, OnDestroy {
         relativeTo: this.activatedRoute,
         queryParams: queryParamsObj,
       });
+    });
+  }
+
+  private fetchEvents(): void {
+    this.eventService.query().subscribe(response => {
+      this.events = response.body ?? []; // ensure events are assigned correctly
     });
   }
 }

@@ -33,7 +33,12 @@
         </div>
 
         <!-- Actual Dates -->
-        <div class="calendar-day app-card" *ngFor="let day of calendarDays" (click)="day !== null ? selectDate(day) : null">
+        <div
+          class="calendar-day app-card"
+          *ngFor="let day of calendarDays"
+          (click)="day !== null ? selectDate(day) : null"
+          [class.disabled]="day === null"
+        >
           <!-- Apply highlight only to the date number -->
           <span *ngIf="day" class="date-number" [class.circle-highlight]="isToday(day)">
             {{ day }}
@@ -88,16 +93,10 @@
         <button class="btn-add" (click)="changeDay(1)">❯</button>
       </div>
 
-      <ul class="event-list">
-        <li *ngFor="let event of getEventsForDay(selectedDate?.getDate())" class="event-item">
-          {{ event.title }}
-        </li>
-      </ul>
-
       <div class="hour-row" *ngFor="let hour of hours">
         <div class="hour-label">{{ hour }}:00</div>
         <div class="hour-events">
-          <div *ngFor="let event of selectedDate ? getEventsForHour(hour, selectedDate) : []" class="event-item">
+          <div *ngFor="let event of selectedDate ? getEventsForHour(hour, selectedDate) : []" class="event-item" (click)="editEvent(event)">
             {{ event.title }}
           </div>
         </div>
