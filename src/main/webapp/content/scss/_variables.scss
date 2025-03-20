@@ -20,10 +20,23 @@ $sidebar-hover-bg: rgba(0, 0, 0, 0.05);
 
   --border-color: #ccc;
 
+  // text colors
   --text-primary: #2c2c38;
   --text-secondary: #6b6b78;
   --text-muted: #a9a9b3;
   --text-accent: var(--accent-color);
+
+  // default fonts
+  --app-font: 'Inter';
+  --heading-font: 'Rubik';
+
+  // font sizes
+  --font-scale: 1;
+  --font-xs: clamp(calc(0.6rem * var(--font-scale)), 1vw, calc(0.75rem * var(--font-scale)));
+  --font-sm: clamp(calc(0.75rem * var(--font-scale)), 1.3vw, calc(0.875rem * var(--font-scale)));
+  --font-md: clamp(calc(0.9rem * var(--font-scale)), 1.6vw, calc(1rem * var(--font-scale)));
+  --font-lg: clamp(calc(1.1rem * var(--font-scale)), 1.8vw, calc(1.25rem * var(--font-scale)));
+  --font-xl: clamp(calc(1.3rem * var(--font-scale)), 2.2vw, calc(1.5rem * var(--font-scale)));
 
   --default-sidebar-color: #fdf1f6;
   --default-sidebar-color-dark: #1d1d1d;
@@ -73,4 +86,55 @@ $sidebar-hover-bg: rgba(0, 0, 0, 0.05);
   --alert-info-bg: var(--card-bg);
 
   --notification-bg: #222831;
+}
+
+.dyslexia-mode {
+  --app-font: 'OpenDyslexic';
+  --heading-font: 'OpenDyslexic';
+}
+
+[data-theme='high-contrast'] {
+  --bg-color: #000000;
+  --bg-color-secondary: #111111;
+  --card-bg: #000000;
+
+  --border-color: #ffffff;
+
+  // text colors
+  --text-primary: #ffffff;
+  --text-secondary: #ffff66;
+  --text-muted: #d3d3d3;
+  --text-accent: var(--accent-color);
+
+  --primary-color: #564df2;
+  --accent-color: var(--primary-color);
+
+  --sidebar-hover-bg: red;
+  --navmenu-text: #ffff66;
+  --navmenu-hover-text: #ffcc00;
+
+  --hover-bg: #444444;
+
+  --notification-bg: #1d1d1d;
+}
+
+[data-theme='high-contrast'] {
+  button,
+  .app-card,
+  .modal-content,
+  .sidebar,
+  .dropdown-menu,
+  .sidebar a,
+  .header-card {
+    border: 2px solid var(--border-color) !important;
+  }
+}
+
+.reduce-motion *,
+.reduce-motion .modal.fade .modal-dialog,
+.reduce-motion .toggle-switch .slider,
+.reduce-motion .toggle-switch .slider:before {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
 }

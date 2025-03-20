@@ -43,7 +43,6 @@ jhi-footer {
   padding: 10px;
   background: #ffefe7; /* Soft warm pastel to match theme */
   color: #6b4f4f; /* Muted text color for readability */
-  font-size: 14px;
   font-weight: 500;
   text-align: center;
 
@@ -59,12 +58,10 @@ jhi-footer {
 .guest-banner .icon {
   width: 16px;
   height: 16px;
-  font-size: 16px;
   fill: currentColor;
 }
 
 .guest-banner a {
-  font-size: 14px;
   text-decoration: underline;
   color: #564df2;
   transition: color 0.2s ease-in-out;

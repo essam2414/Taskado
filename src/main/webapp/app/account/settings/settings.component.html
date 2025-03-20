@@ -1,22 +1,43 @@
 <div>
-  <h2>Settings</h2>
+  <div class="entity-header">
+    <div class="entity-header-left">
+      <h2>Settings</h2>
+
+      <!-- Normal filter buttons for desktop -->
+      <div class="desktop-only entity-filters">
+        <button class="btn-filter" *ngFor="let tab of tabs" [class.active]="activeTab === tab.value" (click)="setActiveTab(tab.value)">
+          <fa-icon [icon]="tab.icon"></fa-icon>
+          {{ tab.label }}
+        </button>
+      </div>
+
+      <!-- Dropdown filters for mobile -->
+      <div class="mobile-only entity-filters-dropdown dropdown dropdown-select" [class.open]="tabsOpen">
+        <button class="dropdown-btn" (click)="toggleTabs()">
+          <span><fa-icon class="filter-icon" [icon]="activeTabIcon"></fa-icon> {{ activeTabLabel }}</span>
+          <fa-icon [icon]="'chevron-down'"></fa-icon>
+        </button>
+
+        <div class="dropdown-menu">
+          <button
+            *ngFor="let tab of tabs"
+            class="dropdown-item"
+            [class.active]="activeTab === tab.value"
+            (click)="setActiveTab(tab.value); toggleTabs()"
+          >
+            <fa-icon [icon]="tab.icon"></fa-icon> {{ tab.label }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="settings-container">
-    <!-- Sidebar (Tabs) -->
-    <div class="settings-tabs">
-      <button class="tab-button" [class.active]="activeTab === 'account'" (click)="setActiveTab('account')">
-        <fa-icon icon="user"></fa-icon> Account
-      </button>
-      <button class="tab-button" [class.active]="activeTab === 'appearance'" (click)="setActiveTab('appearance')">
-        <fa-icon icon="palette"></fa-icon> Appearance
-      </button>
-    </div>
-
     <div class="settings-content">
       <!-- Account Settings -->
       <div *ngIf="activeTab === 'account'">
         @if (settingsForm.value.login) {
-          <h2 class="auth-title">User settings</h2>
+          <h3 class="settings-title">Account</h3>
         }
 
         @if (success()) {
@@ -28,17 +49,17 @@
         @if (settingsForm.value.login) {
           <form name="form" (ngSubmit)="save()" [formGroup]="settingsForm" novalidate>
             <div class="auth-input-group">
-              <label class="form-label" for="firstName">First Name</label>
+              <span class="setting-label" for="firstName">First Name</span>
               <input type="text" class="form-control" id="firstName" formControlName="firstName" />
             </div>
 
             <div class="auth-input-group">
-              <label class="form-label" for="lastName">Last Name</label>
+              <span class="setting-label" for="lastName">Last Name</span>
               <input type="text" class="form-control" id="lastName" formControlName="lastName" />
             </div>
 
             <div class="auth-input-group">
-              <label class="form-label" for="email">Email</label>
+              <span class="setting-label" for="email">Email</span>
               <input type="email" class="form-control" id="email" formControlName="email" />
             </div>
 
@@ -49,7 +70,7 @@
 
       <!-- Appearance Settings -->
       <div *ngIf="activeTab === 'appearance'">
-        <h2>Appearance</h2>
+        <h3 class="settings-title">Appearance</h3>
 
         <div class="setting-item">
           <div>
@@ -135,20 +156,89 @@
           </div>
         </div>
 
-        <div class="setting-item">
+        <div class="setting-item" [class.disabled]="highContrast">
           <div>
             <span class="setting-label">Dark Mode</span>
             <p class="setting-desc">Toggle between light and dark mode</p>
           </div>
 
           <label class="toggle-switch">
-            <input type="checkbox" [checked]="darkMode" (change)="toggleDarkMode()" />
+            <input type="checkbox" [checked]="darkMode" (change)="toggleDarkMode()" [disabled]="highContrast" />
             <span class="slider"></span>
           </label>
+
+          <p *ngIf="highContrast" class="disabled-text">
+            <fa-icon icon="info-circle"></fa-icon> High contrast mode is active. Disable it to toggle dark mode.
+          </p>
         </div>
 
         <!-- Reset Button -->
         <button class="reset-btn" (click)="resetColors()">Reset to default</button>
+      </div>
+
+      <!-- Accessibility Settings -->
+      <div *ngIf="activeTab === 'accessibility'">
+        <h3 class="settings-title">Accessibility</h3>
+
+        <div class="setting-item">
+          <div>
+            <span class="setting-label">Font Size</span>
+            <p class="setting-desc">Adjust text size for better readability</p>
+          </div>
+
+          <div class="font-size-slider-container">
+            <span class="font-size-label">A</span>
+
+            <div class="font-size-controls">
+              <input type="range" min="0" max="4" [(ngModel)]="fontSizeLevel" (input)="updateFontSize()" class="font-size-slider" />
+
+              <div class="font-size-steps">
+                <span
+                  *ngFor="let step of [0, 1, 2, 3, 4]; let i = index"
+                  class="font-size-step"
+                  [class.active]="fontSizeLevel === i"
+                ></span>
+              </div>
+            </div>
+            <span class="font-size-label large">A</span>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <div>
+            <span class="setting-label">Dyslexic Font</span>
+            <p class="setting-desc">Use a font designed for easier reading and letter distinction</p>
+          </div>
+
+          <label class="toggle-switch">
+            <input type="checkbox" [checked]="dyslexiaMode" (change)="toggleDyslexiaFont()" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-item">
+          <div>
+            <span class="setting-label">High Contrast Mode</span>
+            <p class="setting-desc">Enhance contrast for clearer text and visuals</p>
+          </div>
+
+          <label class="toggle-switch">
+            <input type="checkbox" [checked]="highContrast" (change)="toggleHighContrast()" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-item">
+          <div>
+            <span class="setting-label">Reduce Motion</span>
+            <p class="setting-desc">Minimize animations for a smoother experience</p>
+          </div>
+
+          <label class="toggle-switch">
+            <input type="checkbox" [checked]="reduceMotion" (change)="toggleReduceMotion()" />
+            <span class="slider"></span>
+          </label>
+        </div>
       </div>
     </div>
   </div>

@@ -7,11 +7,11 @@ import { Subject, of } from 'rxjs';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 
-import HomeComponent from './home.component';
+import DashboardComponent from './dashboard.component';
 
-describe('Home Component', () => {
-  let comp: HomeComponent;
-  let fixture: ComponentFixture<HomeComponent>;
+describe('Dashboard Component', () => {
+  let comp: DashboardComponent;
+  let fixture: ComponentFixture<DashboardComponent>;
   let mockAccountService: AccountService;
   let mockRouter: Router;
   const account: Account = {
@@ -27,15 +27,15 @@ describe('Home Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HomeComponent],
+      imports: [DashboardComponent],
       providers: [AccountService],
     })
-      .overrideTemplate(HomeComponent, '')
+      .overrideTemplate(DashboardComponent, '')
       .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(HomeComponent);
+    fixture = TestBed.createComponent(DashboardComponent);
     comp = fixture.componentInstance;
     mockAccountService = TestBed.inject(AccountService);
     mockAccountService.identity = jest.fn(() => of(null));

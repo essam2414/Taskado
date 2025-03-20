@@ -16,8 +16,15 @@ const initialAccount: Account = {} as Account;
 })
 export default class SettingsComponent implements OnInit {
   success = signal(false);
-  activeTab = 'account';
   darkMode = false;
+
+  activeTab = 'account';
+  tabsOpen = false;
+  tabs = [
+    { value: 'account', label: 'Account', icon: 'user' },
+    { value: 'appearance', label: 'Appearance', icon: 'palette' },
+    { value: 'accessibility', label: 'Accessibility', icon: 'eye' },
+  ];
 
   themeColors: string[] = [];
   darkModePalette: string[] = this.getThemeColors(true);
@@ -43,6 +50,12 @@ export default class SettingsComponent implements OnInit {
   customSidebarHexInput = '';
   customAccentHexInput = '';
 
+  fontSizeLevel = 2;
+  fontScaleOptions = [0.7, 0.85, 1, 1.15, 1.3];
+  dyslexiaMode = false;
+  highContrast = false;
+  reduceMotion = false;
+
   settingsForm = new FormGroup({
     firstName: new FormControl(initialAccount.firstName, {
       nonNullable: true,
@@ -67,14 +80,22 @@ export default class SettingsComponent implements OnInit {
   private readonly accountService = inject(AccountService);
 
   ngOnInit(): void {
+    this.loadFontSize();
+    this.loadDyslexiaFont();
+    this.loadHighContrast();
+    this.loadReduceMotion();
+
     this.darkMode = localStorage.getItem('darkMode') === 'true';
-    document.documentElement.setAttribute('data-theme', this.darkMode ? 'dark' : 'light');
+    const highContrast = localStorage.getItem('highContrast') === 'true';
+
+    document.documentElement.setAttribute('data-theme', highContrast ? 'high-contrast' : this.darkMode ? 'dark' : 'light');
 
     this.themeColors = this.darkMode ? this.darkModePalette : this.lightModePalette;
     this.selectedSidebarColorLight = this.getStoredSidebarColor(false);
     this.selectedSidebarColorDark = this.getStoredSidebarColor(true);
 
     this.selectedSidebarColor = this.getStoredSidebarColor(this.darkMode);
+
     this.applySidebarColor();
 
     this.selectedAccentColor =
@@ -127,8 +148,20 @@ export default class SettingsComponent implements OnInit {
     });
   }
 
+  get activeTabLabel(): string {
+    return this.tabs.find(tab => tab.value === this.activeTab)?.label ?? 'Settings';
+  }
+
+  get activeTabIcon(): string {
+    return this.tabs.find(tab => tab.value === this.activeTab)?.icon ?? 'cog';
+  }
+
   setActiveTab(tab: string): void {
     this.activeTab = tab;
+  }
+
+  toggleTabs(): void {
+    this.tabsOpen = !this.tabsOpen;
   }
 
   toggleDarkMode(): void {
@@ -163,21 +196,26 @@ export default class SettingsComponent implements OnInit {
   applySidebarColor(): void {
     document.documentElement.style.setProperty('--sidebar-color', this.selectedSidebarColor);
 
-    const rgb = this.hexToRgb(this.selectedSidebarColor);
-    if (rgb) {
-      const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
-      const textColor = brightness > 128 ? '#2C2C38' : '#FFFFFF';
+    let textColor = '#FFFFFF';
+    let hoverColor = '#444444';
 
-      document.documentElement.style.setProperty('--sidebar-text-color', textColor);
-      document.documentElement.style.setProperty('--navmenu-text', textColor);
-      document.documentElement.style.setProperty('--navmenu-hover-text', textColor);
+    if (!this.highContrast) {
+      const rgb = this.hexToRgb(this.selectedSidebarColor);
+      if (rgb) {
+        const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+        textColor = brightness > 128 ? '#2C2C38' : '#FFFFFF';
 
-      const hoverColor =
-        brightness > 128
-          ? `rgba(${rgb.r - 20}, ${rgb.g - 20}, ${rgb.b - 20}, 0.3)`
-          : `rgba(${rgb.r + 20}, ${rgb.g + 20}, ${rgb.b + 20}, 0.3)`;
-      document.documentElement.style.setProperty('--sidebar-hover-bg', hoverColor);
+        hoverColor =
+          brightness > 128
+            ? `rgba(${rgb.r - 20}, ${rgb.g - 20}, ${rgb.b - 20}, 0.3)`
+            : `rgba(${rgb.r + 20}, ${rgb.g + 20}, ${rgb.b + 20}, 0.3)`;
+      }
     }
+
+    document.documentElement.style.setProperty('--sidebar-text-color', textColor);
+    document.documentElement.style.setProperty('--navmenu-text', textColor);
+    document.documentElement.style.setProperty('--navmenu-hover-text', textColor);
+    document.documentElement.style.setProperty('--sidebar-hover-bg', hoverColor);
   }
 
   resetColors(): void {
@@ -191,6 +229,10 @@ export default class SettingsComponent implements OnInit {
   }
 
   getStoredSidebarColor(isDarkMode: boolean): string {
+    if (this.highContrast) {
+      return localStorage.getItem('sidebarColorHighContrast') ?? '#000000'; // Black sidebar in high contrast
+    }
+
     return isDarkMode
       ? (localStorage.getItem('sidebarColorDark') ??
           getComputedStyle(document.documentElement).getPropertyValue('--default-sidebar-color-dark').trim())
@@ -216,5 +258,73 @@ export default class SettingsComponent implements OnInit {
     const g = parseInt(c[2] + c[3], 16);
     const b = parseInt(c[4] + c[5], 16);
     return { r, g, b };
+  }
+
+  updateFontSize(): void {
+    const newScale = this.fontScaleOptions[this.fontSizeLevel];
+    document.documentElement.style.setProperty('--font-scale', newScale.toString());
+    localStorage.setItem('fontSizeLevel', this.fontSizeLevel.toString());
+  }
+
+  loadFontSize(): void {
+    const storedLevel = localStorage.getItem('fontSizeLevel');
+    if (storedLevel !== null) {
+      this.fontSizeLevel = parseInt(storedLevel, 10);
+      this.updateFontSize();
+    }
+  }
+
+  toggleDyslexiaFont(): void {
+    this.dyslexiaMode = !this.dyslexiaMode;
+    document.documentElement.classList.toggle('dyslexia-mode', this.dyslexiaMode);
+    localStorage.setItem('dyslexiaMode', this.dyslexiaMode.toString());
+  }
+
+  loadDyslexiaFont(): void {
+    const storedDyslexiaMode = localStorage.getItem('dyslexiaMode');
+    this.dyslexiaMode = storedDyslexiaMode === 'true';
+
+    if (this.dyslexiaMode) {
+      document.documentElement.classList.add('dyslexia-mode');
+    }
+  }
+
+  toggleHighContrast(): void {
+    this.highContrast = !this.highContrast;
+
+    if (this.highContrast) {
+      document.documentElement.setAttribute('data-theme', 'high-contrast');
+      localStorage.setItem('highContrast', 'true');
+
+      this.selectedSidebarColor = '#000000';
+    } else {
+      document.documentElement.setAttribute('data-theme', this.darkMode ? 'dark' : 'light');
+      localStorage.removeItem('highContrast');
+
+      this.selectedSidebarColor = this.darkMode ? this.getStoredSidebarColor(true) : this.getStoredSidebarColor(false);
+    }
+
+    this.applySidebarColor();
+  }
+
+  loadHighContrast(): void {
+    const storedSetting = localStorage.getItem('highContrast');
+    if (storedSetting === 'true') {
+      this.highContrast = true;
+      document.documentElement.setAttribute('data-theme', 'high-contrast');
+    }
+  }
+
+  toggleReduceMotion(): void {
+    this.reduceMotion = !this.reduceMotion;
+    document.documentElement.classList.toggle('reduce-motion', this.reduceMotion);
+    localStorage.setItem('reduceMotion', this.reduceMotion.toString());
+  }
+
+  loadReduceMotion(): void {
+    this.reduceMotion = localStorage.getItem('reduceMotion') === 'true';
+    if (this.reduceMotion) {
+      document.documentElement.classList.add('reduce-motion');
+    }
   }
 }

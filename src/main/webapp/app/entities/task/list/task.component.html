@@ -19,7 +19,7 @@
       <!-- Dropdown filters for mobile -->
       <div class="mobile-only entity-filters-dropdown dropdown dropdown-select" [class.open]="filtersOpen">
         <button class="dropdown-btn" (click)="toggleFilters()">
-          <div><fa-icon class="filter-icon" [icon]="activeFilterIcon"></fa-icon> {{ activeFilterLabel }}</div>
+          <span><fa-icon class="filter-icon" [icon]="activeFilterIcon"></fa-icon> {{ activeFilterLabel }}</span>
           <fa-icon [icon]="'chevron-down'"></fa-icon>
         </button>
 
@@ -28,7 +28,7 @@
             *ngFor="let filter of filters"
             class="dropdown-item"
             [class.active]="activeFilter === filter.value"
-            (click)="setFilter(filter.value)"
+            (click)="setFilter(filter.value); toggleFilters()"
           >
             {{ filter.label }}
           </button>
@@ -94,7 +94,7 @@
             />
 
             <div class="task-info">
-              <h3 class="task-title">{{ task.title }}</h3>
+              <h4 class="task-title">{{ task.title }}</h4>
               <div class="task-description">{{ task.description }}</div>
 
               <div class="task-details">
@@ -209,7 +209,7 @@
               />
 
               <div class="task-info">
-                <h3 class="task-title">{{ task.title }}</h3>
+                <h4 class="task-title">{{ task.title }}</h4>
                 <div class="task-description">{{ task.description }}</div>
 
                 <div class="task-details">

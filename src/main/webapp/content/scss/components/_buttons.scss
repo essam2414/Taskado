@@ -46,16 +46,11 @@ $text-accent: #695cff;
   font-weight: 500;
   padding: 12px 24px;
   border-radius: 8px;
-  font-size: 1rem;
 
   transition: all 0.3s ease-in-out;
   text-transform: none;
   box-shadow: none;
   white-space: nowrap;
-
-  fa-icon {
-    font-size: 1.1em;
-  }
 
   &:disabled {
     cursor: not-allowed;

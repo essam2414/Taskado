@@ -22,12 +22,11 @@
 
   width: 100%;
 
-  font-size: 16px;
   border: none;
   background: none;
 
   cursor: pointer;
-  color: #6b6b78;
+  color: var(--text-muted);
 
   transition: color 0.2s ease-in-out;
 
@@ -41,7 +40,6 @@
   }
 
   fa-icon {
-    font-size: 18px;
     width: 18px;
     height: 18px;
 
@@ -51,28 +49,29 @@
   }
 }
 
+.settings-title {
+  margin-bottom: 20px;
+}
+
 .settings-content {
   flex-grow: 1;
-
-  h2 {
-    text-align: left;
-    font-size: 22px;
-    margin-bottom: 20px;
-  }
 }
 
 .setting-item {
   display: flex;
   flex-direction: column;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .setting-label {
   font-weight: 600;
 }
 
-.setting-desc {
-  font-size: 16px;
+// when dark mode is disabeld
+.setting-item.disabled .setting-label,
+.setting-item.disabled .setting-desc,
+.setting-item.disabled .toggle-switch {
+  opacity: 0.4;
 }
 
 .color-palette {
@@ -86,7 +85,6 @@
   align-items: center;
   gap: 8px;
 
-  font-size: 14px;
   font-weight: 500;
 
   input {
@@ -135,7 +133,6 @@
     left: 50%;
     transform: translate(-50%, -50%);
     color: white;
-    font-size: 16px;
   }
 }
 
@@ -179,6 +176,19 @@
   input:checked + .slider:before {
     transform: translateX(20px);
   }
+
+  input:disabled + .slider {
+    cursor: not-allowed; /* Show disabled cursor */
+  }
+}
+
+.disabled-text {
+  font-size: var(--font-sm);
+  color: var(--warning-color);
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .reset-btn {
@@ -186,13 +196,91 @@
   background: none;
   padding: 0;
   font-weight: 500;
-  font-size: 15px;
   color: var(--text-muted);
   transition: color 0.2s ease-in-out;
 
   &:hover {
     color: var(--text-secondary);
   }
+}
+
+/* Font size slider */
+.font-size-slider-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.font-size-controls {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+}
+
+.font-size-slider {
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background-color: var(--hover-bg);
+
+  border-radius: 10px;
+  outline: none;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+  z-index: 2; /* Makes sure the slider is ABOVE the step dots */
+}
+
+.font-size-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+
+  width: 20px; /* Set a specific slider handle width */
+  height: 20px; /* Slider handle height */
+  border-radius: 50%;
+
+  background-color: var(--accent-color);
+  cursor: pointer; /* Cursor on hover */
+}
+
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  cursor: pointer;
+}
+
+.font-size-label {
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.font-size-label.large {
+  font-size: 1.8rem;
+}
+
+.font-size-steps {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 1; /* Below the slider thumb but above track */
+  transform: translateY(-50%);
+}
+
+/* Small Circles (Same Color as Slider) */
+.font-size-step {
+  width: 12px;
+  height: 12px;
+  background: var(--hover-bg);
+  border-radius: 50%;
+  position: relative;
+  z-index: 1;
 }
 
 /* Responsive */

@@ -42,13 +42,12 @@
   justify-content: space-between;
   padding-bottom: 20px;
   margin-bottom: 30px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .sidebar-topbar .icon {
   width: 20px;
   height: 20px;
-  font-size: 20px;
   fill: currentColor;
 }
 
@@ -65,7 +64,6 @@
 
   text-decoration: none;
   font-weight: 500;
-  font-size: 16px;
 }
 
 .user-info:hover {
@@ -135,7 +133,6 @@
 
 /* Navigation Menu */
 .nav-menu a {
-  font-size: 14px;
   font-weight: 400;
   color: var(--navmenu-text);
 
@@ -175,7 +172,6 @@
 .sidebar-bottom .icon {
   width: 16px;
   height: 16px;
-  font-size: 16px;
   margin-right: 10px;
   fill: currentColor;
   overflow: visible;
@@ -195,7 +191,6 @@
   padding: 14px 20px;
   border-radius: 5px;
 
-  font-size: 14px;
   font-weight: 300;
   text-decoration: none;
 
