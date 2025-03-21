@@ -10,7 +10,12 @@ entity Task {
   priority Priority,
   completed Boolean,
   createdAt Instant,
-  updatedAt Instant
+  updatedAt Instant,
+  order Integer
+}
+
+entity Section {
+  name String required
 }
 
 entity Event {
@@ -112,7 +117,8 @@ entity ProductivityReport {
 }
 
 relationship OneToMany {
-  ProductivityReport{pomodoroSessions} to PomodoroSession
+  ProductivityReport{pomodoroSessions} to PomodoroSession,
+  Section{tasks} to Task{section}
 }
 
 relationship ManyToMany {

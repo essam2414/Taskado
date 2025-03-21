@@ -11,6 +11,7 @@
   min-height: 100vh;
   transition: margin-left 0.3s ease-in-out;
   padding: clamp(20px, 5vw, 60px);
+  padding-top: max(75px, 5vw); /* Ensures top padding, min 56px */
   padding-bottom: 0;
 }
 
@@ -42,7 +43,6 @@ jhi-footer {
   padding: 10px;
   background: #ffefe7; /* Soft warm pastel to match theme */
   color: #6b4f4f; /* Muted text color for readability */
-  font-size: 14px;
   font-weight: 500;
   text-align: center;
 
@@ -58,12 +58,10 @@ jhi-footer {
 .guest-banner .icon {
   width: 16px;
   height: 16px;
-  font-size: 16px;
   fill: currentColor;
 }
 
 .guest-banner a {
-  font-size: 14px;
   text-decoration: underline;
   color: #564df2;
   transition: color 0.2s ease-in-out;

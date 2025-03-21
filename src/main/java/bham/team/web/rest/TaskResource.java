@@ -142,6 +142,9 @@ public class TaskResource {
                 if (task.getUpdatedAt() != null) {
                     existingTask.setUpdatedAt(task.getUpdatedAt());
                 }
+                if (task.getOrder() != null) {
+                    existingTask.setOrder(task.getOrder());
+                }
 
                 return existingTask;
             })

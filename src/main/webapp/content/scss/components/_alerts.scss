@@ -1,0 +1,130 @@
+@import '../variables';
+
+/* ==========================================================================
+Custom alerts for notification
+========================================================================== */
+.alerts {
+  .alert {
+    text-overflow: ellipsis;
+    transition:
+      opacity 0.4s ease-in-out,
+      transform 0.3s ease-in-out;
+
+    pre {
+      background: none;
+      border: none;
+      font: inherit;
+      color: inherit;
+      padding: 0;
+      margin: 0;
+    }
+    .popover pre {
+      font-size: 10px;
+    }
+  }
+  .jhi-toast {
+    position: fixed;
+    width: 100%;
+    &.left {
+      left: 5px;
+    }
+    &.right {
+      right: 5px;
+    }
+    &.top {
+      top: 55px;
+    }
+    &.bottom {
+      bottom: 55px;
+    }
+  }
+}
+
+.alert-success,
+.alert-danger,
+.alert-warning,
+.alert-info {
+  font-weight: 500;
+  border-radius: 2px;
+  padding: 16px 32px;
+}
+
+.alert-success {
+  background: var(--alert-success-bg) !important;
+  color: var(--success-color) !important;
+  border-left: 4px solid var(--success-color) !important;
+}
+
+.alert-danger {
+  background: var(--alert-danger-bg) !important;
+  color: var(--danger-color) !important;
+  border-left: 4px solid var(--danger-color) !important;
+}
+
+.alert-warning {
+  background: var(--alert-warning-bg) !important;
+  color: var(--warning-color) !important;
+  border-left: 4px solid var(--warning-color) !important;
+}
+
+.alert-info {
+  background: var(--alert-info-bg) !important;
+  color: var(--info-color) !important;
+  border-left: 4px solid var(--info-color) !important;
+}
+
+.alert-dismissible {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 24px;
+
+  background: var(--notification-bg) !important;
+  border-radius: 12px;
+  border: none !important;
+  color: white !important;
+  font-weight: 300;
+  padding: 20px;
+  box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
+
+  z-index: 1050;
+  animation: fadeInSlide 0.4s ease-in-out;
+}
+
+.alert-dismissible .btn-close {
+  position: relative;
+  margin-left: auto;
+  padding: 0;
+}
+
+@media screen and (min-width: 480px) {
+  .alerts .jhi-toast {
+    width: 50%;
+  }
+}
+
+@media screen and (min-width: 480px) {
+  .alerts .jhi-toast {
+    width: 50%;
+    max-width: 400px;
+  }
+}
+
+// Fade-In Animation for Alerts
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.alert {
+  animation: fadeInSlide 0.4s ease-in-out;
+}

@@ -3,30 +3,32 @@ import dayjs from 'dayjs/esm';
 import { ITask, NewTask } from './task.model';
 
 export const sampleWithRequiredData: ITask = {
-  id: 12837,
-  title: 'marten oxygenate',
+  id: 20406,
+  title: 'inwardly solidly recent',
 };
 
 export const sampleWithPartialData: ITask = {
-  id: 23152,
-  title: 'sadly',
-  createdAt: dayjs('2025-01-31T09:38'),
-  updatedAt: dayjs('2025-01-31T15:51'),
+  id: 2128,
+  title: 'foodstuffs',
+  dueDate: dayjs('2025-01-31T10:38'),
+  priority: 'MEDIUM',
+  createdAt: dayjs('2025-01-31T08:35'),
 };
 
 export const sampleWithFullData: ITask = {
-  id: 29994,
-  title: 'bravely across square',
-  description: 'ingratiate instead summarise',
-  dueDate: dayjs('2025-01-31T12:47'),
-  priority: 'CRITICAL',
+  id: 31019,
+  title: 'blah wherever',
+  description: 'before lightly',
+  dueDate: dayjs('2025-01-31T01:09'),
+  priority: 'LOW',
   completed: true,
-  createdAt: dayjs('2025-01-30T22:33'),
-  updatedAt: dayjs('2025-01-31T04:15'),
+  createdAt: dayjs('2025-01-31T09:22'),
+  updatedAt: dayjs('2025-01-31T02:32'),
+  order: 27968,
 };
 
 export const sampleWithNewData: NewTask = {
-  title: 'iterate how',
+  title: 'treasure notwithstanding duh',
   id: null,
 };
 

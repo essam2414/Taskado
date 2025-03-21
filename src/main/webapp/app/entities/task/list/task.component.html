@@ -1,9 +1,10 @@
 <div>
-  <div class="task-header">
-    <div class="task-header-left">
+  <div class="entity-header">
+    <div class="entity-header-left">
       <h2 id="page-heading" data-cy="TaskHeading">Tasks</h2>
 
-      <div class="task-filters">
+      <!-- Normal filter buttons for desktop -->
+      <div class="desktop-only entity-filters">
         <button
           *ngFor="let filter of filters"
           class="btn-filter"
@@ -14,11 +15,39 @@
           {{ filter.label }}
         </button>
       </div>
+
+      <!-- Dropdown filters for mobile -->
+      <div class="mobile-only entity-filters-dropdown dropdown dropdown-select" [class.open]="filtersOpen">
+        <button class="dropdown-btn" (click)="toggleFilters()">
+          <span><fa-icon class="filter-icon" [icon]="activeFilterIcon"></fa-icon> {{ activeFilterLabel }}</span>
+          <fa-icon [icon]="'chevron-down'"></fa-icon>
+        </button>
+
+        <div class="dropdown-menu">
+          <button
+            *ngFor="let filter of filters"
+            class="dropdown-item"
+            [class.active]="activeFilter === filter.value"
+            (click)="setFilter(filter.value); toggleFilters()"
+          >
+            {{ filter.label }}
+          </button>
+        </div>
+      </div>
     </div>
 
-    <button id="jh-create-entity" data-cy="entityCreateButton" class="btn-add jh-create-entity create-task" [routerLink]="['/task/new']">
+    <button
+      id="jh-create-entity"
+      data-cy="entityCreateButton"
+      class="btn-add jh-create-entity create-task desktop-only"
+      (click)="addTask()"
+    >
       <fa-icon icon="plus"></fa-icon>
       <span>New task</span>
+    </button>
+
+    <button class="btn-add-icon jh-create-entity create-task mobile-only" (click)="addTask()">
+      <fa-icon icon="plus"></fa-icon>
     </button>
   </div>
 
@@ -26,95 +55,224 @@
 
   <jhi-alert></jhi-alert>
 
-  <div class="task-list">
+  <!-- Task Filter View -->
+  <div class="task-list-header">
     <h3 class="task-subtitle">{{ activeFilterLabel }}</h3>
-    @for (task of getFilteredTasks(); track trackId(task)) {
-      <div
-        class="app-card"
-        [class.completed]="task.completed"
-        [class.non-clickable]="task.completed"
-        (click)="!task.completed && editTask(task)"
-      >
-        <div class="task-smth">
-          <input
-            type="checkbox"
-            class="form-check-input custom-checkbox"
-            [checked]="task.completed"
-            (change)="toggleCompleted(task)"
-            (click)="$event.stopPropagation()"
-            id="task-{{ task.id }}"
-          />
 
-          <div class="task-info">
-            <h3 class="task-title">{{ task.title }}</h3>
-            <div class="task-description">{{ task.description }}</div>
+    <div class="dropdown dropdown-action task-settings" [class.open]="settingsOpen">
+      <fa-icon icon="ellipsis-vertical" class="dropdown-btn" (click)="toggleSettings(); $event.stopPropagation()"></fa-icon>
+      <div class="dropdown-menu">
+        <button class="dropdown-item" (click)="addSection(); $event.stopPropagation()">
+          <fa-icon icon="plus"></fa-icon>
+          <span>Add Section</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
-            <div class="task-details">
-              @if (task.priority) {
-                <div class="task-tag task-priority" [ngClass]="task.priority">
-                  <fa-icon icon="flag"></fa-icon>
-                  {{
-                    { null: '', LOW: 'Low Priority', MEDIUM: 'Medium Priority', HIGH: 'High Priority', CRITICAL: 'Critical Priority' }[
-                      task.priority
-                    ]
-                  }}
-                </div>
-              }
+  <!-- Task -->
+  <div cdkDropListGroup>
+    <div class="task-list" cdkDropList id="unsectioned" [cdkDropListData]="unsectionedTasks" (cdkDropListDropped)="drop($event, null)">
+      @for (task of unsectionedTasks; track trackId(task)) {
+        <div
+          cdkDrag
+          [cdkDragData]="task"
+          class="app-card"
+          [class.completed]="task.completed"
+          [class.non-clickable]="task.completed"
+          (click)="!task.completed && editTask(task)"
+          *ngIf="!shouldHideTask(task)"
+        >
+          <div class="task-smth">
+            <input
+              type="checkbox"
+              class="form-check-input custom-checkbox"
+              [checked]="task.completed"
+              (change)="toggleCompleted(task)"
+              (click)="$event.stopPropagation()"
+              id="task-{{ task.id }}"
+            />
 
-              @if (task.category) {
-                <div
-                  class="task-tag task-category"
-                  [ngStyle]="{
-                    color: task.category.color,
-                    'background-color': task.category.color + '30',
-                  }"
-                >
-                  {{ task.category.name }}
-                </div>
-              }
+            <div class="task-info">
+              <h4 class="task-title">{{ task.title }}</h4>
+              <div class="task-description">{{ task.description }}</div>
+
+              <div class="task-details">
+                @if (task.priority) {
+                  <div class="task-tag task-priority" [ngClass]="task.priority">
+                    <fa-icon icon="flag"></fa-icon>
+                    {{
+                      { null: '', LOW: 'Low Priority', MEDIUM: 'Medium Priority', HIGH: 'High Priority', CRITICAL: 'Critical Priority' }[
+                        task.priority
+                      ]
+                    }}
+                  </div>
+                }
+
+                @if (task.category) {
+                  <div
+                    class="task-tag task-category"
+                    [ngStyle]="{
+                      color: task.category.color,
+                      'background-color': task.category.color + '30',
+                    }"
+                  >
+                    {{ task.category.name }}
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="task-date" [ngClass]="isTaskPast(task.dueDate) ? 'past-task' : ''">
+            <span>{{ formatTaskDate(task.dueDate) }}</span>
+          </div>
+
+          <div class="dropdown dropdown-action task-dropdown" [class.open]="openMenuTaskId === task.id">
+            <fa-icon icon="ellipsis-vertical" class="dropdown-btn" (click)="toggleMenu(task.id); $event.stopPropagation()"></fa-icon>
+            <div class="dropdown-menu" [class.show]="openMenuTaskId === task.id">
+              <button class="dropdown-item" (click)="editTask(task); $event.stopPropagation()">
+                <fa-icon icon="pencil"></fa-icon>
+                <span>Edit</span>
+              </button>
+              <button class="dropdown-item delete" (click)="delete(task); $event.stopPropagation()">
+                <fa-icon icon="trash-alt"></fa-icon>
+                <span>Delete</span>
+              </button>
             </div>
           </div>
         </div>
+      }
+    </div>
 
-        <div class="task-date">
-          <span>{{ formatTaskDate(task.dueDate) }}</span>
-        </div>
+    @for (section of sections; track section?.id) {
+      <div class="section-header">
+        <fa-icon
+          *ngIf="editingSectionId !== section.id"
+          [icon]="collapsedSections[section.id] ? 'chevron-right' : 'chevron-down'"
+          (click)="toggleSection(section); $event.stopPropagation()"
+        >
+        </fa-icon>
 
-        <div class="dropdown dropdown-action" [class.open]="openMenuTaskId === task.id">
-          <fa-icon icon="ellipsis-vertical" class="dropdown-btn" (click)="toggleMenu(task.id); $event.stopPropagation()"></fa-icon>
-          <div class="dropdown-menu" [class.show]="openMenuTaskId === task.id">
-            <button class="dropdown-item" (click)="editTask(task); $event.stopPropagation()">
-              <fa-icon icon="pencil"></fa-icon>
-              <span>Edit</span>
-            </button>
-            <button class="dropdown-item delete" (click)="delete(task); $event.stopPropagation()">
-              <fa-icon icon="trash-alt"></fa-icon>
-              <span>Delete</span>
-            </button>
+        <div class="section-title">
+          <input
+            type="text"
+            [(ngModel)]="section.name"
+            (focus)="startEditing(section)"
+            (blur)="stopEditing()"
+            (keydown.enter)="saveSection(section, $event)"
+            class="section-title-input"
+          />
+          <div *ngIf="editingSectionId === section.id" class="section-name-btns">
+            <button class="btn btn-primary" (click)="saveSection(section)">Save</button>
+            <button class="btn" (click)="cancelEdit(section)">Cancel</button>
           </div>
         </div>
+
+        <button class="delete-section" *ngIf="editingSectionId !== section.id" (click)="deleteSection(section); $event.stopPropagation()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path
+              d="M21,4H17.9A5.009,5.009,0,0,0,13,0H11A5.009,5.009,0,0,0,6.1,4H3A1,1,0,0,0,3,6H4V19a5.006,5.006,0,0,0,5,5h6a5.006,5.006,0,0,0,5-5V6h1a1,1,0,0,0,0-2ZM11,2h2a3.006,3.006,0,0,1,2.829,2H8.171A3.006,3.006,0,0,1,11,2Zm7,17a3,3,0,0,1-3,3H9a3,3,0,0,1-3-3V6H18Z"
+            />
+            <path d="M10,18a1,1,0,0,0,1-1V11a1,1,0,0,0-2,0v6A1,1,0,0,0,10,18Z" />
+            <path d="M14,18a1,1,0,0,0,1-1V11a1,1,0,0,0-2,0v6A1,1,0,0,0,14,18Z" />
+          </svg>
+        </button>
+      </div>
+
+      <div
+        class="task-list"
+        cdkDropList
+        id="section-{{ section.id }}"
+        [cdkDropListData]="sectionsMap[section.id]"
+        (cdkDropListDropped)="drop($event, section)"
+        [style.display]="collapsedSections[section.id] ? 'none' : 'flex'"
+      >
+        @for (task of sectionsMap[section.id]; track trackId(task)) {
+          <div
+            cdkDrag
+            [cdkDragData]="task"
+            class="app-card"
+            [class.completed]="task.completed"
+            [class.non-clickable]="task.completed"
+            (click)="!task.completed && editTask(task)"
+            *ngIf="!shouldHideTask(task)"
+          >
+            <div class="task-smth">
+              <input
+                type="checkbox"
+                class="form-check-input custom-checkbox"
+                [checked]="task.completed"
+                (change)="toggleCompleted(task)"
+                (click)="$event.stopPropagation()"
+                id="task-{{ task.id }}"
+              />
+
+              <div class="task-info">
+                <h4 class="task-title">{{ task.title }}</h4>
+                <div class="task-description">{{ task.description }}</div>
+
+                <div class="task-details">
+                  @if (task.priority) {
+                    <div class="task-tag task-priority" [ngClass]="task.priority">
+                      <fa-icon icon="flag"></fa-icon>
+                      {{
+                        { null: '', LOW: 'Low Priority', MEDIUM: 'Medium Priority', HIGH: 'High Priority', CRITICAL: 'Critical Priority' }[
+                          task.priority
+                        ]
+                      }}
+                    </div>
+                  }
+
+                  @if (task.category) {
+                    <div
+                      class="task-tag task-category"
+                      [ngStyle]="{
+                        color: task.category.color,
+                        'background-color': task.category.color + '30',
+                      }"
+                    >
+                      {{ task.category.name }}
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="task-date" [ngClass]="isTaskPast(task.dueDate) ? 'past-task' : ''">
+              <span>{{ formatTaskDate(task.dueDate) }}</span>
+            </div>
+
+            <div class="dropdown dropdown-action task-dropdown" [class.open]="openMenuTaskId === task.id">
+              <fa-icon icon="ellipsis-vertical" class="dropdown-btn" (click)="toggleMenu(task.id); $event.stopPropagation()"></fa-icon>
+              <div class="dropdown-menu" [class.show]="openMenuTaskId === task.id">
+                <button class="dropdown-item" (click)="editTask(task); $event.stopPropagation()">
+                  <fa-icon icon="pencil"></fa-icon>
+                  <span>Edit</span>
+                </button>
+                <button class="dropdown-item delete" (click)="delete(task); $event.stopPropagation()">
+                  <fa-icon icon="trash-alt"></fa-icon>
+                  <span>Delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        }
       </div>
     }
+  </div>
 
-    <div class="add-task">
-      <input
-        type="text"
-        class="task-input"
-        [(ngModel)]="newTaskTitle"
-        placeholder="Start typing to add a task..."
-        (keyup.enter)="addTask()"
-      />
+  <div class="add-task">
+    <input
+      type="text"
+      class="task-input"
+      [(ngModel)]="newTaskTitle"
+      placeholder="Start typing to add a task..."
+      (keyup.enter)="addTask(newTaskTitle)"
+    />
 
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn-add-icon jh-create-entity create-task"
-        [routerLink]="['/task/new']"
-        [queryParams]="{ title: newTaskTitle }"
-        [disabled]="!newTaskTitle.trim()"
-      >
-        <fa-icon icon="plus"></fa-icon>
-      </button>
-    </div>
+    <button class="btn-add-icon jh-create-entity create-task" (click)="addTask(newTaskTitle)" [disabled]="!newTaskTitle.trim()">
+      <fa-icon icon="plus"></fa-icon>
+    </button>
   </div>
 </div>

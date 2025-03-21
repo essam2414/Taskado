@@ -9,7 +9,7 @@ const taskRoute: Routes = [
     path: '',
     loadComponent: () => import('./list/task.component').then(m => m.TaskComponent),
     data: {
-      defaultSort: `id,${ASC}`,
+      defaultSort: `order,${ASC},id,${ASC}`,
     },
     canActivate: [UserRouteAccessService],
   },
