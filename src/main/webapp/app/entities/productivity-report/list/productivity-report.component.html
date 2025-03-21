@@ -55,26 +55,24 @@
       </button>
 
       <!-- Report Date -->
-      @if (productivityReports && productivityReports.length > 0) {
-        <span
-          *ngIf="productivityReports[0]"
-          style="
-            font-size: 18px;
-            font-weight: bold;
-            color: #007bff;
-            padding: 10px 20px;
-            border-radius: 6px;
-            text-align: center;
-            border: 2px solid #007bff;
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-            height: 44px;
-          "
-        >
-          📅 {{ productivityReports[0].timestamp | formatMediumDate }}
-        </span>
-      }
+      <span
+        id="reportDate"
+        style="
+          font-size: 18px;
+          font-weight: bold;
+          color: #007bff;
+          padding: 10px 20px;
+          border-radius: 6px;
+          text-align: center;
+          border: 2px solid #007bff;
+          background: #f8f9fa;
+          display: flex;
+          align-items: center;
+          height: 44px;
+        "
+      >
+        📅 {{ timestamp ?? 'Unselected' }}
+      </span>
 
       <!-- Next Button -->
       <button
@@ -114,8 +112,8 @@
 
   <hr style="margin-top: 10px; margin-bottom: 20px; border: 1px solid #ccc" />
 
-  <jhi-alert-error></jhi-alert-error>
-  <jhi-alert></jhi-alert>
+  <!--  <jhi-alert-error></jhi-alert-error>-->
+  <!--  <jhi-alert></jhi-alert>-->
 
   @if (productivityReports?.length === 0) {
     <div class="alert alert-warning" id="no-result">
@@ -195,8 +193,8 @@
     </div>
 
     <!-- Right Side: Graph -->
-    <div *ngIf="productivityReports && productivityReports.length > 0" style="flex: 1; display: flex; justify-content: center">
-      <canvas #chartCanvas style="height: 625px !important; width: 100%"></canvas>
+    <div style="flex: 1; display: flex; justify-content: center">
+      <canvas #chartCanvas style="height: 600px !important; width: 100%"></canvas>
     </div>
   </div>
 </div>
