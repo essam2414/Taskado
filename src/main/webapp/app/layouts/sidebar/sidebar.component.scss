@@ -72,26 +72,22 @@
 }
 
 /* Profile Picture */
-.profile-image,
-.letter-avatar {
-  width: 28px;
-  height: 28px;
-  margin-right: 8px;
+.profile-pic {
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: uppercase;
-  color: white;
-  background-color: #ddd;
-  overflow: hidden;
-  object-fit: cover;
-}
 
-.letter-avatar {
-  font-family: Arial, sans-serif;
+  box-shadow:
+    0 0 0 1px var(--card-bg),
+    0 0 0 1.5px var(--border-color);
+
+  margin-right: 8px;
+
+  background-color: var(--avatar-bg);
 }
 
 /* Topbar Controls */

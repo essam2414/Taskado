@@ -302,3 +302,44 @@
     text-align: center;
   }
 }
+
+.form-user {
+  display: flex;
+  gap: 12px;
+}
+
+.auth-input-group {
+  flex: 1;
+}
+
+.form-profile-pic {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 30px;
+
+  label,
+  button {
+    font-size: var(--font-sm);
+    font-weight: 400;
+    padding: 7px 16px;
+
+    border: 1px solid var(--accent-color);
+  }
+}
+
+.profile-pic {
+  border-radius: 50%;
+  height: 100px;
+  width: 100px;
+
+  box-shadow:
+    0 0 0 2px var(--card-bg),
+    0 0 0 2.5px var(--border-color);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: var(--avatar-bg);
+}

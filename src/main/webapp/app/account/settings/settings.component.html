@@ -48,14 +48,27 @@
 
         @if (settingsForm.value.login) {
           <form name="form" (ngSubmit)="save()" [formGroup]="settingsForm" novalidate>
-            <div class="auth-input-group">
-              <span class="setting-label" for="firstName">First Name</span>
-              <input type="text" class="form-control" id="firstName" formControlName="firstName" />
+            <div class="form-profile-pic">
+              <img [src]="previewUrl || getProfilePictureUrl()" alt="Profile Picture" class="profile-pic" />
+
+              <div>
+                <label for="profilePicUpload" class="btn btn-primary">Upload new picture</label>
+                <input type="file" id="profilePicUpload" (change)="onFileSelected($event)" accept="image/*" hidden />
+
+                <button *ngIf="shouldShowRemoveButton()" (click)="removeProfilePicture()" class="btn btn-outline">Remove picture</button>
+              </div>
             </div>
 
-            <div class="auth-input-group">
-              <span class="setting-label" for="lastName">Last Name</span>
-              <input type="text" class="form-control" id="lastName" formControlName="lastName" />
+            <div class="form-user">
+              <div class="auth-input-group">
+                <span class="setting-label" for="firstName">First Name</span>
+                <input type="text" class="form-control" id="firstName" formControlName="firstName" />
+              </div>
+
+              <div class="auth-input-group">
+                <span class="setting-label" for="lastName">Last Name</span>
+                <input type="text" class="form-control" id="lastName" formControlName="lastName" />
+              </div>
             </div>
 
             <div class="auth-input-group">

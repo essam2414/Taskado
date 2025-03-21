@@ -15,6 +15,7 @@ const initialAccount: Account = {} as Account;
   styleUrls: ['./settings.component.scss'],
 })
 export default class SettingsComponent implements OnInit {
+  user: Account | null = null;
   success = signal(false);
   darkMode = false;
 
@@ -55,6 +56,9 @@ export default class SettingsComponent implements OnInit {
   dyslexiaMode = false;
   highContrast = false;
   reduceMotion = false;
+
+  previewUrl: string | null = null;
+  selectedFile: File | null = null;
 
   settingsForm = new FormGroup({
     firstName: new FormControl(initialAccount.firstName, {
@@ -104,9 +108,50 @@ export default class SettingsComponent implements OnInit {
 
     this.accountService.identity().subscribe(account => {
       if (account) {
+        this.user = account;
         this.settingsForm.patchValue(account);
       }
     });
+  }
+
+  getProfilePictureUrl(): string {
+    const login = this.settingsForm.value.login;
+    let imageUrl = this.settingsForm.get('imageUrl')?.value;
+
+    if (!imageUrl || imageUrl.trim() === '') {
+      imageUrl = this.getAvatarUrl(login ?? 'guest');
+    }
+
+    return imageUrl;
+  }
+
+  getAvatarUrl(seed: string): string {
+    return `https://api.dicebear.com/7.x/micah/svg?seed=${encodeURIComponent(seed)}`;
+  }
+
+  removeProfilePicture(): void {
+    this.settingsForm.get('imageUrl')?.setValue('');
+    this.previewUrl = null;
+    this.selectedFile = null;
+  }
+
+  shouldShowRemoveButton(): boolean {
+    const imageUrl = this.settingsForm.get('imageUrl')?.value;
+    return !!imageUrl?.trim();
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+
+      // Preview the selected image
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.previewUrl = reader.result as string;
+      };
+      reader.readAsDataURL(this.selectedFile);
+    }
   }
 
   getThemeColors(isDarkMode: boolean): string[] {
@@ -141,11 +186,15 @@ export default class SettingsComponent implements OnInit {
     this.success.set(false);
 
     const account = this.settingsForm.getRawValue();
-    this.accountService.save(account).subscribe(() => {
-      this.success.set(true);
-
-      this.accountService.authenticate(account);
-    });
+    if (this.selectedFile) {
+      this.uploadProfilePicture(this.selectedFile).then(imageUrl => {
+        account.imageUrl = imageUrl; // Update image URL
+        this.settingsForm.patchValue({ imageUrl }); // update form immediately
+        this.submitAccountUpdate(account);
+      });
+    } else {
+      this.submitAccountUpdate(account);
+    }
   }
 
   get activeTabLabel(): string {
@@ -326,5 +375,39 @@ export default class SettingsComponent implements OnInit {
     if (this.reduceMotion) {
       document.documentElement.classList.add('reduce-motion');
     }
+  }
+
+  protected submitAccountUpdate(account: Account): void {
+    this.accountService.save(account).subscribe(() => {
+      this.success.set(true);
+      this.accountService.authenticate(account);
+
+      this.accountService.identity(true).subscribe(updated => {
+        this.user = updated;
+        if (updated) {
+          this.settingsForm.patchValue(updated);
+        }
+      });
+    });
+  }
+
+  protected async uploadProfilePicture(file: File): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'taskado_preset'); // your unsigned preset
+
+    const cloudName = 'dzxjmjjnt'; // Cloudinary cloud name
+
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Upload failed');
+    }
+
+    const data: { secure_url: string } = await response.json();
+    return data.secure_url; // this is the public image URL
   }
 }

@@ -5,15 +5,8 @@
       <a class="user-info dropdown-btn" (click)="toggleAccountDropdown()" href="javascript:void(0);">
         @let accountRef = account();
 
-        <!-- Show Profile Picture If Available -->
-        <img *ngIf="account()?.imageUrl as imageUrl; else letterAvatar" [src]="imageUrl" class="profile-image" alt="User Avatar" />
-
-        <!-- Default Letter Avatar -->
-        <ng-template #letterAvatar>
-          <div class="letter-avatar" [ngStyle]="{ 'background-color': avatarColor }">
-            {{ getInitial(account()?.login) }}
-          </div>
-        </ng-template>
+        <!-- Show Profile Picture -->
+        <img [src]="getProfilePictureUrl()" class="profile-pic" alt="Profile Picture" />
 
         <!-- Username -->
         <span>{{ account()?.login ?? 'Account' }}</span>

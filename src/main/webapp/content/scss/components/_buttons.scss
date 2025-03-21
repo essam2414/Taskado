@@ -102,6 +102,7 @@ $text-accent: #695cff;
   background-color: var(--bg-color-secondary);
   opacity: 0.75;
   transition: all 0.3s ease;
+  white-space: nowrap;
 
   fa-icon {
     margin-right: 4px;

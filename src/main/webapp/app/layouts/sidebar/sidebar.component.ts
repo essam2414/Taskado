@@ -24,7 +24,6 @@ export class SidebarComponent implements OnInit {
   openAPIEnabled?: boolean;
   account = inject(AccountService).trackCurrentAccount();
   accountDropdownOpen = false;
-  avatarColor = '#ccc';
 
   sidebarItems = [
     {
@@ -95,10 +94,6 @@ export class SidebarComponent implements OnInit {
       this.inProduction = profileInfo.inProduction;
       this.openAPIEnabled = profileInfo.openAPIEnabled;
     });
-
-    if (this.account()?.login) {
-      this.avatarColor = this.getAvatarColor(this.account()?.login ?? '');
-    }
   }
 
   isCollapsed(): boolean {
@@ -136,20 +131,18 @@ export class SidebarComponent implements OnInit {
     this.router.navigate(['']);
   }
 
-  /** Extracts First Letter from Username */
-  getInitial(username?: string): string {
-    return username ? username.charAt(0).toUpperCase() : '?';
-  }
+  getProfilePictureUrl(): string {
+    const user = this.account();
+    const imageUrl = user?.imageUrl?.trim();
 
-  /** Generates a Consistent Avatar Color */
-  getAvatarColor(username: string): string {
-    const colors = ['#F94144', '#F3722C', '#F8961E', '#F9C74F', '#90BE6D', '#43AA8B', '#577590'];
-
-    let hash = 0;
-    for (let i = 0; i < username.length; i++) {
-      hash = (hash * 31 + username.charCodeAt(i)) % colors.length;
+    if (imageUrl) {
+      return imageUrl;
     }
 
-    return colors[hash];
+    const login = user?.login ?? 'guest';
+    return this.getAvatarUrl(login);
+  }
+  getAvatarUrl(seed: string): string {
+    return `https://api.dicebear.com/7.x/micah/svg?seed=${encodeURIComponent(seed)}`;
   }
 }
