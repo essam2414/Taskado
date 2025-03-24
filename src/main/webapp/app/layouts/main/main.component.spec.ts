@@ -82,14 +82,14 @@ describe('MainComponent', () => {
         // GIVEN
         router.resetConfig([
           {
-            path: 'home',
+            path: 'dashboard',
             title: parentRoutePageTitle,
             children: [{ path: '', title: childRoutePageTitle, component: BlankComponent }],
           },
         ]);
 
         // WHEN
-        ngZone.run(navigateByUrlFn('home'));
+        ngZone.run(navigateByUrlFn('dashboard'));
         tick();
 
         // THEN
@@ -100,14 +100,14 @@ describe('MainComponent', () => {
         // GIVEN
         router.resetConfig([
           {
-            path: 'home',
+            path: 'dashboard',
             title: parentRoutePageTitle,
             children: [{ path: '', component: BlankComponent }],
           },
         ]);
 
         // WHEN
-        ngZone.run(navigateByUrlFn('home'));
+        ngZone.run(navigateByUrlFn('dashboard'));
         tick();
 
         // THEN

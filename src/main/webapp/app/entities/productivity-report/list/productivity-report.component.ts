@@ -13,6 +13,7 @@ import { EntityArrayResponseType, ProductivityReportService } from '../service/p
 import { ProductivityReportDeleteDialogComponent } from '../delete/productivity-report-delete-dialog.component';
 
 import { Chart, ChartDataset } from 'chart.js/auto';
+import dayjs from 'dayjs';
 
 @Component({
   standalone: true,
@@ -47,6 +48,7 @@ export class ProductivityReportComponent implements OnInit {
   pomodoroSessionsCompleted: number | string = 'N/A';
   totalFocusTime: number | string = 'N/A';
   efficiencyScore: number | string = 'N/A';
+  timestamp: dayjs.Dayjs | string = 'Unselected';
 
   public readonly router = inject(Router);
   protected readonly productivityReportService = inject(ProductivityReportService);
@@ -142,6 +144,7 @@ export class ProductivityReportComponent implements OnInit {
     this.pomodoroSessionsCompleted = report.pomodoroSessionsCompleted ?? 'N/A';
     this.totalFocusTime = report.totalFocusTime ?? 'N/A';
     this.efficiencyScore = report.efficiencyScore ?? 'N/A';
+    this.timestamp = report.timestamp ?? 'Unselected';
 
     // Update chart data dynamically if the chart exists
     if (this.chart) {

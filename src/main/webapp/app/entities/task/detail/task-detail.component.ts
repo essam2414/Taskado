@@ -27,7 +27,7 @@ export class TaskDetailComponent {
   }
 
   delete(task: ITask): void {
-    const modalRef = this.modalService.open(TaskDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+    const modalRef = this.modalService.open(TaskDeleteDialogComponent, { centered: true, size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.task = task;
     // unsubscribe not needed because closed completes on modal close
     modalRef.closed.pipe(filter(reason => reason === ITEM_DELETED_EVENT)).subscribe();

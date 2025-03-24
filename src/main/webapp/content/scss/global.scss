@@ -9,6 +9,36 @@
 @import 'components/forms';
 @import 'variables';
 @import 'components/layout';
+@import 'components/modal';
+@import 'components/alerts';
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/content/fonts/OpenDyslexic-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/content/fonts/OpenDyslexic-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/content/fonts/OpenDyslexic-Italic.woff2') format('woff2');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/content/fonts/OpenDyslexic-Bold-Italic.woff2') format('woff2');
+  font-weight: bold;
+  font-style: italic;
+}
 
 html,
 body {
@@ -17,7 +47,7 @@ body {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--app-font), sans-serif;
   font-weight: 300;
   font-size: clamp(0.875rem, 2vw, 1rem);
 
@@ -48,7 +78,7 @@ body {
 h1,
 h2,
 h3 {
-  font-family: 'Rubik', sans-serif;
+  font-family: var(--heading-font), sans-serif;
   font-weight: 600;
 }
 
@@ -65,37 +95,68 @@ a {
 }
 
 // responsive font sizes
+body {
+  font-size: clamp(calc(0.85rem * var(--font-scale)), 1.4vw, calc(0.9rem * var(--font-scale))); // fallback font size
+}
+
 h1 {
-  font-size: clamp(1.75rem, 5vw, 3rem);
+  font-size: clamp(calc(1.6rem * var(--font-scale)), 3.8vw, calc(2.3rem * var(--font-scale)));
 }
 
 h2 {
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-size: clamp(calc(1.4rem * var(--font-scale)), 3vw, calc(1.8rem * var(--font-scale)));
 }
 
 h3 {
-  font-size: clamp(1.25rem, 3vw, 2rem);
+  font-size: clamp(calc(1.2rem * var(--font-scale)), 2.5vw, calc(1.5rem * var(--font-scale)));
+}
+
+h4 {
+  font-size: clamp(calc(1.05rem * var(--font-scale)), 2.2vw, calc(1.3rem * var(--font-scale)));
 }
 
 p,
 a {
-  font-size: clamp(0.875rem, 2vw, 1.125rem);
+  font-size: clamp(calc(0.85rem * var(--font-scale)), 1.4vw, calc(0.9rem * var(--font-scale)));
 }
 
 button {
-  font-size: clamp(0.875rem, 2vw, 1rem);
+  font-size: clamp(calc(0.85rem * var(--font-scale)), 1.4vw, calc(0.9rem * var(--font-scale)));
+}
+
+input,
+textarea,
+select {
+  font-size: clamp(calc(0.85rem * var(--font-scale)), 1.4vw, calc(0.95rem * var(--font-scale)));
+}
+
+label {
+  font-size: clamp(calc(0.9rem * var(--font-scale)), 1.5vw, calc(1rem * var(--font-scale)));
+}
+
+li {
+  font-size: clamp(calc(0.85rem * var(--font-scale)), 1.4vw, calc(0.95rem * var(--font-scale)));
+}
+
+/* Global Responsive Utility Classes */
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+
+  .mobile-only {
+    display: flex !important;
+  }
 }
 
 /* ==============================================================
 Bootstrap tweaks
 ===============================================================*/
-
-body,
-h1,
-h2,
-h3,
-h4 {
-}
 
 a:hover {
   /* make sure browsers use the pointer cursor for anchors, even with no href */
@@ -166,48 +227,6 @@ Generic styles
 .hand,
 [jhisortby] {
   cursor: pointer;
-}
-
-/* ==========================================================================
-Custom alerts for notification
-========================================================================== */
-.alerts {
-  .alert {
-    text-overflow: ellipsis;
-    pre {
-      background: none;
-      border: none;
-      font: inherit;
-      color: inherit;
-      padding: 0;
-      margin: 0;
-    }
-    .popover pre {
-      font-size: 10px;
-    }
-  }
-  .jhi-toast {
-    position: fixed;
-    width: 100%;
-    &.left {
-      left: 5px;
-    }
-    &.right {
-      right: 5px;
-    }
-    &.top {
-      top: 55px;
-    }
-    &.bottom {
-      bottom: 55px;
-    }
-  }
-}
-
-@media screen and (min-width: 480px) {
-  .alerts .jhi-toast {
-    width: 50%;
-  }
 }
 
 /* ==========================================================================

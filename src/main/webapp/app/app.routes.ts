@@ -21,7 +21,7 @@ const routes: Routes = [
   },
   {
     path: 'dashboard',
-    loadComponent: () => import('./home/home.component'),
+    loadComponent: () => import('./dashboard/dashboard.component'),
     title: 'Taskado | Dashboard',
   },
   {

@@ -14,7 +14,6 @@ $primary: #564df2;
 .form-label {
   display: block;
   margin-bottom: 5px;
-  font-size: clamp(0.8rem, 2.5vw, 1rem);
   font-weight: 500;
 }
 
@@ -23,7 +22,6 @@ $primary: #564df2;
   padding: clamp(10px, 3vw, 14px);
   border: 1.5px solid var(--border-color);
   border-radius: 8px;
-  font-size: clamp(0.9rem, 2.5vw, 1rem);
   transition: all 0.3s ease-in-out;
   background-color: var(--card-bg);
   color: var(--text-secondary);
@@ -36,7 +34,6 @@ $primary: #564df2;
 }
 
 form h2 {
-  font-size: clamp(1.5rem, 4vw, 2rem);
   font-weight: 600;
   margin-bottom: 30px;
 }
