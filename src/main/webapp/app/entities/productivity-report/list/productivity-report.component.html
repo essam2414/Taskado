@@ -1,6 +1,6 @@
 <div>
   <h2 id="page-heading" data-cy="ProductivityReportHeading" style="display: flex; justify-content: space-between; align-items: center">
-    <span>Productivity Insights</span>
+    <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden">Productivity Insights</span>
 
     <div style="display: flex; align-items: center; gap: 20px">
       <!-- Previous Button -->
@@ -97,7 +97,7 @@
         <!-- Dropdown Menu -->
         <div class="dropdown-menu" [ngClass]="{ show: isDropdownOpen }">
           <button class="dropdown-item" (click)="generateReport()">Update</button>
-          <button class="dropdown-item delete" (click)="generateReport()">Delete</button>
+          <button class="dropdown-item delete" (click)="openDeleteModal()"><span>Delete</span> <fa-icon icon="trash-alt"></fa-icon></button>
         </div>
       </div>
     </div>
@@ -109,6 +109,17 @@
 
   <div *ngIf="successMessage" class="alert alert-success" id="success-message" style="margin-top: 10px">
     <span>{{ successMessage }}</span>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div class="confirmation-modal" *ngIf="isDeleteModalOpen">
+    <div class="modal-content">
+      <h3>Are you sure you want to delete this Report?</h3>
+      <div class="modal-actions">
+        <button class="btn-confirm" (click)="confirmDelete()">Yes</button>
+        <button class="btn-cancel" (click)="cancelDelete()">No</button>
+      </div>
+    </div>
   </div>
 
   <hr style="margin-top: 10px; margin-bottom: 20px; border: 1px solid #ccc" />

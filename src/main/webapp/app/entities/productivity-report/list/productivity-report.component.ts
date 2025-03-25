@@ -39,6 +39,7 @@ export class ProductivityReportComponent implements OnInit {
   successMessage: string | null = null;
 
   isDropdownOpen = false;
+  isDeleteModalOpen = false;
 
   sortState = sortStateSignal({});
 
@@ -130,6 +131,26 @@ export class ProductivityReportComponent implements OnInit {
     setTimeout(() => {
       this.errorMessage = null;
     }, 2500);
+  }
+
+  // Call this function when the delete button is clicked
+  openDeleteModal(): void {
+    this.isDeleteModalOpen = true;
+  }
+
+  // Confirm the deletion
+  confirmDelete(): void {
+    this.closeDeleteModal();
+  }
+
+  // Cancel the deletion
+  cancelDelete(): void {
+    this.closeDeleteModal();
+  }
+
+  // Close the modal
+  closeDeleteModal(): void {
+    this.isDeleteModalOpen = false;
   }
 
   generateReport(): void {
