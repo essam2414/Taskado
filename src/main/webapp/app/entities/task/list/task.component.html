@@ -17,7 +17,7 @@
       </div>
 
       <!-- Dropdown filters for mobile -->
-      <div class="mobile-only entity-filters-dropdown dropdown dropdown-select" [class.open]="filtersOpen">
+      <div class="mobile-only dropdown dropdown-select" [class.open]="filtersOpen">
         <button class="dropdown-btn" (click)="toggleFilters()">
           <span><fa-icon class="filter-icon" [icon]="activeFilterIcon"></fa-icon> {{ activeFilterLabel }}</span>
           <fa-icon [icon]="'chevron-down'"></fa-icon>
@@ -52,7 +52,6 @@
   </div>
 
   <jhi-alert-error></jhi-alert-error>
-
   <jhi-alert></jhi-alert>
 
   <!-- Task Filter View -->
@@ -81,7 +80,6 @@
           [class.completed]="task.completed"
           [class.non-clickable]="task.completed"
           (click)="!task.completed && editTask(task)"
-          *ngIf="!shouldHideTask(task)"
         >
           <div class="task-smth">
             <input
@@ -110,13 +108,7 @@
                 }
 
                 @if (task.category) {
-                  <div
-                    class="task-tag task-category"
-                    [ngStyle]="{
-                      color: task.category.color,
-                      'background-color': task.category.color + '30',
-                    }"
-                  >
+                  <div class="task-tag task-category" [ngStyle]="getCategoryStyle(task.category)">
                     {{ task.category.name }}
                   </div>
                 }
@@ -196,7 +188,6 @@
             [class.completed]="task.completed"
             [class.non-clickable]="task.completed"
             (click)="!task.completed && editTask(task)"
-            *ngIf="!shouldHideTask(task)"
           >
             <div class="task-smth">
               <input
@@ -225,13 +216,7 @@
                   }
 
                   @if (task.category) {
-                    <div
-                      class="task-tag task-category"
-                      [ngStyle]="{
-                        color: task.category.color,
-                        'background-color': task.category.color + '30',
-                      }"
-                    >
+                    <div class="task-tag task-category" [ngStyle]="getCategoryStyle(task.category)">
                       {{ task.category.name }}
                     </div>
                   }

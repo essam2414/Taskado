@@ -143,6 +143,6 @@ export class SidebarComponent implements OnInit {
     return this.getAvatarUrl(login);
   }
   getAvatarUrl(seed: string): string {
-    return `https://api.dicebear.com/7.x/micah/svg?seed=${encodeURIComponent(seed)}`;
+    return `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(seed)}`;
   }
 }
