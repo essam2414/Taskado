@@ -3,31 +3,6 @@
     <span>Productivity Insights</span>
 
     <div style="display: flex; align-items: center; gap: 20px">
-      <!-- Generate Report Button -->
-      <button
-        id="generateReport"
-        class="btn"
-        (click)="generateReport()"
-        style="
-          padding: 12px 20px;
-          font-size: 16px;
-          font-weight: bold;
-          border-radius: 6px;
-          background-color: #28a745;
-          color: white;
-          border: none;
-          cursor: pointer;
-          transition: background 0.3s;
-          display: flex;
-          align-items: center;
-          height: 44px;
-        "
-        onmouseover="this.style.backgroundColor='#218838'"
-        onmouseout="this.style.backgroundColor='#28a745'"
-      >
-        ➕ Generate Report
-      </button>
-
       <!-- Previous Button -->
       <button
         id="Previous"
@@ -78,7 +53,7 @@
       <button
         id="Next"
         data-cy="entityNextButton"
-        class="btn"
+        class="btn-add jh-create-entity create-task desktop-only"
         (click)="navigateReport()"
         style="
           padding: 12px 20px;
@@ -99,6 +74,32 @@
       >
         Next <span style="font-size: 20px; margin-left: 8px">&#8594;</span>
       </button>
+
+      <!-- Generate Report Button -->
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn-add jh-create-entity create-task desktop-only"
+        (click)="generateReport()"
+        style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span>Generate Report</span>
+      </button>
+
+      <div class="dropdown dropdown-action" [class.open]="isDropdownOpen">
+        <!-- Dropdown Toggle Button (Down Arrow) -->
+        <button class="btn-add dropdown-toggle" (click)="isDropdownOpen = !isDropdownOpen">
+          <span>Options</span>
+          <fa-icon icon="caret-down"></fa-icon>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div class="dropdown-menu" [ngClass]="{ show: isDropdownOpen }">
+          <button class="dropdown-item" (click)="generateReport()">Update</button>
+          <button class="dropdown-item delete" (click)="generateReport()">Delete</button>
+        </div>
+      </div>
     </div>
   </h2>
 

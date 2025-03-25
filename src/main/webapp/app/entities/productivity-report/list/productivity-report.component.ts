@@ -38,6 +38,8 @@ export class ProductivityReportComponent implements OnInit {
   errorMessage: string | null = null;
   successMessage: string | null = null;
 
+  isDropdownOpen = false;
+
   sortState = sortStateSignal({});
 
   public chart: Chart | null = null;
