@@ -22,18 +22,19 @@
       <!-- Navigation for Previous/Next Month -->
       <div class="calendar-header calendar-subtitle">
         <button class="btn-add" (click)="changeMonth(-1)">❮</button>
-        <h3>{{ currentDate.toLocaleString('default', { month: 'long', year: 'numeric' }) }}</h3>
+        <h3>{{ getFormattedCurrentMonth() }}</h3>
         <button class="btn-add" (click)="changeMonth(1)">❯</button>
       </div>
 
       <!-- Month View: Default View -->
-      <div class="calendar-grid">
+      <div class="calendar-grid" cdkDropListGroup>
         <div class="day-header" *ngFor="let day of ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']">
           {{ day }}
         </div>
 
         <!-- Actual Dates -->
         <div
+          cdkDropList
           class="calendar-day app-card"
           *ngFor="let day of calendarDays"
           (click)="day !== null ? selectDate(day) : null"
@@ -41,12 +42,11 @@
         >
           <!-- Apply highlight only to the date number -->
           <span *ngIf="day" class="date-number" [class.circle-highlight]="isToday(day)">
-            {{ day }}
+            {{ getDayNumber(day) }}
           </span>
 
-          <!-- Show events under each date -->
-          <div class="event-badges">
-            <span *ngFor="let event of getEventsForDay(day)" class="event-badge">
+          <div class="event-badges" cdkDropList [cdkDropListData]="getEventsForDay(day)" (cdkDropListDropped)="drop($event, day)">
+            <span *ngFor="let event of getEventsForDay(day)" class="event-badge" cdkDrag [cdkDragData]="event">
               {{ event.title }}
             </span>
           </div>
@@ -59,7 +59,10 @@
   <div *ngIf="viewMode === 'week'" class="week-view">
     <div class="week-header">
       <button class="btn-add" (click)="changeWeek(-1)">❮</button>
-      <h3>{{ getStartOfWeek(weekStartDate) | date: 'd' }} - {{ weekEndDate | date: 'd MMMM yyyy' }}</h3>
+      <h3>
+        {{ getStartOfWeek(weekStartDate).toDate() | date: 'd' }} -
+        {{ weekEndDate?.toDate() | date: 'd MMMM yyyy' }}
+      </h3>
       <button class="btn-add" (click)="changeWeek(1)">❯</button>
     </div>
 
@@ -67,14 +70,16 @@
       <thead>
         <tr>
           <th></th>
-          <th *ngFor="let day of weekDays">{{ day.date | date: 'EEE d, MMM' }}</th>
+          <th *ngFor="let day of weekDays">
+            {{ day.date.toDate() | date: 'EEE d, MMM' }}
+          </th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let hour of hours">
           <td>{{ hour }}:00</td>
           <td *ngFor="let day of weekDays">
-            <span *ngFor="let event of getEventsForHour(hour, day.date)">
+            <span *ngFor="let event of getEventsForHour(hour, day.date)" class="event-badge">
               {{ event.title }}
             </span>
           </td>
@@ -89,7 +94,7 @@
       <!-- Navigation Arrows -->
       <div class="day-header">
         <button class="btn-add" (click)="changeDay(-1)">❮</button>
-        <h4>{{ selectedDate | date: 'fullDate' }}</h4>
+        <h4>{{ selectedDate?.toDate() | date: 'fullDate' }}</h4>
         <button class="btn-add" (click)="changeDay(1)">❯</button>
       </div>
 
