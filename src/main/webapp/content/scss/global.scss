@@ -152,6 +152,14 @@ li {
   .mobile-only {
     display: flex !important;
   }
+
+  .mobile-only.dropdown .dropdown-menu {
+    display: none;
+  }
+
+  .mobile-only.dropdown.open .dropdown-menu {
+    display: flex;
+  }
 }
 
 /* ==============================================================

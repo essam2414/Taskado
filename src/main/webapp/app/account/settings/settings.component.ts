@@ -126,7 +126,7 @@ export default class SettingsComponent implements OnInit {
   }
 
   getAvatarUrl(seed: string): string {
-    return `https://api.dicebear.com/7.x/micah/svg?seed=${encodeURIComponent(seed)}`;
+    return `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(seed)}`;
   }
 
   removeProfilePicture(): void {

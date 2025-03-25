@@ -25,6 +25,7 @@ Custom alerts for notification
   .jhi-toast {
     position: fixed;
     width: 100%;
+    z-index: 9999;
     &.left {
       left: 5px;
     }
@@ -90,8 +91,8 @@ Custom alerts for notification
   padding: 20px;
   box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.15);
 
-  z-index: 1050;
-  animation: fadeInSlide 0.4s ease-in-out;
+  z-index: 9999;
+  animation: fadeInSlide 0.25s ease-out;
 }
 
 .alert-dismissible .btn-close {
@@ -117,7 +118,7 @@ Custom alerts for notification
 @keyframes fadeInSlide {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -126,5 +127,5 @@ Custom alerts for notification
 }
 
 .alert {
-  animation: fadeInSlide 0.4s ease-in-out;
+  animation: fadeInSlide 0.25s ease-out;
 }
