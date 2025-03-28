@@ -1,4 +1,4 @@
-/* === Base Dropdown Styles === */
+/* Base Dropdown Styles */
 .dropdown {
   position: relative;
   width: 100%;
@@ -25,34 +25,34 @@
   }
 }
 
-/* === Dropdown Button Shared === */
+/* Dropdown Button Shared */
 .dropdown-btn {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 12px 16px;
+  padding: 16px;
   cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  border-radius: 10px;
+  transition: all 0.3s ease-in-out;
 
   fa-icon {
     transition: transform 0.3s;
   }
 }
 
-/* === Select Dropdown (Category / Priority) === */
+/* Select Dropdown (Category / Priority) */
 .dropdown-select {
   width: 100%;
   max-width: 300px;
 
   .dropdown-btn {
-    background: var(--bg-color-secondary);
+    background: var(--bg-color);
     color: var(--text-secondary);
-    border: 1px solid var(--border-color);
+    font-weight: 400;
 
     &:hover {
-      background: var(--card-bg);
+      background: var(--bg-color-secondary);
       color: var(--text-primary);
     }
   }
@@ -79,12 +79,12 @@
     display: flex;
 
     &:hover {
-      background: var(--bg-color-secondary);
+      background: var(--bg-color);
     }
   }
 }
 
-/* === Action Dropdown (Account etc.) === */
+/* Action Dropdown (Account etc.) */
 .dropdown-action {
   width: 200px;
 

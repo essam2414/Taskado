@@ -1,5 +1,3 @@
-@import '../../content/scss/variables';
-
 .landing-container {
   display: flex;
   align-items: center;
@@ -9,13 +7,12 @@
   margin-top: 100px;
 
   @media (max-width: 768px) {
-    // Adjust for mobile
     flex-direction: column;
   }
 }
 
 .svg-overlay {
-  position: fixed; /* Full screen coverage */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
@@ -23,8 +20,8 @@
   pointer-events: none;
   z-index: -1;
 
-  background-image: url('/content/images/background.svg'); /* External file */
-  background-size: cover; /* Cover full screen */
+  background-image: url('/content/images/background.svg');
+  background-size: cover;
   background-position: center;
   opacity: 0.05;
 }
@@ -42,12 +39,12 @@
   font-size: clamp(2rem, 8vw, 4rem);
   font-family: 'Montserrat', sans-serif;
   font-weight: 800;
-  color: $text-primary;
+  color: var(--text-primary);
 }
 
 .landing-subtitle {
   font-size: clamp(1rem, 4vw, 1.5rem);
-  color: $text-secondary;
+  color: var(--text-secondary);
 }
 
 .landing-buttons {
@@ -58,7 +55,7 @@
 
 .landing-buttons button {
   font-size: clamp(1rem, 3vw, 1.25rem);
-  background-color: $primary;
+  background-color: var(--primary-color);
 }
 
 .landing-buttons svg {
@@ -102,5 +99,5 @@
 .landing-graphic svg {
   max-width: 100%;
   height: auto;
-  display: block; /* Removes extra spacing */
+  display: block;
 }

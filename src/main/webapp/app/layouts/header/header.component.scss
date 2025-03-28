@@ -44,7 +44,7 @@
 }
 
 .header-nav a:hover {
-  color: #564df2; /* Your theme’s purple */
+  color: #564df2;
 }
 
 .logo-text {
@@ -125,7 +125,7 @@
 }
 
 .menu-toggle {
-  display: none; // Default hidden
+  display: none;
   background: none;
   border: none;
   cursor: pointer;
@@ -136,10 +136,10 @@
 @media (max-width: 768px) {
   .header-nav,
   .header-btns {
-    display: none; // Hide desktop nav & buttons on mobile
+    display: none;
   }
 
   .menu-toggle {
-    display: flex; // Show mobile menu button
+    display: flex;
   }
 }

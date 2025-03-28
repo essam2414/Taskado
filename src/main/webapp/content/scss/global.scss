@@ -3,14 +3,16 @@
 @import 'bootstrap/scss/functions';
 @import 'bootswatch/dist/materia/variables';
 @import 'bootstrap/scss/variables';
+
+@import 'variables';
 @import 'components/buttons';
 @import 'components/dropdowns';
 @import 'components/cards';
 @import 'components/forms';
-@import 'variables';
 @import 'components/layout';
 @import 'components/modal';
 @import 'components/alerts';
+@import 'components/auth';
 
 @font-face {
   font-family: 'OpenDyslexic';
@@ -127,11 +129,11 @@ button {
 input,
 textarea,
 select {
-  font-size: clamp(calc(0.85rem * var(--font-scale)), 1.4vw, calc(0.95rem * var(--font-scale)));
+  font-size: clamp(calc(0.85rem * var(--font-scale)), 1.4vw, calc(0.95rem * var(--font-scale))) !important;
 }
 
 label {
-  font-size: clamp(calc(0.9rem * var(--font-scale)), 1.5vw, calc(1rem * var(--font-scale)));
+  font-size: clamp(calc(0.8rem * var(--font-scale)), 1.4vw, calc(0.9rem * var(--font-scale)));
 }
 
 li {
@@ -197,7 +199,7 @@ Generic styles
 
 .error {
   color: white;
-  background-color: $error;
+  background-color: var(--danger-color);
 }
 
 .pad {

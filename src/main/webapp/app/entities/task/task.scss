@@ -1,44 +1,12 @@
-.task-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 20px;
-  margin-bottom: 8px;
-}
-
-.task-header-left {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.task-filters {
-  display: flex;
-  gap: 12px;
-}
-
 .task-subtitle {
   font-weight: 500;
   color: var(--text-secondary);
   margin-top: 24px;
 }
 
-.task-list {
-  display: flex;
-  flex-direction: column;
-  margin-top: 24px;
-  gap: 12px;
-
-  min-height: 50px;
-}
-
 .completed:hover {
   box-shadow: none;
 }
-
-/** Task Dropdown **/
 
 .task-dropdown {
   position: absolute;
@@ -119,6 +87,19 @@
   color: #6c757d;
 }
 
+.LOW-dot {
+  background-color: #4caf50;
+}
+.MEDIUM-dot {
+  background-color: #ffc107;
+}
+.HIGH-dot {
+  background-color: #ff9800;
+}
+.CRITICAL-dot {
+  background-color: #f44336;
+}
+
 .task-date {
   text-align: right;
   margin-top: auto;
@@ -139,29 +120,33 @@
   pointer-events: none;
 }
 
-.add-task {
+.quick-add {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+
   margin-top: 20px;
   margin-bottom: 20px;
 
-  border-radius: 12px;
-  padding: 8px 20px;
+  border-radius: 16px;
+  padding: 12px 20px;
   width: 100%;
 
-  border: var(--bg-color-secondary) solid 1px;
   background-color: var(--bg-color-secondary);
   transition:
     background 0.3s ease,
+    box-shadow 0.3s ease,
     border 0.3s ease;
 
   &:focus-within,
   &:has(.task-input:not(:placeholder-shown)) {
     background-color: var(--card-bg);
-    border: var(--border-color) solid 1px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
+}
+
+.quick-add-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .task-input {
@@ -180,6 +165,137 @@
     outline: none;
     border-bottom: none;
     box-shadow: none;
+  }
+}
+
+.quick-add-options {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  &.active {
+    opacity: 1;
+    pointer-events: auto;
+
+    .dropdown-btn {
+      transform: scale(1);
+    }
+  }
+
+  .dropdown-menu {
+    top: auto !important;
+    bottom: calc(100% + 6px);
+    margin-top: 0 !important;
+    margin-bottom: 0;
+  }
+
+  .dropdown-btn {
+    height: 44px;
+    width: 44px;
+    transform: scale(0.75);
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+
+    padding: 0;
+
+    white-space: nowrap;
+    transition:
+      width 0.3s ease,
+      background 0.3s ease,
+      transform 0.3 ease;
+
+    position: relative;
+
+    &.hover {
+      background-color: var(--bg-color);
+    }
+
+    .indicator-dot {
+      position: absolute;
+      top: -1px;
+      right: -1px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px var(--card-bg);
+      pointer-events: none;
+    }
+
+    .quick-add-icon {
+      flex-shrink: 0;
+      height: 44px;
+      width: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition:
+        width 0.3s ease,
+        opacity 0.3s ease;
+    }
+
+    .quick-add-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: var(--font-xs);
+
+      opacity: 0;
+      max-width: 0;
+      overflow: hidden;
+      transition:
+        max-width 0.3s ease,
+        opacity 0.3s ease;
+    }
+
+    .datepicker-input {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+
+    .datepicker-input::-webkit-calendar-picker-indicator {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      cursor: pointer;
+    }
+  }
+
+  .dropdown-btn.hoverable:hover:not(.open),
+  .dropdown-btn.open {
+    width: 160px;
+    padding-right: 12px;
+
+    .quick-add-icon {
+      width: 0;
+      opacity: 0;
+    }
+
+    .quick-add-label {
+      opacity: 1;
+      max-width: 160px;
+      width: 100%;
+    }
+  }
+
+  .task-tag {
+    font-size: var(--font-2xs);
   }
 }
 
@@ -314,23 +430,18 @@
   transition: transform 300ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-.task-list.cdk-drop-list-dragging .app-card:not(.cdk-drag-placeholder) {
+.entity-list.cdk-drop-list-dragging .app-card:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
 .modal-body {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
+  gap: 40px;
 }
 
 .modal-form {
   flex: 1;
-}
-
-.modal-sidebar {
-  border-left: 1px solid var(--border-color);
-  padding-left: 20px;
 }
 
 @media (max-width: 768px) {
@@ -345,52 +456,6 @@
     border-top: 1px solid var(--border-color);
     padding-top: 20px;
   }
-}
-
-.date-time-picker {
-  position: absolute;
-  top: 100px;
-  right: 0;
-  background: white;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  padding: 10px;
-  z-index: 1050;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.time-picker-container {
-  margin-top: 10px;
-}
-
-.btn-time-toggle {
-  width: 100%;
-  padding: 8px;
-  cursor: pointer;
-
-  background: none;
-  color: var(--text-muted);
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
-  transition: all 0.2s ease-in-out;
-
-  fa-icon {
-    margin-right: 4px;
-  }
-
-  &:hover {
-    background: var(--hover-bg);
-    color: var(--text-secondary);
-  }
-}
-
-.custom-day.today {
-  color: var(--primary-color);
-  font-weight: 700;
 }
 
 .category-dropdown-footer {
@@ -540,5 +605,27 @@
 
   &:hover .delete-category-btn {
     opacity: 1;
+  }
+}
+
+.subtask-btn {
+  color: var(--text-muted);
+  text-decoration: none;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  transition: color 0.3s ease;
+
+  svg {
+    width: 12px;
+    height: 12px;
+    font-size: 12px;
+    fill: currentColor;
+  }
+
+  &:hover {
+    color: var(--text-secondary);
   }
 }

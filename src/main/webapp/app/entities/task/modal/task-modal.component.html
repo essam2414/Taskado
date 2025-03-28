@@ -2,9 +2,13 @@
   <div>
     <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
       <div class="modal-header">
-        <h2 class="modal-title" id="jhi-task-heading" data-cy="TaskCreateUpdateHeading">{{ task?.id ? 'Edit task' : 'Add a task' }}</h2>
+        <h2 class="modal-title" id="jhi-task-heading" data-cy="TaskCreateUpdateHeading">{{ task?.id ? 'Edit task' : 'Add task' }}</h2>
         <button class="close" type="button" id="cancel-save" data-cy="entityCreateCancelButton" (click)="close()">
-          <fa-icon icon="times"></fa-icon>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path
+              d="M23.707.293h0a1,1,0,0,0-1.414,0L12,10.586,1.707.293a1,1,0,0,0-1.414,0h0a1,1,0,0,0,0,1.414L10.586,12,.293,22.293a1,1,0,0,0,0,1.414h0a1,1,0,0,0,1.414,0L12,13.414,22.293,23.707a1,1,0,0,0,1.414,0h0a1,1,0,0,0,0-1.414L13.414,12,23.707,1.707A1,1,0,0,0,23.707.293Z"
+            />
+          </svg>
         </button>
       </div>
 
@@ -26,15 +30,25 @@
           </div>
           <div class="mb-3">
             <label class="form-label" for="field_description">Description</label>
-            <input
-              type="text"
+            <textarea
+              rows="3"
               class="form-control"
               name="description"
               id="field_description"
               data-cy="description"
               formControlName="description"
-            />
+              style="resize: none"
+            ></textarea>
           </div>
+
+          <a class="subtask-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M23,11H13V1a1,1,0,0,0-1-1h0a1,1,0,0,0-1,1V11H1a1,1,0,0,0-1,1H0a1,1,0,0,0,1,1H11V23a1,1,0,0,0,1,1h0a1,1,0,0,0,1-1V13H23a1,1,0,0,0,1-1h0A1,1,0,0,0,23,11Z"
+              />
+            </svg>
+            <span>Add a subtask</span>
+          </a>
         </div>
 
         <div class="modal-sidebar">

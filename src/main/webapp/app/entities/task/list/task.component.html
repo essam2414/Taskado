@@ -71,7 +71,7 @@
 
   <!-- Task -->
   <div cdkDropListGroup>
-    <div class="task-list" cdkDropList id="unsectioned" [cdkDropListData]="unsectionedTasks" (cdkDropListDropped)="drop($event, null)">
+    <div class="entity-list" cdkDropList id="unsectioned" [cdkDropListData]="unsectionedTasks" (cdkDropListDropped)="drop($event, null)">
       @for (task of unsectionedTasks; track trackId(task)) {
         <div
           cdkDrag
@@ -173,7 +173,7 @@
       </div>
 
       <div
-        class="task-list"
+        class="entity-list"
         cdkDropList
         id="section-{{ section.id }}"
         [cdkDropListData]="sectionsMap[section.id]"
@@ -247,17 +247,115 @@
     }
   </div>
 
-  <div class="add-task">
+  <div class="quick-add" [class.active]="newTaskTitle.trim()">
     <input
       type="text"
-      class="task-input"
+      class="task-input btn-content"
       [(ngModel)]="newTaskTitle"
       placeholder="Start typing to add a task..."
       (keyup.enter)="addTask(newTaskTitle)"
     />
 
-    <button class="btn-add-icon jh-create-entity create-task" (click)="addTask(newTaskTitle)" [disabled]="!newTaskTitle.trim()">
-      <fa-icon icon="plus"></fa-icon>
-    </button>
+    <div class="quick-add-right">
+      <div class="quick-add-options" [class.active]="newTaskTitle.trim()">
+        <!-- Date Picker -->
+        <div class="dropdown dropdown-select" [class.open]="dateDropdownOpen">
+          <div class="dropdown-btn" [class.open]="dateDropdownOpen" [class.hoverable]="noDropdownOpen" (click)="toggleDateDropdown()">
+            <fa-icon icon="calendar-day" class="quick-add-icon"></fa-icon>
+
+            <div class="quick-add-label datepicker-toggle">
+              <span>
+                {{ quickAddDueDate ? formatTaskDate(quickAddDueDate) : 'Select date' }}
+              </span>
+              <input #quickAddDate type="datetime-local" class="datepicker-input" [(ngModel)]="quickAddDueDate" />
+            </div>
+
+            <span *ngIf="quickAddDueDate" class="indicator-dot" [ngStyle]="{ backgroundColor: '#B0B0B0' }"></span>
+          </div>
+        </div>
+
+        <!-- Priority Dropdown -->
+        <div class="dropdown dropdown-select" [class.open]="priorityDropdownOpen">
+          <div
+            class="dropdown-btn"
+            (click)="togglePriorityDropdown()"
+            [class.hoverable]="noDropdownOpen"
+            [class.open]="priorityDropdownOpen"
+          >
+            <fa-icon icon="flag" class="quick-add-icon"></fa-icon>
+
+            <div class="quick-add-label">
+              <div [ngClass]="quickAddPriority ? ['task-tag', 'task-priority', quickAddPriority] : ''">
+                <span><fa-icon *ngIf="quickAddPriority" icon="flag"></fa-icon>{{ getPriorityLabel(quickAddPriority) }}</span>
+              </div>
+              <fa-icon icon="chevron-down"></fa-icon>
+            </div>
+
+            <span *ngIf="quickAddPriority" class="indicator-dot" [ngClass]="quickAddPriority + '-dot'"></span>
+          </div>
+
+          <ul class="dropdown-menu" *ngIf="priorityDropdownOpen">
+            <li *ngFor="let priority of priorityValues" (click)="selectQuickAddPriority(priority)">
+              <div class="task-tag task-priority" [ngClass]="priority">
+                <fa-icon icon="flag"></fa-icon>
+                <span>{{ getPriorityLabel(priority) }}</span>
+              </div>
+            </li>
+
+            <li class="task-tag" (click)="selectQuickAddPriority(null)">
+              <div class="task-tag NO_PRIORITY">
+                <fa-icon icon="ban"></fa-icon>
+                <span>No Priority</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Category Dropdown -->
+        <div class="dropdown dropdown-select" [class.open]="categoryDropdownOpen">
+          <div
+            class="dropdown-btn"
+            (click)="toggleCategoryDropdown()"
+            [class.hoverable]="noDropdownOpen"
+            [class.open]="categoryDropdownOpen"
+          >
+            <fa-icon icon="tags" class="quick-add-icon"></fa-icon>
+
+            <div class="quick-add-label">
+              <div *ngIf="quickAddCategory" class="task-tag task-category" [ngStyle]="getCategoryStyle(quickAddCategory)">
+                {{ quickAddCategory.name }}
+              </div>
+              <div *ngIf="!quickAddCategory">Select Category</div>
+              <fa-icon icon="chevron-down"></fa-icon>
+            </div>
+
+            <span *ngIf="quickAddCategory" class="indicator-dot category" [ngStyle]="{ backgroundColor: quickAddCategory.color }"></span>
+          </div>
+
+          <ul class="dropdown-menu" *ngIf="categoryDropdownOpen">
+            <li
+              class="category-option"
+              *ngFor="let categoryOption of categoriesSharedCollection"
+              (click)="selectQuickAddCategory(categoryOption)"
+            >
+              <div class="task-tag task-category" [ngStyle]="getCategoryStyle(categoryOption)">
+                {{ categoryOption.name }}
+              </div>
+            </li>
+
+            <li (click)="selectQuickAddCategory(null)">
+              <div class="task-tag NO_CATEGORY">
+                <fa-icon icon="ban"></fa-icon>
+                <span>No Category</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <button class="btn-add-icon jh-create-entity create-task" (click)="addTask(newTaskTitle)" [disabled]="!newTaskTitle.trim()">
+        <fa-icon icon="plus"></fa-icon>
+      </button>
+    </div>
   </div>
 </div>

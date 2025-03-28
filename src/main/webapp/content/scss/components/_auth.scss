@@ -1,5 +1,4 @@
 /* Shared styles for login & register pages */
-$primary: #564df2;
 
 .auth-wrapper {
   display: flex;
@@ -17,6 +16,7 @@ $primary: #564df2;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
+
 .auth-header {
   position: relative;
   display: flex;
