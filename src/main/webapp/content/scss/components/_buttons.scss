@@ -47,9 +47,9 @@
   white-space: nowrap;
   appearance: none;
   background-image: none;
-  box-shadow: none;
 
   &:disabled {
+    pointer-events: auto;
     cursor: not-allowed;
     opacity: 0.6;
   }
@@ -72,6 +72,11 @@
     color: white !important;
     transform: scale(0.98) !important;
     box-shadow: none !important;
+  }
+
+  &:disabled {
+    background-color: color-mix(in srgb, var(--accent-color) 50%, white);
+    border-color: color-mix(in srgb, var(--accent-color) 50%, white);
   }
 }
 

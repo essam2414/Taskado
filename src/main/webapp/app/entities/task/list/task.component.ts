@@ -50,6 +50,7 @@ export class TaskComponent implements OnInit {
   tasks: ITask[] = [];
   categories: ICategory[] = [];
   isLoading = false;
+  isDragging = false;
 
   newTaskTitle = '';
 
@@ -163,6 +164,8 @@ export class TaskComponent implements OnInit {
     }
 
     for (const task of this.tasks) {
+      if (task.parentTask) continue; // skip subtasks
+
       const isToday = task.dueDate && dayjs(task.dueDate).isSame(dayjs(), 'day');
       if (task.completed) {
         this.filtersMap['completed'].push(task);
@@ -493,9 +496,16 @@ export class TaskComponent implements OnInit {
     return date.format(`D MMM${isNextYear ? ' YYYY' : ''} HH:mm`);
   }
 
-  isTaskPast(dueDate: dayjs.Dayjs | string | null | undefined): boolean {
-    if (!dueDate) return false;
-    return dayjs(dueDate).isBefore(dayjs(), 'minute');
+  getDueDateClass(dueDate: dayjs.Dayjs | string | null | undefined): string {
+    if (!dueDate) return '';
+
+    const date = dayjs(dueDate);
+    const now = dayjs();
+
+    if (date.isBefore(now, 'minute')) return 'past-task';
+    if (date.isSame(now, 'day')) return 'due-today';
+
+    return '';
   }
 
   getCategoryStyle(category: ICategory | null): Record<string, string> {
@@ -527,6 +537,19 @@ export class TaskComponent implements OnInit {
     const g = parseInt(c[2] + c[3], 16);
     const b = parseInt(c[4] + c[5], 16);
     return { r, g, b };
+  }
+
+  getSubtasks(task: ITask): ITask[] {
+    return this.tasks.filter(t => t.parentTask?.id === task.id);
+  }
+
+  getCompletedSubtasks(task: ITask): number {
+    return this.getSubtasks(task).filter(t => t.completed).length;
+  }
+
+  isAllSubtasksCompleted(task: ITask): boolean {
+    const subs = this.getSubtasks(task);
+    return subs.length > 0 && subs.every(t => t.completed);
   }
 
   /* ─────────────────────────────*

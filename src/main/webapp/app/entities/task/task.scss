@@ -8,6 +8,10 @@
   box-shadow: none;
 }
 
+.completed {
+  opacity: 0.7;
+}
+
 .task-dropdown {
   position: absolute;
   top: 8px;
@@ -30,7 +34,7 @@
 
 .task-title {
   font-weight: 400;
-  margin-bottom: 8px;
+  margin-bottom: 0;
 }
 
 .task-description {
@@ -70,20 +74,20 @@
   color: #4caf50;
 }
 .MEDIUM {
-  background-color: rgba(255, 193, 7, 0.2); /* Light yellow */
+  background-color: rgba(255, 193, 7, 0.2);
   color: #ffc107;
 }
 .HIGH {
-  background-color: rgba(255, 152, 0, 0.2); /* Light orange */
+  background-color: rgba(255, 152, 0, 0.2);
   color: #ff9800;
 }
 .CRITICAL {
-  background-color: rgba(244, 67, 54, 0.2); /* Light red */
+  background-color: rgba(244, 67, 54, 0.2);
   color: #f44336;
 }
 .NO_PRIORITY,
 .NO_CATEGORY {
-  background-color: rgba(128, 128, 128, 0.15); /* Light gray background */
+  background-color: rgba(128, 128, 128, 0.15);
   color: #6c757d;
 }
 
@@ -106,6 +110,24 @@
   color: var(--text-muted);
   white-space: nowrap;
   font-size: var(--font-xs);
+
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  svg {
+    height: 1em;
+    width: 1em;
+    fill: currentColor;
+  }
+
+  &.past-task {
+    color: var(--danger-color);
+  }
+
+  &.due-today {
+    color: var(--success-color);
+  }
 }
 
 .completed .task-title {
@@ -253,28 +275,6 @@
         max-width 0.3s ease,
         opacity 0.3s ease;
     }
-
-    .datepicker-input {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      cursor: pointer;
-      box-sizing: border-box;
-    }
-
-    .datepicker-input::-webkit-calendar-picker-indicator {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      cursor: pointer;
-    }
   }
 
   .dropdown-btn.hoverable:hover:not(.open),
@@ -358,10 +358,11 @@
     width: 20px;
     height: 20px;
     border-radius: 4px;
-    transition: background 0.2s ease-in;
+    transition: color 0.3s ease;
+    color: var(--text-secondary);
 
     &:hover {
-      background-color: var(--hover-bg);
+      color: var(--text-primary);
     }
   }
 
@@ -403,23 +404,26 @@
 }
 
 .section-title-input {
-  font-weight: bold;
   background: transparent;
   width: 100%;
   border: none;
   color: var(--text-secondary);
   padding: 6px 10px;
   border-radius: 4px;
+  font-weight: 500;
 
   &:focus {
-    border: 1px solid var(--primary-color); /* Highlight color */
+    border: 1px solid var(--primary-color);
+    color: var(--text-primary);
     outline: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle glow */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
-}
 
-.past-task {
-  color: var(--danger-color);
+  &:disabled {
+    border: none;
+    color: var(--text-secondary);
+    pointer-events: none;
+  }
 }
 
 .cdk-drag-placeholder {
@@ -442,6 +446,11 @@
 
 .modal-form {
   flex: 1;
+}
+
+.modal-sidebar {
+  width: 220px;
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
@@ -483,6 +492,7 @@
 
   &.active {
     color: var(--text-secondary);
+    font-weight: 500;
   }
 }
 
@@ -496,7 +506,7 @@
   gap: 10px;
 
   .hint {
-    font-size: var(--font-xs);
+    font-size: var(--font-2xs);
     color: var(--text-muted);
     margin-left: auto;
 
@@ -566,7 +576,7 @@
     width: 100%;
 
     color: var(--text-muted);
-    font-size: var(--font-xs);
+    font-size: var(--font-xs) !important;
     font-weight: 300;
     transition: color 0.2s ease;
 
@@ -608,13 +618,167 @@
   }
 }
 
+.task-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.subtasks-progress {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  font-weight: 500;
+
+  svg {
+    height: 1em;
+    width: auto;
+
+    fill: var(--text-muted);
+  }
+
+  &.done {
+    color: var(--text-muted);
+    font-weight: 400;
+
+    svg {
+      fill: var(--accent-color);
+      stroke-width: 2;
+    }
+  }
+}
+
+.subtask-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  max-height: 300px;
+  overflow-y: auto;
+  position: relative;
+}
+
+.completed .subtask-title {
+  text-decoration: line-through;
+}
+
+.subtasks-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+
+  .form-label {
+    margin: 0;
+  }
+}
+
+.subtask {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 0.5px solid var(--border-color);
+  background-color: var(--card-bg);
+
+  cursor: pointer;
+  transition:
+    background 0.3s ease,
+    border 0.3s ease;
+
+  &:hover {
+    background-color: var(--input-bg);
+    border: 0.5px solid var(--input-bg);
+
+    .subtask-title {
+      color: var(--text-primary);
+    }
+
+    .subtask-desc {
+      color: var(--text-secondary);
+    }
+  }
+
+  .task-tag {
+    font-size: var(--font-2xs);
+    padding: 2px 10px;
+  }
+
+  .task-date {
+    font-size: var(--font-2xs);
+    margin: 0;
+  }
+}
+
+.subtask-left {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.subtask-right {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.subtask-tags {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.subtask-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.subtask-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .subtask-title {
+    line-height: 1;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+  }
+
+  .subtask-desc {
+    line-height: 1;
+    font-size: var(--font-xs);
+    color: var(--text-muted);
+    transition: color 0.3s ease;
+  }
+}
+
+.edit-subtask {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.subtask .custom-checkbox {
+  width: 16px;
+  height: 16px;
+  border-width: 1px;
+}
+
 .subtask-btn {
   color: var(--text-muted);
+  font-size: var(--font-sm);
   text-decoration: none;
 
   display: flex;
   align-items: center;
   gap: 6px;
+  margin-top: 8px;
 
   transition: color 0.3s ease;
 
@@ -628,4 +792,119 @@
   &:hover {
     color: var(--text-secondary);
   }
+}
+
+.subtask-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+
+  border: 0.5px solid var(--border-color);
+  border-radius: 8px;
+  overflow: visible;
+}
+
+.subtask-inputs {
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+
+.subtask-inputs .form-control {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+.subtask-desc-input {
+  font-size: var(--font-xs) !important;
+  color: var(--text-muted);
+  margin-top: 8px;
+
+  &:focus {
+    color: var(--text-secondary);
+  }
+}
+
+.subtask-title-input {
+  font-weight: 500;
+}
+
+.subtask-options {
+  display: flex;
+  gap: 8px;
+
+  .dropdown-btn,
+  input {
+    font-size: var(--font-2xs) !important;
+    white-space: nowrap;
+    height: 40px;
+    max-width: 160px;
+    padding: 12px;
+  }
+
+  .task-tag {
+    font-size: var(--font-2xs);
+  }
+}
+
+.subtask-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.delete-subtask {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: fill 0.3s ease;
+
+  width: 16px;
+  height: 16px;
+  fill: var(--text-muted);
+
+  &:hover {
+    fill: var(--danger-color);
+  }
+}
+
+.subtask-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+
+  button {
+    font-size: var(--font-xs);
+  }
+}
+
+.datepicker-input {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.datepicker-input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.datepicker-btn svg {
+  fill: currentColor;
+  width: 14px;
+  height: 14px;
 }

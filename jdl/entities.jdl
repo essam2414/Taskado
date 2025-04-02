@@ -127,9 +127,10 @@ relationship ManyToMany {
 }
 
 relationship ManyToOne {
-  Task{category} to Category,
+  Task{category} to Category
   Habit{category} to Category,
   Note{category} to Category,
+  Task{parentTask} to Task,
   Task{user} to User with builtInEntity,
   Habit{user} to User with builtInEntity,
   Event{user} to User with builtInEntity,

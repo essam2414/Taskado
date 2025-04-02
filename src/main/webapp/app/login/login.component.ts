@@ -12,7 +12,6 @@ import { HeaderComponent } from 'app/layouts/header/header.component';
   selector: 'jhi-login',
   imports: [SharedModule, FormsModule, ReactiveFormsModule, RouterModule, HeaderComponent],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
 })
 export default class LoginComponent implements OnInit, AfterViewInit {
   username = viewChild.required<ElementRef>('username');

@@ -60,6 +60,11 @@ body {
     color 0.4s ease-in-out;
 }
 
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted) !important;
+}
+
 .sidebar {
   background-color: var(--sidebar-color);
   transition: background-color 0.4s ease-in-out;

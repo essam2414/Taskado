@@ -10,7 +10,6 @@ import { HeaderComponent } from 'app/layouts/header/header.component';
   selector: 'jhi-password-reset-init',
   imports: [SharedModule, FormsModule, ReactiveFormsModule, HeaderComponent],
   templateUrl: './password-reset-init.component.html',
-  styleUrls: ['./password-reset-init.component.scss'],
 })
 export default class PasswordResetInitComponent implements AfterViewInit {
   email = viewChild.required<ElementRef>('email');

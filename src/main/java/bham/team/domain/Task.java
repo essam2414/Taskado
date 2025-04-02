@@ -58,10 +58,13 @@ public class Task implements Serializable {
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "category", "parentTask", "user", "section", "productivityReports" }, allowSetters = true)
+    private Task parentTask;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "section_id", nullable = true, foreignKey = @ForeignKey(name = "fk_task_section"))
     @JsonIgnoreProperties(value = { "tasks" }, allowSetters = true)
     private Section section;
 
@@ -199,6 +202,19 @@ public class Task implements Serializable {
 
     public Task category(Category category) {
         this.setCategory(category);
+        return this;
+    }
+
+    public Task getParentTask() {
+        return this.parentTask;
+    }
+
+    public void setParentTask(Task task) {
+        this.parentTask = task;
+    }
+
+    public Task parentTask(Task task) {
+        this.setParentTask(task);
         return this;
     }
 

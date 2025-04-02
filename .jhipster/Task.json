@@ -48,6 +48,12 @@
       "relationshipType": "many-to-one"
     },
     {
+      "otherEntityName": "task",
+      "relationshipName": "parentTask",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
       "otherEntityName": "user",
       "relationshipName": "user",
       "relationshipSide": "left",

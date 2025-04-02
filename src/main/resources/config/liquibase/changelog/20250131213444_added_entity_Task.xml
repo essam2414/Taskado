@@ -41,6 +41,9 @@
             <column name="category_id" type="bigint">
                 <constraints nullable="true" />
             </column>
+            <column name="parent_task_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
             <column name="user_id" type="bigint">
                 <constraints nullable="true" />
             </column>

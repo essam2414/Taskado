@@ -67,6 +67,7 @@ public class TaskAsserts {
         assertThat(expected)
             .as("Verify Task relationships")
             .satisfies(e -> assertThat(e.getCategory()).as("check category").isEqualTo(actual.getCategory()))
+            .satisfies(e -> assertThat(e.getParentTask()).as("check parentTask").isEqualTo(actual.getParentTask()))
             .satisfies(e -> assertThat(e.getSection()).as("check section").isEqualTo(actual.getSection()))
             .satisfies(e ->
                 assertThat(e.getProductivityReports()).as("check productivityReports").isEqualTo(actual.getProductivityReports())

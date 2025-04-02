@@ -4,6 +4,7 @@ import static bham.team.domain.CategoryTestSamples.*;
 import static bham.team.domain.ProductivityReportTestSamples.*;
 import static bham.team.domain.SectionTestSamples.*;
 import static bham.team.domain.TaskTestSamples.*;
+import static bham.team.domain.TaskTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import bham.team.web.rest.TestUtil;
@@ -37,6 +38,18 @@ class TaskTest {
 
         task.category(null);
         assertThat(task.getCategory()).isNull();
+    }
+
+    @Test
+    void parentTaskTest() {
+        Task task = getTaskRandomSampleGenerator();
+        Task taskBack = getTaskRandomSampleGenerator();
+
+        task.setParentTask(taskBack);
+        assertThat(task.getParentTask()).isEqualTo(taskBack);
+
+        task.parentTask(null);
+        assertThat(task.getParentTask()).isNull();
     }
 
     @Test
