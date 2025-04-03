@@ -1,0 +1,159 @@
+<div>
+  <h2 id="page-heading" data-cy="UserPreferencesHeading">
+    <span>User Preferences</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
+        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-user-preferences"
+        [routerLink]="['/user-preferences/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span>Create a new User Preferences</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  @if (userPreferences?.length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No User Preferences found</span>
+    </div>
+  }
+
+  @if (userPreferences && userPreferences.length > 0) {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="darkMode">
+              <div class="d-flex">
+                <span>Dark Mode</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="sidebarColorLight">
+              <div class="d-flex">
+                <span>Sidebar Color Light</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="sidebarColorDark">
+              <div class="d-flex">
+                <span>Sidebar Color Dark</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="accentColor">
+              <div class="d-flex">
+                <span>Accent Color</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fontSizeLevel">
+              <div class="d-flex">
+                <span>Font Size Level</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dyslexiaMode">
+              <div class="d-flex">
+                <span>Dyslexia Mode</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="highContrast">
+              <div class="d-flex">
+                <span>High Contrast</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="reduceMotion">
+              <div class="d-flex">
+                <span>Reduce Motion</span>
+
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="user.login">
+              <div class="d-flex">
+                <span>User</span>
+                <fa-icon class="p-1" icon="sort"></fa-icon>
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (userPreferences of userPreferences; track trackId(userPreferences)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/user-preferences', userPreferences.id, 'view']">{{ userPreferences.id }}</a>
+              </td>
+              <td>{{ userPreferences.darkMode }}</td>
+              <td>{{ userPreferences.sidebarColorLight }}</td>
+              <td>{{ userPreferences.sidebarColorDark }}</td>
+              <td>{{ userPreferences.accentColor }}</td>
+              <td>{{ userPreferences.fontSizeLevel }}</td>
+              <td>{{ userPreferences.dyslexiaMode }}</td>
+              <td>{{ userPreferences.highContrast }}</td>
+              <td>{{ userPreferences.reduceMotion }}</td>
+              <td>
+                {{ userPreferences.user?.login }}
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/user-preferences', userPreferences.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye"></fa-icon>
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/user-preferences', userPreferences.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt"></fa-icon>
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="submit" (click)="delete(userPreferences)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times"></fa-icon>
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

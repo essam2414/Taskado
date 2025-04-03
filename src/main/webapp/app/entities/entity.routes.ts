@@ -56,6 +56,11 @@ const routes: Routes = [
     data: { pageTitle: 'Sections' },
     loadChildren: () => import('./section/section.routes'),
   },
+  {
+    path: 'user-preferences',
+    data: { pageTitle: 'UserPreferences' },
+    loadChildren: () => import('./user-preferences/user-preferences.routes'),
+  },
   /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
 ];
 

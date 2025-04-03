@@ -116,6 +116,21 @@ entity ProductivityReport {
   timestamp Instant required                   // When report was generated
 }
 
+entity UserPreferences {
+  darkMode Boolean,
+  sidebarColorLight String,
+  sidebarColorDark String,
+  accentColor String,
+  fontSizeLevel Integer,
+  dyslexiaMode Boolean,
+  highContrast Boolean,
+  reduceMotion Boolean
+}
+
+relationship OneToOne {
+  UserPreferences{user(login)} to @OnDelete("CASCADE") @Id User with builtInEntity
+}
+
 relationship OneToMany {
   ProductivityReport{pomodoroSessions} to PomodoroSession,
   Section{tasks} to Task{section}
