@@ -1,24 +1,30 @@
 .greeting-message {
   color: var(--accent-color);
+  font-size: var(--font-2xl);
 }
 
 .todays-date {
   color: var(--text-secondary);
-  font-weight: 400;
+  font-weight: 300;
 }
 
 .header-card {
   background: color-mix(in srgb, var(--accent-color) 10%, transparent);
   border-radius: 20px;
-  margin-top: 40px;
-  margin-bottom: 40px;
 
   color: var(--accent-color);
   display: flex;
   justify-content: space-between;
+  gap: 0px;
+
+  grid-column: span 2;
+  grid-row: span 1;
+  aspect-ratio: 2 / 1;
 
   @media (max-width: 768px) {
     flex-direction: column;
+    grid-row: span 2;
+    aspect-ratio: 2 / 2;
   }
 }
 
@@ -56,7 +62,8 @@
   background-color: var(--card-bg);
   padding: 30px;
   align-items: center;
-  border: 0.3px solid var(--border-color); /* ✅ Light border */
+  border: 0.3px solid var(--border-color);
+  margin-top: 16px;
 }
 
 .under-development .header-svg {
@@ -66,4 +73,166 @@
 
 .under-development h3 {
   color: var(--text-primary);
+}
+
+.widgets-container {
+  margin-top: 40px;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-auto-rows: 1fr;
+  grid-auto-flow: dense;
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.widget {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  cursor: move;
+
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 100, 100, 0.2) transparent;
+
+  background-color: var(--card-bg);
+  border-radius: 20px;
+  padding: 24px;
+
+  transition: box-shadow 0.2s ease-out;
+
+  &:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+
+    .widget-link {
+      opacity: 1;
+    }
+  }
+
+  &.widget-small {
+    grid-column: span 1;
+    grid-row: span 1;
+    font-size: var(--font-xs);
+  }
+
+  &.widget-medium {
+    grid-column: span 2;
+    grid-row: span 1;
+    font-size: var(--font-md);
+  }
+
+  &.widget-tall {
+    grid-column: span 1;
+    grid-row: span 2;
+    font-size: var(--font-md);
+  }
+
+  &.widget-large {
+    grid-column: span 2;
+    grid-row: span 2;
+    font-size: var(--font-lg);
+  }
+}
+
+.widget::-webkit-scrollbar {
+  width: 6px;
+}
+
+.widget::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.2);
+  border-radius: 10px;
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.widget-title {
+  font-size: var(--font-md);
+  font-weight: 500;
+}
+
+.widget-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+
+  width: 32px;
+  height: 32px;
+
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  border-radius: 50%;
+
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: var(--bg-color-secondary);
+  }
+
+  svg {
+    fill: currentColor;
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.cdk-drag-placeholder {
+  border: 1px dashed var(--border-color);
+  border-radius: 20px;
+  background-color: transparent !important;
+
+  ::ng-deep * {
+    opacity: 0 !important;
+    visibility: hidden !important;
+  }
+}
+
+.cdk-drag-preview {
+  transform: scale(1.03);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  border-radius: 20px;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+// task widget styles
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  background-color: var(--bg-color);
+  padding: 12px;
+  border-radius: 12px;
+
+  .custom-checkbox {
+    height: 1em;
+    width: 1em;
+    font-size: inherit !important;
+  }
+}
+
+.completed {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.task-list-empty {
+  color: var(--text-secondary);
 }

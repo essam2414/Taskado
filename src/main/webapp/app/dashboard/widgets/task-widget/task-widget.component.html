@@ -1,0 +1,12 @@
+<div>
+  @if (tasks().length === 0) {
+    <div class="task-list-empty">No tasks due today. Enjoy your day! 🎉</div>
+  } @else {
+    <div class="task-list">
+      <div class="task" *ngFor="let task of tasks()">
+        <input type="checkbox" (click)="toggleCompleted(task)" [checked]="task.completed" class="form-check-input custom-checkbox" />
+        <span [class.completed]="task.completed">{{ task.title }}</span>
+      </div>
+    </div>
+  }
+</div>

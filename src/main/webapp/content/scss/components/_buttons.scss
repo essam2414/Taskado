@@ -2,7 +2,7 @@
   width: clamp(16px, 3vw, 24px);
   height: clamp(16px, 3vw, 24px);
   border-radius: 50%;
-  border: 1.5px solid gainsboro;
+  border: 1px solid var(--border-color);
   cursor: pointer;
   transition:
     transform 0.2s ease-in-out,

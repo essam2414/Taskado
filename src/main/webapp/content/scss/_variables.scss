@@ -29,6 +29,8 @@
   --font-md: clamp(calc(0.9rem * var(--font-scale)), 1.6vw, calc(1rem * var(--font-scale)));
   --font-lg: clamp(calc(1.1rem * var(--font-scale)), 1.8vw, calc(1.25rem * var(--font-scale)));
   --font-xl: clamp(calc(1.3rem * var(--font-scale)), 2.2vw, calc(1.5rem * var(--font-scale)));
+  --font-2xl: clamp(calc(1.5rem * var(--font-scale)), 2.6vw, calc(1.75rem * var(--font-scale)));
+  --font-3xl: clamp(calc(1.75rem * var(--font-scale)), 3vw, calc(2rem * var(--font-scale)));
 
   --default-sidebar-color: #fdf1f6;
   --default-sidebar-color-dark: #1d1d1d;
