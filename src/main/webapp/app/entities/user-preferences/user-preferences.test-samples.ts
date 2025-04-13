@@ -6,21 +6,22 @@ export const sampleWithRequiredData: IUserPreferences = {
 
 export const sampleWithPartialData: IUserPreferences = {
   id: 4053,
-  fontSizeLevel: 30455,
-  highContrast: true,
+  accentColor: 'eek',
   reduceMotion: false,
 };
 
 export const sampleWithFullData: IUserPreferences = {
   id: 5774,
-  darkMode: true,
-  sidebarColorLight: 'above chops',
-  sidebarColorDark: 'when although',
-  accentColor: 'even zowie',
-  fontSizeLevel: 20996,
-  dyslexiaMode: true,
+  darkMode: false,
+  sidebarColorLight: 'butter',
+  sidebarColorDark: 'camouflage within',
+  accentColor: 'because roundabout unnaturally',
+  fontSizeLevel: 18780,
+  dyslexiaMode: false,
   highContrast: true,
   reduceMotion: true,
+  dashboardWidgetsJson: '../fake-data/blob/hipster.txt',
+  dashboardTheme: 'hippodrome impractical colorfully',
 };
 
 export const sampleWithNewData: NewUserPreferences = {

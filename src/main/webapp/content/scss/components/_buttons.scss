@@ -4,10 +4,7 @@
   border-radius: 50%;
   border: 1px solid var(--border-color);
   cursor: pointer;
-  transition:
-    transform 0.2s ease-in-out,
-    box-shadow 0.2s ease-in-out,
-    background-color 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
   appearance: none;
   display: flex;
   align-items: center;

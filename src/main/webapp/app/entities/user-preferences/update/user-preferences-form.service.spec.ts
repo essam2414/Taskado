@@ -28,6 +28,8 @@ describe('UserPreferences Form Service', () => {
             dyslexiaMode: expect.any(Object),
             highContrast: expect.any(Object),
             reduceMotion: expect.any(Object),
+            dashboardWidgetsJson: expect.any(Object),
+            dashboardTheme: expect.any(Object),
             user: expect.any(Object),
           }),
         );
@@ -47,6 +49,8 @@ describe('UserPreferences Form Service', () => {
             dyslexiaMode: expect.any(Object),
             highContrast: expect.any(Object),
             reduceMotion: expect.any(Object),
+            dashboardWidgetsJson: expect.any(Object),
+            dashboardTheme: expect.any(Object),
             user: expect.any(Object),
           }),
         );

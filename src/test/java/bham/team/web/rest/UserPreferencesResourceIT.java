@@ -67,6 +67,12 @@ class UserPreferencesResourceIT {
     private static final Boolean DEFAULT_REDUCE_MOTION = false;
     private static final Boolean UPDATED_REDUCE_MOTION = true;
 
+    private static final String DEFAULT_DASHBOARD_WIDGETS_JSON = "AAAAAAAAAA";
+    private static final String UPDATED_DASHBOARD_WIDGETS_JSON = "BBBBBBBBBB";
+
+    private static final String DEFAULT_DASHBOARD_THEME = "AAAAAAAAAA";
+    private static final String UPDATED_DASHBOARD_THEME = "BBBBBBBBBB";
+
     private static final String ENTITY_API_URL = "/api/user-preferences";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -110,7 +116,9 @@ class UserPreferencesResourceIT {
             .fontSizeLevel(DEFAULT_FONT_SIZE_LEVEL)
             .dyslexiaMode(DEFAULT_DYSLEXIA_MODE)
             .highContrast(DEFAULT_HIGH_CONTRAST)
-            .reduceMotion(DEFAULT_REDUCE_MOTION);
+            .reduceMotion(DEFAULT_REDUCE_MOTION)
+            .dashboardWidgetsJson(DEFAULT_DASHBOARD_WIDGETS_JSON)
+            .dashboardTheme(DEFAULT_DASHBOARD_THEME);
         // Add required entity
         User user = UserResourceIT.createEntity();
         em.persist(user);
@@ -134,7 +142,9 @@ class UserPreferencesResourceIT {
             .fontSizeLevel(UPDATED_FONT_SIZE_LEVEL)
             .dyslexiaMode(UPDATED_DYSLEXIA_MODE)
             .highContrast(UPDATED_HIGH_CONTRAST)
-            .reduceMotion(UPDATED_REDUCE_MOTION);
+            .reduceMotion(UPDATED_REDUCE_MOTION)
+            .dashboardWidgetsJson(UPDATED_DASHBOARD_WIDGETS_JSON)
+            .dashboardTheme(UPDATED_DASHBOARD_THEME);
         // Add required entity
         User user = UserResourceIT.createEntity();
         em.persist(user);
@@ -255,7 +265,9 @@ class UserPreferencesResourceIT {
             .andExpect(jsonPath("$.[*].fontSizeLevel").value(hasItem(DEFAULT_FONT_SIZE_LEVEL)))
             .andExpect(jsonPath("$.[*].dyslexiaMode").value(hasItem(DEFAULT_DYSLEXIA_MODE.booleanValue())))
             .andExpect(jsonPath("$.[*].highContrast").value(hasItem(DEFAULT_HIGH_CONTRAST.booleanValue())))
-            .andExpect(jsonPath("$.[*].reduceMotion").value(hasItem(DEFAULT_REDUCE_MOTION.booleanValue())));
+            .andExpect(jsonPath("$.[*].reduceMotion").value(hasItem(DEFAULT_REDUCE_MOTION.booleanValue())))
+            .andExpect(jsonPath("$.[*].dashboardWidgetsJson").value(hasItem(DEFAULT_DASHBOARD_WIDGETS_JSON.toString())))
+            .andExpect(jsonPath("$.[*].dashboardTheme").value(hasItem(DEFAULT_DASHBOARD_THEME)));
     }
 
     @SuppressWarnings({ "unchecked" })
@@ -294,7 +306,9 @@ class UserPreferencesResourceIT {
             .andExpect(jsonPath("$.fontSizeLevel").value(DEFAULT_FONT_SIZE_LEVEL))
             .andExpect(jsonPath("$.dyslexiaMode").value(DEFAULT_DYSLEXIA_MODE.booleanValue()))
             .andExpect(jsonPath("$.highContrast").value(DEFAULT_HIGH_CONTRAST.booleanValue()))
-            .andExpect(jsonPath("$.reduceMotion").value(DEFAULT_REDUCE_MOTION.booleanValue()));
+            .andExpect(jsonPath("$.reduceMotion").value(DEFAULT_REDUCE_MOTION.booleanValue()))
+            .andExpect(jsonPath("$.dashboardWidgetsJson").value(DEFAULT_DASHBOARD_WIDGETS_JSON.toString()))
+            .andExpect(jsonPath("$.dashboardTheme").value(DEFAULT_DASHBOARD_THEME));
     }
 
     @Test
@@ -324,7 +338,9 @@ class UserPreferencesResourceIT {
             .fontSizeLevel(UPDATED_FONT_SIZE_LEVEL)
             .dyslexiaMode(UPDATED_DYSLEXIA_MODE)
             .highContrast(UPDATED_HIGH_CONTRAST)
-            .reduceMotion(UPDATED_REDUCE_MOTION);
+            .reduceMotion(UPDATED_REDUCE_MOTION)
+            .dashboardWidgetsJson(UPDATED_DASHBOARD_WIDGETS_JSON)
+            .dashboardTheme(UPDATED_DASHBOARD_THEME);
 
         restUserPreferencesMockMvc
             .perform(
@@ -404,7 +420,12 @@ class UserPreferencesResourceIT {
         UserPreferences partialUpdatedUserPreferences = new UserPreferences();
         partialUpdatedUserPreferences.setId(userPreferences.getId());
 
-        partialUpdatedUserPreferences.fontSizeLevel(UPDATED_FONT_SIZE_LEVEL).dyslexiaMode(UPDATED_DYSLEXIA_MODE);
+        partialUpdatedUserPreferences
+            .accentColor(UPDATED_ACCENT_COLOR)
+            .fontSizeLevel(UPDATED_FONT_SIZE_LEVEL)
+            .highContrast(UPDATED_HIGH_CONTRAST)
+            .reduceMotion(UPDATED_REDUCE_MOTION)
+            .dashboardWidgetsJson(UPDATED_DASHBOARD_WIDGETS_JSON);
 
         restUserPreferencesMockMvc
             .perform(
@@ -443,7 +464,9 @@ class UserPreferencesResourceIT {
             .fontSizeLevel(UPDATED_FONT_SIZE_LEVEL)
             .dyslexiaMode(UPDATED_DYSLEXIA_MODE)
             .highContrast(UPDATED_HIGH_CONTRAST)
-            .reduceMotion(UPDATED_REDUCE_MOTION);
+            .reduceMotion(UPDATED_REDUCE_MOTION)
+            .dashboardWidgetsJson(UPDATED_DASHBOARD_WIDGETS_JSON)
+            .dashboardTheme(UPDATED_DASHBOARD_THEME);
 
         restUserPreferencesMockMvc
             .perform(

@@ -115,7 +115,10 @@
 }
 
 .toggle-btn {
-  transition: transform 0.3s ease-in-out;
+  transition:
+    transform 0.3s ease-in-out,
+    background 0.3s ease-in-out,
+    color 0.3s ease-in-out;
 }
 
 .sidebar.collapsed .toggle-btn {

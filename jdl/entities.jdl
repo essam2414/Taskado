@@ -124,7 +124,9 @@ entity UserPreferences {
   fontSizeLevel Integer,
   dyslexiaMode Boolean,
   highContrast Boolean,
-  reduceMotion Boolean
+  reduceMotion Boolean,
+  dashboardWidgetsJson TextBlob,
+  dashboardTheme String
 }
 
 relationship OneToOne {

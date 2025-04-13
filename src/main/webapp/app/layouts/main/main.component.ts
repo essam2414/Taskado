@@ -41,10 +41,17 @@ export default class MainComponent implements OnInit {
       // Add paths that use landing background
       const landingRoutes = ['/', '/login', '/account/register', '/account/reset/request'];
 
+      const dashboardRoutes = ['/dashboard'];
+
       if (landingRoutes.includes(this.router.url)) {
         this.renderer.addClass(document.body, 'landing-bg');
+        this.renderer.removeClass(document.body, 'dashboard-bg');
+      } else if (dashboardRoutes.includes(this.router.url)) {
+        this.renderer.addClass(document.body, 'dashboard-bg');
+        this.renderer.removeClass(document.body, 'landing-bg');
       } else {
         this.renderer.removeClass(document.body, 'landing-bg');
+        this.renderer.removeClass(document.body, 'dashboard-bg');
       }
     });
   }

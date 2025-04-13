@@ -8,6 +8,9 @@ import { Account } from 'app/core/auth/account.model';
 import { UserPreferencesService } from 'app/entities/user-preferences/service/user-preferences.service';
 import { IUserPreferences } from 'app/entities/user-preferences/user-preferences.model';
 
+import { dashboardWidgets, Widget } from 'app/dashboard/widgets/widgets.component';
+import { ActivatedRoute } from '@angular/router';
+
 const initialAccount: Account = {} as Account;
 
 @Component({
@@ -21,15 +24,11 @@ export default class SettingsComponent implements OnInit {
   user: Account | null = null;
   preferences: IUserPreferences | null = null;
   success = signal(false);
-  darkMode = false;
 
+  darkMode = false;
   selectedSidebarColorLight = '#fdf1f6';
   selectedSidebarColorDark = '#1d1d1d';
   selectedAccentColor = '#564df2';
-  fontSizeLevel = 2;
-  dyslexiaMode = false;
-  highContrast = false;
-  reduceMotion = false;
 
   themeColors: string[] = [];
   darkModePalette: string[] = this.getThemeColors(true);
@@ -51,16 +50,35 @@ export default class SettingsComponent implements OnInit {
     '#be3e82', // Violet
   ];
 
+  fontSizeLevel = 2;
+  dyslexiaMode = false;
+  highContrast = false;
+  reduceMotion = false;
+
   activeTab = 'account';
   tabsOpen = false;
   tabs = [
     { value: 'account', label: 'Account', icon: 'user' },
     { value: 'appearance', label: 'Appearance', icon: 'palette' },
     { value: 'accessibility', label: 'Accessibility', icon: 'eye' },
+    { value: 'dashboard', label: 'Dashboard', icon: 'desktop' },
   ];
 
   previewUrl: string | null = null;
   selectedFile: File | null = null;
+
+  dashboardThemes = [
+    { id: 'Default', bg: this.getDashboardThemeBackground('Default') },
+    { id: 'Midnight', bg: this.getDashboardThemeBackground('Midnight') },
+    { id: 'Amethyst', bg: this.getDashboardThemeBackground('Amethyst') },
+    { id: 'Blush', bg: this.getDashboardThemeBackground('Blush') },
+    { id: 'Apricot', bg: this.getDashboardThemeBackground('Apricot') },
+    { id: 'Mist', bg: this.getDashboardThemeBackground('Mist') },
+    { id: 'Sage', bg: this.getDashboardThemeBackground('Sage') },
+    { id: 'Bloom', bg: this.getDashboardThemeBackground('Bloom') },
+  ];
+  selectedDashboardTheme = 'Default';
+  widgets: Widget[] = [];
 
   settingsForm = new FormGroup({
     firstName: new FormControl(initialAccount.firstName, {
@@ -85,8 +103,16 @@ export default class SettingsComponent implements OnInit {
 
   private readonly accountService = inject(AccountService);
   private readonly userPreferencesService = inject(UserPreferencesService);
+  private readonly route = inject(ActivatedRoute);
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      const tab = params['tab'];
+      if (tab && this.tabs.some(t => t.value === tab)) {
+        this.activeTab = tab;
+      }
+    });
+
     this.accountService.identity().subscribe(account => {
       if (account) {
         this.user = account;
@@ -95,6 +121,9 @@ export default class SettingsComponent implements OnInit {
         this.userPreferencesService.getOrCreateAndApply().then(prefs => {
           this.preferences = prefs;
           this.applyPreferences(prefs);
+
+          this.selectedDashboardTheme = prefs.dashboardTheme ?? 'Default';
+          this.widgets = this.userPreferencesService.widgets;
         });
       }
     });
@@ -129,6 +158,8 @@ export default class SettingsComponent implements OnInit {
     });
   }
 
+  // appearance settings
+
   toggleDarkMode(): void {
     this.darkMode = !this.darkMode;
     this.updateUserPreference({ darkMode: this.darkMode });
@@ -136,6 +167,35 @@ export default class SettingsComponent implements OnInit {
     this.selectedSidebarColor = this.darkMode ? this.selectedSidebarColorDark : this.selectedSidebarColorLight;
     this.themeColors = this.darkMode ? this.darkModePalette : this.lightModePalette;
   }
+
+  updateAccentColor(): void {
+    this.updateUserPreference({ accentColor: this.selectedAccentColor });
+  }
+
+  setSidebarColor(color: string): void {
+    if (this.darkMode) {
+      this.selectedSidebarColorDark = color;
+      this.updateUserPreference({ sidebarColorDark: color });
+    } else {
+      this.selectedSidebarColorLight = color;
+      this.updateUserPreference({ sidebarColorLight: color });
+    }
+
+    this.selectedSidebarColor = color;
+  }
+
+  isAppearanceDefault(): boolean {
+    const defaultSidebarColor = (
+      this.darkMode
+        ? getComputedStyle(document.documentElement).getPropertyValue('--default-sidebar-color-dark')
+        : getComputedStyle(document.documentElement).getPropertyValue('--default-sidebar-color')
+    ).trim();
+    const defaultAccentColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+
+    return this.selectedSidebarColor === defaultSidebarColor && this.selectedAccentColor === defaultAccentColor;
+  }
+
+  // accessability settings
 
   toggleHighContrast(): void {
     this.highContrast = !this.highContrast;
@@ -156,23 +216,47 @@ export default class SettingsComponent implements OnInit {
     this.updateUserPreference({ fontSizeLevel: this.fontSizeLevel });
   }
 
-  updateAccentColor(): void {
-    this.updateUserPreference({ accentColor: this.selectedAccentColor });
+  isAccessibilityDefault(): boolean {
+    return !this.highContrast && !this.dyslexiaMode && !this.reduceMotion && this.fontSizeLevel === 2;
   }
 
-  setSidebarColor(color: string): void {
-    if (this.darkMode) {
-      this.selectedSidebarColorDark = color;
-      this.updateUserPreference({ sidebarColorDark: color });
-    } else {
-      this.selectedSidebarColorLight = color;
-      this.updateUserPreference({ sidebarColorLight: color });
-    }
+  // dashboard settings
 
-    this.selectedSidebarColor = color;
+  toggleWidget(widget: Widget): void {
+    widget.enabled = !widget.enabled;
+
+    const visibleWidgets = this.widgets.filter(w => w.enabled);
+    const widgetsJson = JSON.stringify(visibleWidgets.map(w => w.id));
+
+    this.updateUserPreference({ dashboardWidgetsJson: widgetsJson });
   }
 
-  resetColors(): void {
+  setDashboardTheme(theme: string): void {
+    this.selectedDashboardTheme = theme;
+    this.updateUserPreference({ dashboardTheme: theme });
+    this.userPreferencesService.applyDashboardTheme(theme);
+  }
+
+  getDashboardThemeBackground(themeId: string): string {
+    const fakeDiv = document.createElement('div');
+    fakeDiv.setAttribute('data-dashboard-theme', themeId);
+    document.body.appendChild(fakeDiv);
+
+    const bg = getComputedStyle(fakeDiv).getPropertyValue('--dashboard-bg').trim();
+
+    document.body.removeChild(fakeDiv);
+
+    return bg;
+  }
+
+  isDashboardDefault(): boolean {
+    const allWidgetsEnabled = this.widgets.every(w => w.enabled);
+    return this.selectedDashboardTheme === 'Default' && allWidgetsEnabled;
+  }
+
+  // reset functions
+
+  resetAppearance(): void {
     const defaultSidebarColor = (
       this.darkMode
         ? getComputedStyle(document.documentElement).getPropertyValue('--default-sidebar-color-dark')
@@ -191,7 +275,40 @@ export default class SettingsComponent implements OnInit {
     });
   }
 
-  // updated til here
+  resetAccessibility(): void {
+    const defaultAccessibilityPrefs = {
+      highContrast: false,
+      dyslexiaMode: false,
+      reduceMotion: false,
+      fontSizeLevel: 2,
+    };
+
+    this.updateUserPreference(defaultAccessibilityPrefs);
+    this.userPreferencesService.resetDOMToDefaultTheme();
+
+    this.darkMode = false;
+    this.highContrast = false;
+    this.dyslexiaMode = false;
+    this.reduceMotion = false;
+    this.fontSizeLevel = 2;
+  }
+
+  resetDashboard(): void {
+    const defaultTheme = 'Default';
+    this.selectedDashboardTheme = defaultTheme;
+    this.userPreferencesService.applyDashboardTheme(defaultTheme);
+
+    this.widgets.forEach(widget => {
+      widget.enabled = true;
+    });
+
+    this.updateUserPreference({
+      dashboardTheme: defaultTheme,
+      dashboardWidgetsJson: JSON.stringify(this.widgets.map(widget => widget.id)),
+    });
+  }
+
+  // account settings
 
   getProfilePictureUrl(): string {
     const login = this.settingsForm.value.login;
@@ -267,8 +384,8 @@ export default class SettingsComponent implements OnInit {
     const account = this.settingsForm.getRawValue();
     if (this.selectedFile) {
       this.uploadProfilePicture(this.selectedFile).then(imageUrl => {
-        account.imageUrl = imageUrl; // Update image URL
-        this.settingsForm.patchValue({ imageUrl }); // update form immediately
+        account.imageUrl = imageUrl;
+        this.settingsForm.patchValue({ imageUrl });
         this.submitAccountUpdate(account);
       });
     } else {
@@ -329,7 +446,7 @@ export default class SettingsComponent implements OnInit {
   protected async uploadProfilePicture(file: File): Promise<string> {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', 'taskado_preset'); // your unsigned preset
+    formData.append('upload_preset', 'taskado_preset');
 
     const cloudName = 'dzxjmjjnt'; // Cloudinary cloud name
 
@@ -343,6 +460,6 @@ export default class SettingsComponent implements OnInit {
     }
 
     const data: { secure_url: string } = await response.json();
-    return data.secure_url; // this is the public image URL
+    return data.secure_url;
   }
 }

@@ -7,8 +7,9 @@ import SharedModule from 'app/shared/shared.module';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { UserPreferencesService } from 'app/entities/user-preferences/service/user-preferences.service';
 
-import { TaskWidgetComponent } from './widgets/task-widget/task-widget.component';
+import { Widget } from './widgets/widgets.component';
 
 @Component({
   standalone: true,
@@ -24,19 +25,12 @@ export default class DashboardComponent implements OnInit, OnDestroy {
   greetingMessage = '';
   currentDate = '';
 
-  widgets = [
-    { id: 'task', title: 'Todays Tasks', component: TaskWidgetComponent, size: 'large', link: '/task' },
-    { id: 'notification', title: 'Notifications', size: 'tall', link: '/notification' },
-    { id: 'habit', title: 'Habits', size: 'medium', link: '/habit' },
-    { id: 'event', title: 'Upcoming Events', size: 'large', link: '/event' },
-    { id: 'note', title: 'Recent Notes', size: 'tall', link: '/note' },
-    { id: 'productivity-report', title: 'Productivity Insights', size: 'large', link: '/productivity-report' },
-    { id: 'pomodoro-session', title: 'Focus Timer', size: 'small', link: '/pomodoro-session' },
-  ];
+  visibleWidgets: Widget[] = [];
 
   private readonly destroy$ = new Subject<void>();
   private readonly accountService = inject(AccountService);
   private readonly router = inject(Router);
+  private readonly userPreferencesService = inject(UserPreferencesService);
 
   ngOnInit(): void {
     this.accountService
@@ -46,10 +40,18 @@ export default class DashboardComponent implements OnInit, OnDestroy {
     this.isGuest = sessionStorage.getItem('guest') === 'true';
     this.setGreeting();
     this.setCurrentDate();
+
+    this.userPreferencesService.getOrCreateAndApply().then(prefs => {
+      this.visibleWidgets = this.userPreferencesService.visibleWidgets;
+    });
+  }
+
+  goToDashboardSettings(): void {
+    this.router.navigate(['/account/settings'], { queryParams: { tab: 'dashboard' } });
   }
 
   drop(event: CdkDragDrop<string[]>): void {
-    moveItemInArray(this.widgets, event.previousIndex, event.currentIndex);
+    moveItemInArray(this.visibleWidgets, event.previousIndex, event.currentIndex);
   }
 
   setGreeting(): void {

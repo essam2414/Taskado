@@ -50,8 +50,20 @@
   --alert-info-bg: #e7f3fe;
 
   --notification-bg: #1d1d1d;
+
+  // dashboard theme
+  --dashboard-bg: var(--bg-color);
+  --widget-bg: var(--card-bg);
+  --dashboard-border: var(--border-color);
+  --dashboard-text-primary: var(--text-primary);
+  --dashboard-text-secondary: var(--text-secondary);
+  --dashboard-text-muted: var(--text-muted);
+  --dashboard-surface: var(--bg-color);
+  --dashboard-surface-hover: var(--bg-color-secondary);
+  --dashboard-accent: var(--accent-color);
 }
 
+// dark mode
 [data-theme='dark'] {
   --bg-color: #0a0a0a;
   --bg-color-secondary: #141414;
@@ -78,11 +90,13 @@
   --notification-bg: #222831;
 }
 
+// dyslexia mode
 .dyslexia-mode {
   --app-font: 'OpenDyslexic';
   --heading-font: 'OpenDyslexic';
 }
 
+// high contrast mode
 [data-theme='high-contrast'] {
   --bg-color: #000000;
   --bg-color-secondary: #111111;

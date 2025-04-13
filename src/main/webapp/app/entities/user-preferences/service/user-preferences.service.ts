@@ -8,6 +8,7 @@ import { createRequestOption } from 'app/core/request/request-util';
 import { IUserPreferences, NewUserPreferences } from '../user-preferences.model';
 import { AccountService } from 'app/core/auth/account.service';
 import { UserService } from 'app/entities/user/service/user.service';
+import { dashboardWidgets, Widget } from 'app/dashboard/widgets/widgets.component';
 
 export type PartialUpdateUserPreferences = Partial<IUserPreferences> & Pick<IUserPreferences, 'id'>;
 
@@ -16,6 +17,9 @@ export type EntityArrayResponseType = HttpResponse<IUserPreferences[]>;
 
 @Injectable({ providedIn: 'root' })
 export class UserPreferencesService {
+  widgets: Widget[] = [];
+  visibleWidgets: Widget[] = [];
+
   protected readonly http = inject(HttpClient);
   protected readonly applicationConfigService = inject(ApplicationConfigService);
   protected readonly accountService = inject(AccountService);
@@ -105,6 +109,8 @@ export class UserPreferencesService {
         accentColor: '#564df2',
         sidebarColorLight: '#fdf1f6',
         sidebarColorDark: '#1d1d1d',
+        dashboardTheme: 'Default',
+        dashboardWidgetsJson: JSON.stringify(dashboardWidgets.map(w => w.id)),
         user: {
           id: fullUser.id,
           login: fullUser.login,
@@ -115,6 +121,8 @@ export class UserPreferencesService {
     }
 
     this.applyPreferencesToDOM(prefs);
+    this.applyDashboardTheme(prefs.dashboardTheme ?? 'Default');
+    this.loadWidgets(prefs.dashboardWidgetsJson);
     return prefs;
   }
 
@@ -172,6 +180,22 @@ export class UserPreferencesService {
     root.style.setProperty('--navmenu-hover-text', '#2C2C38');
     root.style.setProperty('--sidebar-hover-bg', 'rgba(0, 0, 0, 0.07)');
     root.style.setProperty('--font-scale', '1');
+  }
+
+  applyDashboardTheme(theme: string): void {
+    document.documentElement.setAttribute('data-dashboard-theme', theme);
+  }
+
+  loadWidgets(widgetJson: string | null | undefined): void {
+    this.widgets = dashboardWidgets;
+
+    if (widgetJson) {
+      this.widgets.forEach(widget => {
+        widget.enabled = widgetJson.includes(widget.id);
+      });
+    }
+
+    this.visibleWidgets = this.widgets.filter(widget => widget.enabled);
   }
 
   private hexToRgb(hex: string): { r: number; g: number; b: number } | null {

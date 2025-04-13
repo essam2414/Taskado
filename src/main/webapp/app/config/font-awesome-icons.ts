@@ -55,6 +55,7 @@ import {
   faUndo,
   faHammer,
   faInfoCircle,
+  faDesktop,
   // jhipster-needle-add-icon-import
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -115,5 +116,6 @@ export const fontAwesomeIcons = [
   faUndo,
   faHammer,
   faInfoCircle,
+  faDesktop,
   // jhipster-needle-add-icon-import
 ];

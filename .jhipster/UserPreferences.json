@@ -35,6 +35,14 @@
     {
       "fieldName": "reduceMotion",
       "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "dashboardWidgetsJson",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "dashboardTheme",
+      "fieldType": "String"
     }
   ],
   "name": "UserPreferences",

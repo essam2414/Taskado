@@ -1,5 +1,6 @@
 .settings-container {
   margin-top: 40px;
+  margin-bottom: 40px;
   display: flex;
   gap: 40px;
 }
@@ -176,7 +177,7 @@
   }
 
   input:disabled + .slider {
-    cursor: not-allowed; /* Show disabled cursor */
+    cursor: not-allowed;
   }
 }
 
@@ -193,16 +194,22 @@
   border: none;
   background: none;
   padding: 0;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--text-muted);
-  transition: color 0.2s ease-in-out;
+  transition:
+    color 0.2s ease-in-out,
+    opacity 0.2s ease-in-out;
 
   &:hover {
     color: var(--text-secondary);
   }
+
+  &:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
-/* Font size slider */
 .font-size-slider-container {
   width: 100%;
   display: flex;
@@ -227,19 +234,19 @@
   outline: none;
   transition: all 0.3s ease-in-out;
   cursor: pointer;
-  z-index: 2; /* Makes sure the slider is ABOVE the step dots */
+  z-index: 2;
 }
 
 .font-size-slider::-webkit-slider-thumb {
-  -webkit-appearance: none; /* Override default look */
+  -webkit-appearance: none;
   appearance: none;
 
-  width: 20px; /* Set a specific slider handle width */
-  height: 20px; /* Slider handle height */
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
 
   background-color: var(--accent-color);
-  cursor: pointer; /* Cursor on hover */
+  cursor: pointer;
 }
 
 .slider::-moz-range-thumb {
@@ -267,11 +274,10 @@
   display: flex;
   justify-content: space-between;
   pointer-events: none;
-  z-index: 1; /* Below the slider thumb but above track */
+  z-index: 1;
   transform: translateY(-50%);
 }
 
-/* Small Circles (Same Color as Slider) */
 .font-size-step {
   width: 12px;
   height: 12px;
@@ -281,7 +287,6 @@
   z-index: 1;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .settings-container {
     flex-direction: column;
@@ -340,4 +345,75 @@
   justify-content: center;
 
   background-color: var(--avatar-bg);
+}
+
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.theme-option {
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  border: 0.5px solid var(--border-color);
+  transition:
+    transform 0.2s ease,
+    border 0.2s ease,
+    outline 0.2s ease;
+
+  .theme-name {
+    font-weight: 300;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    mix-blend-mode: difference;
+    color: white;
+  }
+}
+
+.theme-option:hover {
+  transform: scale(1.05);
+
+  .theme-name {
+    opacity: 0.7;
+  }
+}
+
+.theme-option.active {
+  border: 1px solid var(--bg-color);
+  outline: 2px solid var(--accent-color);
+}
+
+.widget-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.widget-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 20px 24px;
+
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+  cursor: pointer;
+
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+  font-weight: 400;
+
+  &:hover {
+    background-color: var(--hover-bg);
+    color: var(--text-primary);
+  }
+}
+
+.widget-item.enabled {
+  color: var(--text-primary);
 }

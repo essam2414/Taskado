@@ -10,6 +10,8 @@ export interface IUserPreferences {
   dyslexiaMode?: boolean | null;
   highContrast?: boolean | null;
   reduceMotion?: boolean | null;
+  dashboardWidgetsJson?: string | null;
+  dashboardTheme?: string | null;
   user?: Pick<IUser, 'id' | 'login'> | null;
 }
 

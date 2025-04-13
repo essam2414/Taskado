@@ -38,9 +38,16 @@
             <column name="reduce_motion" type="boolean">
                 <constraints nullable="true" />
             </column>
+            <column name="dashboard_widgets_json" type="${clobType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="dashboard_theme" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
             <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
         </createTable>
     </changeSet>
 
     <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
 </databaseChangeLog>

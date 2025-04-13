@@ -65,7 +65,11 @@ public class UserPreferencesAsserts {
             .satisfies(e -> assertThat(e.getFontSizeLevel()).as("check fontSizeLevel").isEqualTo(actual.getFontSizeLevel()))
             .satisfies(e -> assertThat(e.getDyslexiaMode()).as("check dyslexiaMode").isEqualTo(actual.getDyslexiaMode()))
             .satisfies(e -> assertThat(e.getHighContrast()).as("check highContrast").isEqualTo(actual.getHighContrast()))
-            .satisfies(e -> assertThat(e.getReduceMotion()).as("check reduceMotion").isEqualTo(actual.getReduceMotion()));
+            .satisfies(e -> assertThat(e.getReduceMotion()).as("check reduceMotion").isEqualTo(actual.getReduceMotion()))
+            .satisfies(e ->
+                assertThat(e.getDashboardWidgetsJson()).as("check dashboardWidgetsJson").isEqualTo(actual.getDashboardWidgetsJson())
+            )
+            .satisfies(e -> assertThat(e.getDashboardTheme()).as("check dashboardTheme").isEqualTo(actual.getDashboardTheme()));
     }
 
     /**

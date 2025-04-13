@@ -26,6 +26,8 @@ type UserPreferencesFormGroupContent = {
   dyslexiaMode: FormControl<IUserPreferences['dyslexiaMode']>;
   highContrast: FormControl<IUserPreferences['highContrast']>;
   reduceMotion: FormControl<IUserPreferences['reduceMotion']>;
+  dashboardWidgetsJson: FormControl<IUserPreferences['dashboardWidgetsJson']>;
+  dashboardTheme: FormControl<IUserPreferences['dashboardTheme']>;
   user: FormControl<IUserPreferences['user']>;
 };
 
@@ -54,6 +56,8 @@ export class UserPreferencesFormService {
       dyslexiaMode: new FormControl(userPreferencesRawValue.dyslexiaMode),
       highContrast: new FormControl(userPreferencesRawValue.highContrast),
       reduceMotion: new FormControl(userPreferencesRawValue.reduceMotion),
+      dashboardWidgetsJson: new FormControl(userPreferencesRawValue.dashboardWidgetsJson),
+      dashboardTheme: new FormControl(userPreferencesRawValue.dashboardTheme),
       user: new FormControl(userPreferencesRawValue.user),
     });
   }

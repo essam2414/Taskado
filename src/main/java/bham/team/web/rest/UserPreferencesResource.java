@@ -154,6 +154,12 @@ public class UserPreferencesResource {
                 if (userPreferences.getReduceMotion() != null) {
                     existingUserPreferences.setReduceMotion(userPreferences.getReduceMotion());
                 }
+                if (userPreferences.getDashboardWidgetsJson() != null) {
+                    existingUserPreferences.setDashboardWidgetsJson(userPreferences.getDashboardWidgetsJson());
+                }
+                if (userPreferences.getDashboardTheme() != null) {
+                    existingUserPreferences.setDashboardTheme(userPreferences.getDashboardTheme());
+                }
 
                 return existingUserPreferences;
             })

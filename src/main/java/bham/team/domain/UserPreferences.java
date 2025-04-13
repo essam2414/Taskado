@@ -44,6 +44,13 @@ public class UserPreferences implements Serializable {
     @Column(name = "reduce_motion")
     private Boolean reduceMotion;
 
+    @Lob
+    @Column(name = "dashboard_widgets_json")
+    private String dashboardWidgetsJson;
+
+    @Column(name = "dashboard_theme")
+    private String dashboardTheme;
+
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "id")
@@ -168,6 +175,32 @@ public class UserPreferences implements Serializable {
         this.reduceMotion = reduceMotion;
     }
 
+    public String getDashboardWidgetsJson() {
+        return this.dashboardWidgetsJson;
+    }
+
+    public UserPreferences dashboardWidgetsJson(String dashboardWidgetsJson) {
+        this.setDashboardWidgetsJson(dashboardWidgetsJson);
+        return this;
+    }
+
+    public void setDashboardWidgetsJson(String dashboardWidgetsJson) {
+        this.dashboardWidgetsJson = dashboardWidgetsJson;
+    }
+
+    public String getDashboardTheme() {
+        return this.dashboardTheme;
+    }
+
+    public UserPreferences dashboardTheme(String dashboardTheme) {
+        this.setDashboardTheme(dashboardTheme);
+        return this;
+    }
+
+    public void setDashboardTheme(String dashboardTheme) {
+        this.dashboardTheme = dashboardTheme;
+    }
+
     public User getUser() {
         return this.user;
     }
@@ -213,6 +246,8 @@ public class UserPreferences implements Serializable {
             ", dyslexiaMode='" + getDyslexiaMode() + "'" +
             ", highContrast='" + getHighContrast() + "'" +
             ", reduceMotion='" + getReduceMotion() + "'" +
+            ", dashboardWidgetsJson='" + getDashboardWidgetsJson() + "'" +
+            ", dashboardTheme='" + getDashboardTheme() + "'" +
             "}";
     }
 }

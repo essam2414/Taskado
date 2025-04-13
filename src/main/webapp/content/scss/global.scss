@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=Inter:wght@200;300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700;800&display=swap');
 @import 'bootstrap-variables';
 @import 'bootstrap/scss/functions';
 @import 'bootswatch/dist/materia/variables';
@@ -13,6 +13,7 @@
 @import 'components/modal';
 @import 'components/alerts';
 @import 'components/auth';
+@import 'components/dashboard-themes';
 
 @font-face {
   font-family: 'OpenDyslexic';
@@ -56,8 +57,8 @@ body {
   background-color: var(--bg-color);
   color: var(--text-primary);
   transition:
-    background-color 0.4s ease-in-out,
-    color 0.4s ease-in-out;
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
 input::placeholder,
@@ -80,6 +81,18 @@ textarea::placeholder {
   );
   backdrop-filter: blur(15px) saturate(180%);
   -webkit-backdrop-filter: blur(15px) saturate(180%);
+}
+
+.dashboard-bg {
+  background: var(--dashboard-bg);
+}
+
+body.dashboard-bg .sidebar.collapsed .toggle-btn {
+  color: var(--dashboard-text-secondary);
+
+  &:hover {
+    color: var(--dashboard-text-primary);
+  }
 }
 
 h1,

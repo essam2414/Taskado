@@ -17,7 +17,8 @@ public class UserPreferencesTestSamples {
             .sidebarColorLight("sidebarColorLight1")
             .sidebarColorDark("sidebarColorDark1")
             .accentColor("accentColor1")
-            .fontSizeLevel(1);
+            .fontSizeLevel(1)
+            .dashboardTheme("dashboardTheme1");
     }
 
     public static UserPreferences getUserPreferencesSample2() {
@@ -26,7 +27,8 @@ public class UserPreferencesTestSamples {
             .sidebarColorLight("sidebarColorLight2")
             .sidebarColorDark("sidebarColorDark2")
             .accentColor("accentColor2")
-            .fontSizeLevel(2);
+            .fontSizeLevel(2)
+            .dashboardTheme("dashboardTheme2");
     }
 
     public static UserPreferences getUserPreferencesRandomSampleGenerator() {
@@ -35,6 +37,7 @@ public class UserPreferencesTestSamples {
             .sidebarColorLight(UUID.randomUUID().toString())
             .sidebarColorDark(UUID.randomUUID().toString())
             .accentColor(UUID.randomUUID().toString())
-            .fontSizeLevel(intCount.incrementAndGet());
+            .fontSizeLevel(intCount.incrementAndGet())
+            .dashboardTheme(UUID.randomUUID().toString());
     }
 }
