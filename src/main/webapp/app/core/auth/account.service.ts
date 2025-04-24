@@ -2,7 +2,7 @@ import { Injectable, Signal, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Observable, ReplaySubject, of } from 'rxjs';
-import { catchError, shareReplay, tap } from 'rxjs/operators';
+import { catchError, shareReplay, tap, map } from 'rxjs/operators';
 
 import { StateStorageService } from 'app/core/auth/state-storage.service';
 import { Account } from 'app/core/auth/account.model';
@@ -12,7 +12,7 @@ import { ApplicationConfigService } from '../config/application-config.service';
 export class AccountService {
   private readonly userIdentity = signal<Account | null>(null);
   private readonly authenticationState = new ReplaySubject<Account | null>(1);
-  private accountCache$?: Observable<Account> | null;
+  private accountCache$?: Observable<Account | null> | null;
 
   private readonly http = inject(HttpClient);
   private readonly stateStorageService = inject(StateStorageService);
@@ -47,22 +47,29 @@ export class AccountService {
   }
 
   identity(force?: boolean): Observable<Account | null> {
-    if (!this.isGuestUser() && sessionStorage.getItem('guest')) {
-      sessionStorage.removeItem('guest');
-    }
-    if (this.isGuestUser()) {
-      return of(this.getGuestAccount());
-    }
     if (!this.accountCache$ || force) {
       this.accountCache$ = this.fetch().pipe(
-        tap((account: Account) => {
+        map(account => {
+          const expiry = account.guestExpiresAt ? new Date(account.guestExpiresAt).getTime() : null;
+          const now = Date.now();
+
+          if (account.guest && expiry && expiry <= now) {
+            this.logout();
+            alert('Your guest session has expired. Please sign up or log in to continue.');
+            this.router.navigate(['/']);
+            return null;
+          }
+
           this.authenticate(account);
           this.navigateToStoredUrl();
+          return account;
         }),
         shareReplay(),
+        catchError(() => of(null)),
       );
     }
-    return this.accountCache$.pipe(catchError(() => of(null)));
+
+    return this.accountCache$;
   }
 
   isAuthenticated(): boolean {
@@ -73,17 +80,12 @@ export class AccountService {
     return this.authenticationState.asObservable();
   }
 
-  enableGuestMode(): void {
-    sessionStorage.setItem('guest', 'true');
-    this.authenticate(this.getGuestAccount());
-  }
-
-  isGuestUser(): boolean {
-    return sessionStorage.getItem('guest') === 'true';
-  }
-
   logout(): void {
     sessionStorage.removeItem('guest');
+
+    sessionStorage.removeItem('jhi-authenticationToken');
+    localStorage.removeItem('jhi-authenticationToken');
+
     this.authenticate(null);
     this.accountCache$ = null;
     this.router.navigate(['/login']);
@@ -101,18 +103,5 @@ export class AccountService {
       this.stateStorageService.clearUrl();
       this.router.navigateByUrl(previousUrl);
     }
-  }
-
-  private getGuestAccount(): Account {
-    return {
-      login: 'guest',
-      firstName: 'Guest',
-      lastName: '',
-      email: '',
-      authorities: [],
-      imageUrl: '',
-      activated: true,
-      langKey: 'en',
-    } as Account;
   }
 }

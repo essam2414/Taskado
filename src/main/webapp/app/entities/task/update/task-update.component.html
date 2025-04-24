@@ -1,10 +1,17 @@
-<div>
-  <div>
+<div class="d-flex justify-content-center">
+  <div class="col-8">
     <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="jhi-task-heading" data-cy="TaskCreateUpdateHeading">{{ task?.id ? 'Edit task' : 'Add a task' }}</h2>
+      <h2 id="jhi-task-heading" data-cy="TaskCreateUpdateHeading">Create or edit a Task</h2>
 
       <div>
         <jhi-alert-error></jhi-alert-error>
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
 
         @let titleRef = editForm.get('title')!;
         <div class="mb-3">
@@ -32,7 +39,7 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_dueDate">Date</label>
+          <label class="form-label" for="field_dueDate">Due Date</label>
           <div class="d-flex">
             <input
               id="field_dueDate"
@@ -48,60 +55,138 @@
 
         <div class="mb-3">
           <label class="form-label" for="field_priority">Priority</label>
+          <select class="form-control" name="priority" formControlName="priority" id="field_priority" data-cy="priority">
+            <option [ngValue]="null"></option>
+            @for (priority of priorityValues; track $index) {
+              <option [value]="priority">
+                {{ { null: '', LOW: 'LOW', MEDIUM: 'MEDIUM', HIGH: 'HIGH', CRITICAL: 'CRITICAL' }[priority] }}
+              </option>
+            }
+          </select>
+        </div>
 
-          <!-- Priority Dropdown -->
-          <div class="dropdown dropdown-select" [class.open]="priorityDropdownOpen" (click)="togglePriorityDropdown()">
-            <div class="dropdown-btn">
-              <span *ngIf="selectedPriority" class="priority-dot" [ngClass]="selectedPriority"></span>
-              <span class="sBtn-text">
-                {{ selectedPriority || 'Select Priority' }}
-              </span>
-              <fa-icon icon="chevron-down"></fa-icon>
-            </div>
+        <div class="mb-3">
+          <label class="form-label" for="field_completed">Completed</label>
+          <input type="checkbox" class="form-check" name="completed" id="field_completed" data-cy="completed" formControlName="completed" />
+        </div>
 
-            <ul class="dropdown-menu" *ngIf="priorityDropdownOpen">
-              <li *ngFor="let priority of priorityValues" (click)="selectPriority(priority)">
-                <span class="priority-dot" [ngClass]="priority"></span>
-                <span>{{ priority }}</span>
-              </li>
-
-              <li (click)="selectPriority(null)">
-                <fa-icon icon="ban"></fa-icon>
-                <span>No Priority</span>
-              </li>
-            </ul>
+        <div class="mb-3">
+          <label class="form-label" for="field_createdAt">Created At</label>
+          <div class="d-flex">
+            <input
+              id="field_createdAt"
+              data-cy="createdAt"
+              type="datetime-local"
+              class="form-control"
+              name="createdAt"
+              formControlName="createdAt"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
           </div>
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_category">Category</label>
-
-          <!-- Category Dropdown -->
-          <div class="dropdown dropdown-select" [class.open]="categoryDropdownOpen" (click)="toggleCategoryDropdown()">
-            <div class="dropdown-btn">
-              <span *ngIf="selectedCategory?.color" class="color-box" [style.backgroundColor]="selectedCategory?.color"></span>
-              <span class="sBtn-text">{{ selectedCategory?.name || 'Select Category' }}</span>
-              <fa-icon icon="chevron-down"></fa-icon>
-            </div>
-
-            <ul class="dropdown-menu" *ngIf="categoryDropdownOpen">
-              <li *ngFor="let categoryOption of categoriesSharedCollection" (click)="selectCategory(categoryOption)">
-                <span class="color-box" [style.backgroundColor]="categoryOption.color"></span>
-                <span>{{ categoryOption.name }}</span>
-              </li>
-
-              <li class="dropdown-select-option" (click)="selectCategory(null)">
-                <fa-icon icon="ban"></fa-icon>
-                <span class="option-text">No Category</span>
-              </li>
-            </ul>
+          <label class="form-label" for="field_updatedAt">Updated At</label>
+          <div class="d-flex">
+            <input
+              id="field_updatedAt"
+              data-cy="updatedAt"
+              type="datetime-local"
+              class="form-control"
+              name="updatedAt"
+              formControlName="updatedAt"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
           </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_order">Order</label>
+          <input type="number" class="form-control" name="order" id="field_order" data-cy="order" formControlName="order" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_category">Category</label>
+          <select
+            class="form-control"
+            id="field_category"
+            data-cy="category"
+            name="category"
+            formControlName="category"
+            [compareWith]="compareCategory"
+          >
+            <option [ngValue]="null"></option>
+            @for (categoryOption of categoriesSharedCollection; track $index) {
+              <option [ngValue]="categoryOption">{{ categoryOption.id }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_parentTask">Parent Task</label>
+          <select
+            class="form-control"
+            id="field_parentTask"
+            data-cy="parentTask"
+            name="parentTask"
+            formControlName="parentTask"
+            [compareWith]="compareTask"
+          >
+            <option [ngValue]="null"></option>
+            @for (taskOption of tasksSharedCollection; track $index) {
+              <option [ngValue]="taskOption">{{ taskOption.id }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_user">User</label>
+          <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user" [compareWith]="compareUser">
+            <option [ngValue]="null"></option>
+            @for (userOption of usersSharedCollection; track $index) {
+              <option [ngValue]="userOption">{{ userOption.id }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_section">Section</label>
+          <select
+            class="form-control"
+            id="field_section"
+            data-cy="section"
+            name="section"
+            formControlName="section"
+            [compareWith]="compareSection"
+          >
+            <option [ngValue]="null"></option>
+            @for (sectionOption of sectionsSharedCollection; track $index) {
+              <option [ngValue]="sectionOption">{{ sectionOption.id }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="field_productivityReports">Productivity Report</label>
+          <select
+            class="form-control"
+            id="field_productivityReports"
+            data-cy="productivityReport"
+            multiple
+            name="productivityReports"
+            formControlName="productivityReports"
+            [compareWith]="compareProductivityReport"
+          >
+            @for (productivityReportOption of productivityReportsSharedCollection; track $index) {
+              <option [ngValue]="productivityReportOption">{{ productivityReportOption.id }}</option>
+            }
+          </select>
         </div>
       </div>
 
       <div>
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
-          Cancel
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
         </button>
 
         <button
@@ -111,7 +196,7 @@
           [disabled]="editForm.invalid || isSaving"
           class="btn btn-primary"
         >
-          Save
+          <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
         </button>
       </div>
     </form>

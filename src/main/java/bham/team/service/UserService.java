@@ -135,6 +135,32 @@ public class UserService {
         return newUser;
     }
 
+    public User createGuestUser() {
+        String guestLogin = "guest_" + UUID.randomUUID().toString().substring(0, 8);
+        String rawPassword = RandomUtil.generatePassword();
+        String encryptedPassword = passwordEncoder.encode(rawPassword);
+
+        User user = new User();
+        user.setLogin(guestLogin);
+        user.setFirstName("Guest");
+        user.setEmail(guestLogin + "@guest.local");
+        user.setLangKey("en");
+        user.setActivated(true);
+        user.setPassword(encryptedPassword);
+        user.setCreatedDate(Instant.now());
+        user.setIsGuest(true);
+        user.setGuestExpiresAt(Instant.now().plus(1, ChronoUnit.HOURS));
+
+        Set<Authority> authorities = new HashSet<>();
+        authorityRepository.findById(AuthoritiesConstants.USER).ifPresent(authorities::add);
+        user.setAuthorities(authorities);
+
+        userRepository.save(user);
+        LOG.debug("Created Information for User: {}", user);
+
+        return user;
+    }
+
     private boolean removeNonActivatedUser(User existingUser) {
         if (existingUser.isActivated()) {
             return false;

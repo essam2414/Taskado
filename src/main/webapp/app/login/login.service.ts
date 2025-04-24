@@ -14,9 +14,6 @@ export class LoginService {
 
   login(credentials: Login): Observable<Account | null> {
     return this.authServerProvider.login(credentials).pipe(
-      tap(() => {
-        sessionStorage.removeItem('guest');
-      }),
       mergeMap(() =>
         this.accountService.identity(true).pipe(
           tap(account => {
@@ -30,7 +27,6 @@ export class LoginService {
   }
 
   logout(): void {
-    sessionStorage.removeItem('guest');
     this.authServerProvider.logout().subscribe({ complete: () => this.accountService.authenticate(null) });
   }
 }

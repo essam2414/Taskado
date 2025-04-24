@@ -15,7 +15,12 @@ import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -40,10 +45,18 @@ public class AccountResource {
 
     private final MailService mailService;
 
-    public AccountResource(UserRepository userRepository, UserService userService, MailService mailService) {
+    private final AuthenticateController authenticateController;
+
+    public AccountResource(
+        UserRepository userRepository,
+        UserService userService,
+        MailService mailService,
+        AuthenticateController authenticateController
+    ) {
         this.userRepository = userRepository;
         this.userService = userService;
         this.mailService = mailService;
+        this.authenticateController = authenticateController;
     }
 
     /**
@@ -76,6 +89,37 @@ public class AccountResource {
         if (!user.isPresent()) {
             throw new AccountResourceException("No user was found for this activation key");
         }
+    }
+
+    /**
+     * {@code POST  /account/guest} : create a guest account.
+     *
+     * @return the created guest account.
+     */
+    @PostMapping("/account/guest")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<AuthenticateController.JWTToken> createGuestAccount() {
+        User guestUser = userService.createGuestUser();
+
+        // Create authorities
+        var authorities = guestUser.getAuthorities().stream().map(auth -> (GrantedAuthority) () -> auth.getName()).toList();
+
+        // Build Authentication object manually
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+            guestUser.getLogin(),
+            null,
+            authorities
+        );
+
+        // Set security context manually
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+        // Generate JWT token
+        String jwt = authenticateController.createToken(authenticationToken, false);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(jwt);
+
+        return new ResponseEntity<>(new AuthenticateController.JWTToken(jwt), headers, HttpStatus.CREATED);
     }
 
     /**

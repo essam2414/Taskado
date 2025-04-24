@@ -16,6 +16,7 @@ export interface ITask {
   updatedAt?: dayjs.Dayjs | null;
   order?: number | null;
   category?: ICategory | null;
+  parentTask?: ITask | null;
   user?: Pick<IUser, 'id'> | null;
   section?: ISection | null;
   productivityReports?: IProductivityReport[] | null;

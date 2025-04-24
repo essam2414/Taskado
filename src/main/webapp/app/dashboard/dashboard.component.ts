@@ -6,6 +6,10 @@ import { takeUntil } from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { UserPreferencesService } from 'app/entities/user-preferences/service/user-preferences.service';
+
+import { Widget } from './widgets/widgets.component';
 
 @Component({
   standalone: true,
@@ -16,23 +20,36 @@ import { Account } from 'app/core/auth/account.model';
 })
 export default class DashboardComponent implements OnInit, OnDestroy {
   account = signal<Account | null>(null);
-  isGuest = false;
 
   greetingMessage = '';
   currentDate = '';
 
+  visibleWidgets: Widget[] = [];
+
   private readonly destroy$ = new Subject<void>();
   private readonly accountService = inject(AccountService);
   private readonly router = inject(Router);
+  private readonly userPreferencesService = inject(UserPreferencesService);
 
   ngOnInit(): void {
     this.accountService
       .getAuthenticationState()
       .pipe(takeUntil(this.destroy$))
       .subscribe(account => this.account.set(account));
-    this.isGuest = sessionStorage.getItem('guest') === 'true';
     this.setGreeting();
     this.setCurrentDate();
+
+    this.userPreferencesService.getOrCreateAndApply().then(prefs => {
+      this.visibleWidgets = this.userPreferencesService.visibleWidgets;
+    });
+  }
+
+  goToDashboardSettings(): void {
+    this.router.navigate(['/account/settings'], { queryParams: { tab: 'dashboard' } });
+  }
+
+  drop(event: CdkDragDrop<string[]>): void {
+    moveItemInArray(this.visibleWidgets, event.previousIndex, event.currentIndex);
   }
 
   setGreeting(): void {

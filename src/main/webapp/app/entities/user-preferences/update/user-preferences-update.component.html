@@ -1,0 +1,133 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-user-preferences-heading" data-cy="UserPreferencesCreateUpdateHeading">Create or edit a User Preferences</h2>
+
+      <div>
+        <jhi-alert-error></jhi-alert-error>
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_darkMode">Dark Mode</label>
+          <input type="checkbox" class="form-check" name="darkMode" id="field_darkMode" data-cy="darkMode" formControlName="darkMode" />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_sidebarColorLight">Sidebar Color Light</label>
+          <input
+            type="text"
+            class="form-control"
+            name="sidebarColorLight"
+            id="field_sidebarColorLight"
+            data-cy="sidebarColorLight"
+            formControlName="sidebarColorLight"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_sidebarColorDark">Sidebar Color Dark</label>
+          <input
+            type="text"
+            class="form-control"
+            name="sidebarColorDark"
+            id="field_sidebarColorDark"
+            data-cy="sidebarColorDark"
+            formControlName="sidebarColorDark"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_accentColor">Accent Color</label>
+          <input
+            type="text"
+            class="form-control"
+            name="accentColor"
+            id="field_accentColor"
+            data-cy="accentColor"
+            formControlName="accentColor"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_fontSizeLevel">Font Size Level</label>
+          <input
+            type="number"
+            class="form-control"
+            name="fontSizeLevel"
+            id="field_fontSizeLevel"
+            data-cy="fontSizeLevel"
+            formControlName="fontSizeLevel"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_dyslexiaMode">Dyslexia Mode</label>
+          <input
+            type="checkbox"
+            class="form-check"
+            name="dyslexiaMode"
+            id="field_dyslexiaMode"
+            data-cy="dyslexiaMode"
+            formControlName="dyslexiaMode"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_highContrast">High Contrast</label>
+          <input
+            type="checkbox"
+            class="form-check"
+            name="highContrast"
+            id="field_highContrast"
+            data-cy="highContrast"
+            formControlName="highContrast"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_reduceMotion">Reduce Motion</label>
+          <input
+            type="checkbox"
+            class="form-check"
+            name="reduceMotion"
+            id="field_reduceMotion"
+            data-cy="reduceMotion"
+            formControlName="reduceMotion"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_user">User</label>
+          <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user" [compareWith]="compareUser">
+            <option [ngValue]="null"></option>
+            @for (userOption of usersSharedCollection; track $index) {
+              <option [ngValue]="userOption">{{ userOption.login }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

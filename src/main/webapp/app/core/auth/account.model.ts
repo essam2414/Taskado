@@ -8,5 +8,7 @@ export class Account {
     public lastName: string | null,
     public login: string,
     public imageUrl: string | null,
+    public guest?: boolean,
+    public guestExpiresAt?: string | null,
   ) {}
 }

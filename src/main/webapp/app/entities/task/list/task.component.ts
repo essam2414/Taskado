@@ -1,4 +1,4 @@
-import { Component, HostListener, NgZone, OnInit, inject } from '@angular/core';
+import { Component, HostListener, NgZone, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
 import { Observable, Subscription, combineLatest, filter, tap, combineLatest as combineLatestRx } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -22,6 +22,9 @@ import { HttpHeaders } from '@angular/common/http';
 import { AlertService } from 'app/core/util/alert.service';
 import { ICategory } from 'app/entities/category/category.model';
 import { CategoryService } from 'app/entities/category/service/category.service';
+import { Priority } from 'app/entities/enumerations/priority.model';
+
+type AllowedPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' | null;
 
 @Component({
   standalone: true,
@@ -47,7 +50,21 @@ export class TaskComponent implements OnInit {
   tasks: ITask[] = [];
   categories: ICategory[] = [];
   isLoading = false;
+  isDragging = false;
+
   newTaskTitle = '';
+
+  @ViewChild('quickAddDate') dateInputRef!: ElementRef<HTMLInputElement>;
+  quickAddDueDate: string | null = null;
+  dateDropdownOpen = false;
+
+  quickAddPriority: AllowedPriority = null;
+  priorityValues = Object.keys(Priority) as (keyof typeof Priority)[];
+  priorityDropdownOpen = false;
+
+  quickAddCategory: ICategory | null = null;
+  categoryDropdownOpen = false;
+  categoriesSharedCollection: ICategory[] = [];
 
   filtersOpen = false;
   activeFilter = 'inbox';
@@ -123,6 +140,7 @@ export class TaskComponent implements OnInit {
     this.categoryService.query().subscribe({
       next: (res: HttpResponse<ICategory[]>) => {
         this.categories = res.body ?? [];
+        this.categoriesSharedCollection = res.body ?? [];
 
         for (const task of this.tasks) {
           if (task.category?.id) {
@@ -146,6 +164,8 @@ export class TaskComponent implements OnInit {
     }
 
     for (const task of this.tasks) {
+      if (task.parentTask) continue; // skip subtasks
+
       const isToday = task.dueDate && dayjs(task.dueDate).isSame(dayjs(), 'day');
       if (task.completed) {
         this.filtersMap['completed'].push(task);
@@ -321,11 +341,22 @@ export class TaskComponent implements OnInit {
   addTask(title?: string): void {
     const taskTitle = title?.trim() ?? '';
     const modalRef = this.modalService.open(TaskModalComponent, { centered: true, size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.task = { title: taskTitle, completed: false } as ITask;
+
+    modalRef.componentInstance.task = {
+      title: taskTitle,
+      completed: false,
+      priority: this.quickAddPriority ?? undefined,
+      category: this.quickAddCategory ?? undefined,
+      dueDate: this.quickAddDueDate ? dayjs(this.quickAddDueDate) : undefined,
+    } as ITask;
+
     modalRef.closed.subscribe(result => {
       if (result) {
         this.tasks.push(result);
         this.newTaskTitle = '';
+        this.quickAddPriority = null;
+        this.quickAddCategory = null;
+        this.quickAddDueDate = null;
         this.refreshTaskLayout();
       }
     });
@@ -357,6 +388,66 @@ export class TaskComponent implements OnInit {
   }
 
   /* ─────────────────────────────*
+   *        Quick Add Methods    *
+   *─────────────────────────────*/
+
+  toggleDateDropdown(): void {
+    this.dateDropdownOpen = !this.dateDropdownOpen;
+    if (!this.dateDropdownOpen) {
+      setTimeout(() => {
+        this.dateInputRef.nativeElement.blur();
+      }, 0);
+    }
+    this.priorityDropdownOpen = false;
+    this.categoryDropdownOpen = false;
+  }
+
+  togglePriorityDropdown(): void {
+    this.priorityDropdownOpen = !this.priorityDropdownOpen;
+    this.dateDropdownOpen = false;
+    this.categoryDropdownOpen = false;
+  }
+
+  toggleCategoryDropdown(): void {
+    this.categoryDropdownOpen = !this.categoryDropdownOpen;
+    this.priorityDropdownOpen = false;
+    this.dateDropdownOpen = false;
+  }
+
+  get noDropdownOpen(): boolean {
+    return !this.dateDropdownOpen && !this.priorityDropdownOpen && !this.categoryDropdownOpen;
+  }
+
+  getPriorityLabel(priority: keyof typeof Priority | null): string {
+    const labels: Record<keyof typeof Priority, string> = {
+      LOW: 'Low Priority',
+      MEDIUM: 'Medium Priority',
+      HIGH: 'High Priority',
+      CRITICAL: 'Critical Priority',
+    };
+
+    return priority ? labels[priority] : 'Select Priority';
+  }
+
+  selectQuickAddPriority(priority: string | null): void {
+    if (priority === null) {
+      this.quickAddPriority = null;
+    } else if (['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].includes(priority)) {
+      this.quickAddPriority = priority as AllowedPriority;
+    } else {
+      this.quickAddPriority = null;
+      console.warn('Invalid priority value:', priority);
+    }
+
+    this.priorityDropdownOpen = false;
+  }
+
+  selectQuickAddCategory(category: ICategory | null): void {
+    this.quickAddCategory = category;
+    this.categoryDropdownOpen = false;
+  }
+
+  /* ─────────────────────────────*
    *     Miscellaneous Methods   *
    *─────────────────────────────*/
   toggleCompleted(task: ITask): void {
@@ -373,13 +464,23 @@ export class TaskComponent implements OnInit {
   }
 
   @HostListener('document:click', ['$event'])
-  closeDropdowns(event: Event): void {
-    const insideSettings = (event.target as HTMLElement).closest('.task-settings');
-    const insideMenu = (event.target as HTMLElement).closest('.task-dropdown');
-    if (!insideSettings) {
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+
+    // 1) Close your Quick Add dropdowns if click is outside them
+    if (!target.closest('.dropdown-btn') && !target.closest('.dropdown-menu')) {
+      this.priorityDropdownOpen = false;
+      this.dateDropdownOpen = false;
+      this.categoryDropdownOpen = false;
+    }
+
+    // 2) Close the “task settings” menu if click is outside .task-settings
+    if (!target.closest('.task-settings')) {
       this.settingsOpen = false;
     }
-    if (!insideMenu) {
+
+    // 3) Close the “ellipsis” menu if click is outside .task-dropdown
+    if (!target.closest('.task-dropdown')) {
       this.openMenuTaskId = null;
     }
   }
@@ -395,9 +496,16 @@ export class TaskComponent implements OnInit {
     return date.format(`D MMM${isNextYear ? ' YYYY' : ''} HH:mm`);
   }
 
-  isTaskPast(dueDate: dayjs.Dayjs | string | null | undefined): boolean {
-    if (!dueDate) return false;
-    return dayjs(dueDate).isBefore(dayjs(), 'minute');
+  getDueDateClass(dueDate: dayjs.Dayjs | string | null | undefined): string {
+    if (!dueDate) return '';
+
+    const date = dayjs(dueDate);
+    const now = dayjs();
+
+    if (date.isBefore(now, 'minute')) return 'past-task';
+    if (date.isSame(now, 'day')) return 'due-today';
+
+    return '';
   }
 
   getCategoryStyle(category: ICategory | null): Record<string, string> {
@@ -429,6 +537,19 @@ export class TaskComponent implements OnInit {
     const g = parseInt(c[2] + c[3], 16);
     const b = parseInt(c[4] + c[5], 16);
     return { r, g, b };
+  }
+
+  getSubtasks(task: ITask): ITask[] {
+    return this.tasks.filter(t => t.parentTask?.id === task.id);
+  }
+
+  getCompletedSubtasks(task: ITask): number {
+    return this.getSubtasks(task).filter(t => t.completed).length;
+  }
+
+  isAllSubtasksCompleted(task: ITask): boolean {
+    const subs = this.getSubtasks(task);
+    return subs.length > 0 && subs.every(t => t.completed);
   }
 
   /* ─────────────────────────────*

@@ -1,5 +1,3 @@
-$primary: #564df2;
-
 .form-container {
   padding: clamp(20px, 5vw, 40px);
   background: #fff;
@@ -13,23 +11,22 @@ $primary: #564df2;
 
 .form-label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   font-weight: 500;
 }
 
 .form-control {
   width: 100%;
-  padding: clamp(10px, 3vw, 14px);
-  border: 1.5px solid var(--border-color);
-  border-radius: 8px;
-  transition: all 0.3s ease-in-out;
-  background-color: var(--card-bg);
+  padding: 16px;
+  border: none;
+  border-radius: 10px;
+  background-color: var(--input-bg);
   color: var(--text-secondary);
 
   &:focus {
     border-color: var(--accent-color);
     color: var(--text-primary);
-    background-color: var(--card-bg);
+    background-color: var(--bg-color-secondary);
   }
 }
 
@@ -49,4 +46,5 @@ input[type='tel'],
 [contenteditable].form-control {
   box-shadow: none !important;
   outline: none !important;
+  transition: all 0.25s ease-in-out !important;
 }

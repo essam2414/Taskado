@@ -11,15 +11,17 @@
 
   <!-- NAVIGATION (Hidden on mobile) -->
   <div class="header-nav">
-    <a routerLink="/#features">About</a>
-    <a routerLink="/#how-it-works">Features</a>
-    <a routerLink="/#testimonials">FAQ</a>
-    <a routerLink="/#faq">Contact</a>
+    <a href="#hero" [class.active]="activeSection === 'hero'">Home</a>
+    <a href="#features" [class.active]="activeSection === 'features'">Features</a>
+    <a href="#dashboard" [class.active]="activeSection === 'dashboard'">Dashboard</a>
+    <a href="#a11y" [class.active]="activeSection === 'a11y'">Accessibility</a>
+    <a href="#reviews" [class.active]="activeSection === 'reviews'">Testimonials</a>
+    <a href="#cta" [class.active]="activeSection === 'cta'">Get Started</a>
   </div>
 
   <div class="header-btns">
-    <button class="btn btn-primary" routerLink="/account/register">Sign Up</button>
-    <button class="btn btn-outline" (click)="login()">Log in</button>
+    <button class="btn login" (click)="login()">Login</button>
+    <button class="btn btn-primary btn-rounded" routerLink="/account/register">Sign Up</button>
   </div>
 
   <!-- MOBILE MENU TOGGLE -->
@@ -34,10 +36,12 @@
     </button>
 
     <div class="mobile-sidebar-nav">
-      <a routerLink="/#features" (click)="toggleSidebar()">About</a>
-      <a routerLink="/#how-it-works" (click)="toggleSidebar()">Features</a>
-      <a routerLink="/#testimonials" (click)="toggleSidebar()">FAQ</a>
-      <a routerLink="/#faq" (click)="toggleSidebar()">Contact</a>
+      <a href="#hero" [class.active]="activeSection === 'hero'" (click)="setActive('hero')">Home</a>
+      <a href="#features" [class.active]="activeSection === 'features'" (click)="setActive('features')">Features</a>
+      <a href="#dashboard" [class.active]="activeSection === 'dashboard'" (click)="setActive('dashboard')">Dashboard</a>
+      <a href="#a11y" [class.active]="activeSection === 'a11y'" (click)="setActive('a11y')">Accessibility</a>
+      <a href="#reviews" [class.active]="activeSection === 'reviews'" (click)="setActive('reviews')">Testimonials</a>
+      <a href="#cta" [class.active]="activeSection === 'cta'" (click)="setActive('cta')">Get Started</a>
     </div>
 
     <div class="mobile-sidebar-btns">

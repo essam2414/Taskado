@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Locale;
@@ -23,7 +22,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "jhi_user")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-public class User extends AbstractAuditingEntity<Long> implements Serializable {
+public class User extends AbstractAuditingEntity<Long> {
 
     private static final long serialVersionUID = 1L;
 
@@ -81,6 +80,12 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     @Column(name = "reset_date")
     private Instant resetDate = null;
+
+    @Column(name = "is_guest")
+    private boolean isGuest = false;
+
+    @Column(name = "guest_expires_at")
+    private Instant guestExpiresAt;
 
     @JsonIgnore
     @ManyToMany
@@ -196,6 +201,22 @@ public class User extends AbstractAuditingEntity<Long> implements Serializable {
 
     public void setAuthorities(Set<Authority> authorities) {
         this.authorities = authorities;
+    }
+
+    public boolean isGuest() {
+        return isGuest;
+    }
+
+    public void setIsGuest(boolean isGuest) {
+        this.isGuest = isGuest;
+    }
+
+    public Instant getGuestExpiresAt() {
+        return guestExpiresAt;
+    }
+
+    public void setGuestExpiresAt(Instant guestExpiresAt) {
+        this.guestExpiresAt = guestExpiresAt;
     }
 
     @Override

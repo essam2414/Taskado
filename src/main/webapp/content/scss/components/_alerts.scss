@@ -1,8 +1,5 @@
-@import '../variables';
+/* Custom alert styles for notification */
 
-/* ==========================================================================
-Custom alerts for notification
-========================================================================== */
 .alerts {
   .alert {
     text-overflow: ellipsis;
@@ -114,7 +111,6 @@ Custom alerts for notification
   }
 }
 
-// Fade-In Animation for Alerts
 @keyframes fadeInSlide {
   from {
     opacity: 0;

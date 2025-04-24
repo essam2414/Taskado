@@ -17,6 +17,13 @@
                                  referencedTableName="category"
                                  />
 
+        <addForeignKeyConstraint baseColumnNames="parent_task_id"
+                                 baseTableName="task"
+                                 constraintName="fk_task__parent_task_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="task"
+                                 />
+
         <addForeignKeyConstraint baseColumnNames="user_id"
                                  baseTableName="task"
                                  constraintName="fk_task__user_id"

@@ -32,6 +32,9 @@
     </div>
   </div>
 
+  <jhi-alert-error></jhi-alert-error>
+  <jhi-alert></jhi-alert>
+
   <div class="settings-container">
     <div class="settings-content">
       <!-- Account Settings -->
@@ -186,7 +189,7 @@
         </div>
 
         <!-- Reset Button -->
-        <button class="reset-btn" (click)="resetColors()">Reset to default</button>
+        <button class="reset-btn" (click)="resetAppearance()" [disabled]="isAppearanceDefault()">Reset to default</button>
       </div>
 
       <!-- Accessibility Settings -->
@@ -252,6 +255,55 @@
             <span class="slider"></span>
           </label>
         </div>
+
+        <!-- Reset Button -->
+        <button class="reset-btn" (click)="resetAccessibility()" [disabled]="isAccessibilityDefault()">Reset to default</button>
+      </div>
+
+      <div *ngIf="activeTab === 'dashboard'">
+        <h3 class="settings-title">Dashboard</h3>
+
+        <div class="setting-item">
+          <div>
+            <span class="setting-label">Widgets</span>
+            <p class="setting-desc">Choose which widgets you want to show on your dashboard</p>
+          </div>
+
+          <div class="widget-list">
+            <div class="widget-item" [class.enabled]="widget.enabled" *ngFor="let widget of widgets" (click)="toggleWidget(widget)">
+              <span>{{ widget.title }}</span>
+              <label class="toggle-switch" (click)="$event.stopPropagation()">
+                <input type="checkbox" [checked]="widget.enabled" (change)="toggleWidget(widget)" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <div>
+            <span class="setting-label">Theme</span>
+            <p class="setting-desc">Choose a theme to change the look and feel of your dashboard</p>
+          </div>
+
+          <div class="theme-options">
+            <button
+              *ngFor="let theme of dashboardThemes"
+              class="theme-option"
+              [class.active]="selectedDashboardTheme === theme.id"
+              [ngStyle]="{
+                background: theme.bg,
+                'background-size': theme.bg.includes('url') ? '120px' : 'cover',
+              }"
+              (click)="setDashboardTheme(theme.id)"
+            >
+              <span class="theme-name">{{ theme.id }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Reset Button -->
+        <button class="reset-btn" (click)="resetDashboard()" [disabled]="isDashboardDefault()">Reset to default</button>
       </div>
     </div>
   </div>

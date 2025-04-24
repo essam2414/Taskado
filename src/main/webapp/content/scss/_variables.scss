@@ -1,25 +1,15 @@
-$background: #f7f7f7;
-$primary: #564df2;
-$secondary: #ff89a4;
-
-$text-primary: #2c2c38;
-$text-secondary: #6b6b78;
-$text-muted: #a9a9b3;
-$text-accent: #695cff;
-
-$success: #46c598;
-$warning: #ffa559;
-$error: #ff89a4;
-
-$sidebar-hover-bg: rgba(0, 0, 0, 0.05);
-
 :root {
   --bg-color: #f7f7f7;
   --bg-color-secondary: #ececec;
   --card-bg: #ffffff;
 
+  --primary-color: #564df2;
+  --accent-color: var(--primary-color);
+
   --border-color: #ccc;
+  --hover-bg: #ebebeb;
   --avatar-bg: #f0f0f0;
+  --input-bg: #f7f7f7;
 
   // text colors
   --text-primary: #2c2c38;
@@ -33,24 +23,21 @@ $sidebar-hover-bg: rgba(0, 0, 0, 0.05);
 
   // font sizes
   --font-scale: 1;
+  --font-2xs: clamp(calc(0.5rem * var(--font-scale)), 0.8vw, calc(0.6rem * var(--font-scale)));
   --font-xs: clamp(calc(0.6rem * var(--font-scale)), 1vw, calc(0.75rem * var(--font-scale)));
   --font-sm: clamp(calc(0.75rem * var(--font-scale)), 1.3vw, calc(0.875rem * var(--font-scale)));
   --font-md: clamp(calc(0.9rem * var(--font-scale)), 1.6vw, calc(1rem * var(--font-scale)));
   --font-lg: clamp(calc(1.1rem * var(--font-scale)), 1.8vw, calc(1.25rem * var(--font-scale)));
   --font-xl: clamp(calc(1.3rem * var(--font-scale)), 2.2vw, calc(1.5rem * var(--font-scale)));
+  --font-2xl: clamp(calc(1.5rem * var(--font-scale)), 2.6vw, calc(1.75rem * var(--font-scale)));
+  --font-3xl: clamp(calc(1.75rem * var(--font-scale)), 3vw, calc(2rem * var(--font-scale)));
 
   --default-sidebar-color: #fdf1f6;
   --default-sidebar-color-dark: #1d1d1d;
   --sidebar-color: var(--default-sidebar-color);
-
-  --primary-color: #564df2;
-  --accent-color: var(--primary-color);
-
   --sidebar-hover-bg: rgba(0, 0, 0, 0.07);
   --navmenu-text: #888;
   --navmenu-hover-text: #2c2c38;
-
-  --hover-bg: #ebebeb;
 
   --success-color: #11b364;
   --danger-color: #f04438;
@@ -63,8 +50,20 @@ $sidebar-hover-bg: rgba(0, 0, 0, 0.05);
   --alert-info-bg: #e7f3fe;
 
   --notification-bg: #1d1d1d;
+
+  // dashboard theme
+  --dashboard-bg: var(--bg-color);
+  --widget-bg: var(--card-bg);
+  --dashboard-border: var(--border-color);
+  --dashboard-text-primary: var(--text-primary);
+  --dashboard-text-secondary: var(--text-secondary);
+  --dashboard-text-muted: var(--text-muted);
+  --dashboard-surface: var(--bg-color);
+  --dashboard-surface-hover: var(--bg-color-secondary);
+  --dashboard-accent: var(--accent-color);
 }
 
+// dark mode
 [data-theme='dark'] {
   --bg-color: #0a0a0a;
   --bg-color-secondary: #141414;
@@ -72,6 +71,7 @@ $sidebar-hover-bg: rgba(0, 0, 0, 0.05);
 
   --border-color: #444;
   --avatar-bg: #2a2a2e;
+  --input-bg: #181818;
 
   --text-primary: #ffffff;
   --text-secondary: #b0b0b0;
@@ -90,11 +90,13 @@ $sidebar-hover-bg: rgba(0, 0, 0, 0.05);
   --notification-bg: #222831;
 }
 
+// dyslexia mode
 .dyslexia-mode {
   --app-font: 'OpenDyslexic';
   --heading-font: 'OpenDyslexic';
 }
 
+// high contrast mode
 [data-theme='high-contrast'] {
   --bg-color: #000000;
   --bg-color-secondary: #111111;

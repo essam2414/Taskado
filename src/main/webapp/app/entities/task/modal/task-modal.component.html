@@ -2,9 +2,13 @@
   <div>
     <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
       <div class="modal-header">
-        <h2 class="modal-title" id="jhi-task-heading" data-cy="TaskCreateUpdateHeading">{{ task?.id ? 'Edit task' : 'Add a task' }}</h2>
+        <h2 class="modal-title" id="jhi-task-heading" data-cy="TaskCreateUpdateHeading">{{ task?.id ? 'Edit task' : 'Add task' }}</h2>
         <button class="close" type="button" id="cancel-save" data-cy="entityCreateCancelButton" (click)="close()">
-          <fa-icon icon="times"></fa-icon>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path
+              d="M23.707.293h0a1,1,0,0,0-1.414,0L12,10.586,1.707.293a1,1,0,0,0-1.414,0h0a1,1,0,0,0,0,1.414L10.586,12,.293,22.293a1,1,0,0,0,0,1.414h0a1,1,0,0,0,1.414,0L12,13.414,22.293,23.707a1,1,0,0,0,1.414,0h0a1,1,0,0,0,0-1.414L13.414,12,23.707,1.707A1,1,0,0,0,23.707.293Z"
+            />
+          </svg>
         </button>
       </div>
 
@@ -15,7 +19,15 @@
           @let titleRef = editForm.get('title')!;
           <div class="mb-3">
             <label class="form-label" for="field_title">Title</label>
-            <input type="text" class="form-control" name="title" id="field_title" data-cy="title" formControlName="title" />
+            <input
+              type="text"
+              class="form-control"
+              name="title"
+              id="field_title"
+              data-cy="title"
+              formControlName="title"
+              placeholder="Enter task title"
+            />
             @if (titleRef.invalid && (titleRef.dirty || titleRef.touched)) {
               <div>
                 @if (editForm.get('title')?.errors?.required) {
@@ -24,32 +36,441 @@
               </div>
             }
           </div>
+
           <div class="mb-3">
             <label class="form-label" for="field_description">Description</label>
-            <input
-              type="text"
+            <textarea
+              rows="3"
               class="form-control"
               name="description"
               id="field_description"
               data-cy="description"
               formControlName="description"
-            />
+              style="resize: none"
+              placeholder="Enter task description"
+            ></textarea>
+          </div>
+
+          <!-- Subtasks -->
+          <div class="subtasks-header" *ngIf="subtasks.length > 0">
+            <label class="form-label">Subtasks</label>
+            <div class="subtasks-progress" [class.done]="completedSubtaskCount === totalSubtaskCount">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="m18.214,9.098c.387.394.381,1.027-.014,1.414l-4.426,4.345c-.783.768-1.791,1.151-2.8,1.151-.998,0-1.996-.376-2.776-1.129l-1.899-1.867c-.394-.387-.399-1.02-.012-1.414.386-.395,1.021-.4,1.414-.012l1.893,1.861c.776.75,2.001.746,2.781-.018l4.425-4.344c.393-.388,1.024-.381,1.414.013Zm5.786,2.902c0,6.617-5.383,12-12,12S0,18.617,0,12,5.383,0,12,0s12,5.383,12,12Zm-2,0c0-5.514-4.486-10-10-10S2,6.486,2,12s4.486,10,10,10,10-4.486,10-10Z"
+                />
+              </svg>
+              <span>{{ completedSubtaskCount }}/{{ totalSubtaskCount }}</span>
+            </div>
+          </div>
+
+          <div *ngIf="task?.id" class="subtask-list" cdkDropList [cdkDropListData]="subtasks" (cdkDropListDropped)="drop($event)">
+            @for (task of subtasks; track trackId(task)) {
+              <div
+                cdkDrag
+                [cdkDragData]="task"
+                *ngIf="editingSubtaskId !== task.id"
+                class="subtask"
+                [class.completed]="task.completed"
+                [class.non-clickable]="task.completed"
+                (click)="editSubtask(task)"
+              >
+                <div class="subtask-left">
+                  <input
+                    class="form-check-input custom-checkbox"
+                    type="checkbox"
+                    [checked]="task.completed"
+                    (change)="toggleCompleted(task)"
+                    (click)="$event.stopPropagation()"
+                    id="task-{{ task.id }}"
+                  />
+                </div>
+
+                <div class="subtask-right">
+                  <div class="subtask-info">
+                    <span class="subtask-title">{{ task.title }}</span>
+                    <span class="subtask-desc">{{ task.description }}</span>
+                  </div>
+
+                  <div class="subtask-bottom">
+                    <div class="subtask-tags">
+                      @if (task.category) {
+                        <div class="task-tag task-category" [ngStyle]="getCategoryStyle(task.category)">
+                          {{ task.category.name }}
+                        </div>
+                      }
+
+                      @if (task.priority) {
+                        <div class="task-tag task-priority" [ngClass]="task.priority">
+                          <fa-icon icon="flag"></fa-icon>
+                          {{
+                            {
+                              null: '',
+                              LOW: 'Low Priority',
+                              MEDIUM: 'Medium Priority',
+                              HIGH: 'High Priority',
+                              CRITICAL: 'Critical Priority',
+                            }[task.priority]
+                          }}
+                        </div>
+                      }
+                    </div>
+
+                    <div *ngIf="task.dueDate" class="task-date" [ngClass]="getDueDateClass(task.dueDate)">
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M19,2H18V1a1,1,0,0,0-2,0V2H8V1A1,1,0,0,0,6,1V2H5A5.006,5.006,0,0,0,0,7V19a5.006,5.006,0,0,0,5,5H19a5.006,5.006,0,0,0,5-5V7A5.006,5.006,0,0,0,19,2ZM2,7A3,3,0,0,1,5,4H19a3,3,0,0,1,3,3V8H2ZM19,22H5a3,3,0,0,1-3-3V10H22v9A3,3,0,0,1,19,22Z"
+                        />
+                      </svg>
+                      <span>{{ formatTaskDate(task.dueDate) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Subtask edit form -->
+              <div class="subtask-form" *ngIf="editingSubtaskId === task.id" [formGroup]="subtaskForm">
+                <div class="subtask-inputs">
+                  @let subtaskTitleRef = subtaskForm.get('title')!;
+                  <input
+                    #subtaskTitleInput
+                    class="form-control subtask-title-input"
+                    type="text"
+                    formControlName="title"
+                    placeholder="Subtask name"
+                  />
+
+                  <!-- Error message for title -->
+                  @if (subtaskTitleRef.invalid && (subtaskTitleRef.dirty || subtaskTitleRef.touched)) {
+                    <small class="form-text text-danger mt-1">This field is required.</small>
+                  }
+                  <input class="form-control subtask-desc-input" type="text" formControlName="description" placeholder="Description" />
+                </div>
+
+                <div class="subtask-options">
+                  <div class="dropdown dropdown-select" [class.open]="subtaskDatePickerOpen">
+                    <div class="dropdown-btn datepicker-btn" [class.open]="subtaskDatePickerOpen" (click)="toggleSubtaskDatePicker()">
+                      <span>{{ selectedSubtaskDueDate ? formatTaskDate(selectedSubtaskDueDate) : 'Select date' }}</span>
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M19,2H18V1a1,1,0,0,0-2,0V2H8V1A1,1,0,0,0,6,1V2H5A5.006,5.006,0,0,0,0,7V19a5.006,5.006,0,0,0,5,5H19a5.006,5.006,0,0,0,5-5V7A5.006,5.006,0,0,0,19,2ZM2,7A3,3,0,0,1,5,4H19a3,3,0,0,1,3,3V8H2ZM19,22H5a3,3,0,0,1-3-3V10H22v9A3,3,0,0,1,19,22Z"
+                        />
+                      </svg>
+
+                      <input
+                        #selectedSubtaskDate
+                        class="datepicker-input"
+                        type="datetime-local"
+                        [(ngModel)]="selectedSubtaskDueDate"
+                        [ngModelOptions]="{ standalone: true }"
+                        (change)="selectDueDate(selectedSubtaskDueDate, subtaskForm)"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Priority Dropdown -->
+                  <div class="dropdown dropdown-select" [class.open]="subtaskPriorityDropdownOpen">
+                    <div class="dropdown-btn" (click)="toggleSubtaskPriorityDropdown()">
+                      <div [ngClass]="selectedSubtaskPriority ? ['task-tag', 'task-priority', selectedSubtaskPriority] : ''">
+                        <span
+                          ><fa-icon *ngIf="selectedSubtaskPriority" icon="flag"></fa-icon
+                          >{{ getPriorityLabel(selectedSubtaskPriority) }}</span
+                        >
+                      </div>
+
+                      <fa-icon icon="chevron-down"></fa-icon>
+                    </div>
+
+                    <ul class="dropdown-menu" *ngIf="subtaskPriorityDropdownOpen">
+                      <li *ngFor="let priority of priorityValues" (click)="selectSubtaskPriority(priority)">
+                        <div class="task-tag task-priority" [ngClass]="priority">
+                          <fa-icon icon="flag"></fa-icon>
+                          <span>{{ getPriorityLabel(priority) }}</span>
+                        </div>
+                      </li>
+
+                      <li class="task-tag" (click)="selectSubtaskPriority(null)">
+                        <div class="task-tag NO_PRIORITY">
+                          <fa-icon icon="ban"></fa-icon>
+                          <span>No Priority</span>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <!-- Category Dropdown -->
+                  <div class="dropdown dropdown-select" [class.open]="subtaskCategoryDropdownOpen">
+                    <div class="dropdown-btn" (click)="toggleSubtaskCategoryDropdown()">
+                      <div
+                        *ngIf="selectedSubtaskCategory"
+                        class="task-tag task-category"
+                        [ngStyle]="getCategoryStyle(selectedSubtaskCategory)"
+                      >
+                        {{ selectedSubtaskCategory.name }}
+                      </div>
+
+                      <div *ngIf="!selectedSubtaskCategory">Select Category</div>
+
+                      <fa-icon icon="chevron-down"></fa-icon>
+                    </div>
+
+                    <ul class="dropdown-menu" *ngIf="subtaskCategoryDropdownOpen">
+                      <li
+                        class="category-option"
+                        *ngFor="let categoryOption of categoriesSharedCollection"
+                        (click)="selectSubtaskCategory(categoryOption)"
+                      >
+                        <div class="task-tag task-category" [ngStyle]="getCategoryStyle(categoryOption)">
+                          {{ categoryOption.name }}
+                        </div>
+                        <button type="button" class="delete-category-btn" (click)="deleteCategory(categoryOption, $event)">✕</button>
+                      </li>
+
+                      <li (click)="selectSubtaskCategory(null)">
+                        <div class="task-tag NO_CATEGORY">
+                          <fa-icon icon="ban"></fa-icon>
+                          <span>No Category</span>
+                        </div>
+                      </li>
+
+                      <div class="category-dropdown-footer">
+                        <button type="button" class="add-category-btn" [class.active]="addCategoryOpen" (click)="toggleAddCategory()">
+                          <fa-icon icon="plus"></fa-icon> Add category
+                        </button>
+                      </div>
+
+                      <div *ngIf="addCategoryOpen" class="add-category-form">
+                        <div class="add-category-input">
+                          <input
+                            #addCategoryInput
+                            class="category-label-input"
+                            type="text"
+                            placeholder="Enter a label..."
+                            [(ngModel)]="newCategoryName"
+                            [ngModelOptions]="{ standalone: true }"
+                            (keydown.enter)="addCategoryFromInput($event)"
+                          />
+                          <input type="color" [(ngModel)]="newCategoryColor" [ngModelOptions]="{ standalone: true }" class="color-picker" />
+                        </div>
+
+                        <small class="hint">
+                          Press
+                          <svg class="key-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path
+                              d="M23,2c-.55,0-1,.45-1,1V11c0,1.65-1.35,3-3,3H2.58l5.14-5.3c.38-.4,.37-1.03-.02-1.41-.4-.38-1.03-.38-1.41,.02L.88,12.88c-1.17,1.17-1.17,3.07-.01,4.23l5.41,5.59c.2,.2,.46,.3,.72,.3s.5-.09,.7-.28c.4-.38,.41-1.02,.02-1.41l-5.14-5.3H19c2.76,0,5-2.24,5-5V3c0-.55-.45-1-1-1Z"
+                            />
+                          </svg>
+                          to add
+                        </small>
+                      </div>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="subtask-footer">
+                  <a class="delete-subtask" (click)="deleteSubtask(task)">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                      <path
+                        d="M20.786,4.758c-.101-.024-1.614-.372-3.841-.64l-.852-2.457c-.059-.169-.203-.294-.38-.327-.071-.014-1.784-.334-3.713-.334s-3.642,.321-3.714,.334c-.176,.034-.32,.158-.379,.328l-.852,2.456c-2.226,.268-3.74,.616-3.842,.64-.27,.062-.437,.331-.374,.6,.054,.231,.26,.387,.487,.387,.037,0,.075-.004,.113-.013,.01-.002,.266-.061,.715-.148-.199,1.677-.385,4.286-.385,6.738,0,5.306,.865,9.19,.902,9.353,.04,.176,.172,.318,.346,.369,.131,.039,3.268,.956,6.981,.956s6.85-.917,6.981-.956c.174-.051,.307-.193,.347-.37,.036-.165,.901-4.091,.901-9.352,0-2.46-.185-5.067-.383-6.738,.448,.087,.703,.146,.713,.148,.271,.063,.537-.104,.601-.373,.062-.269-.104-.538-.374-.601ZM8.756,2.269c.553-.088,1.85-.269,3.244-.269s2.689,.18,3.245,.269l.6,1.731c-1.168-.111-2.475-.19-3.845-.19s-2.676,.078-3.845,.19l.6-1.731Zm10.474,10.054c0,4.343-.619,7.835-.817,8.841-.85,.221-3.48,.837-6.412,.837s-5.564-.616-6.413-.837c-.198-.999-.816-4.464-.816-8.841,0-2.551,.214-5.35,.416-6.923,1.591-.264,4.101-.589,6.813-.589s5.226,.325,6.815,.589c.208,1.613,.414,4.348,.414,6.923Z"
+                      />
+                      <path d="M9.558,9.118c-.276,0-.5,.224-.5,.5v8.042c0,.276,.224,.5,.5,.5s.5-.224,.5-.5V9.618c0-.276-.224-.5-.5-.5Z" />
+                      <path d="M14.442,18.16c.276,0,.5-.224,.5-.5V9.618c0-.276-.224-.5-.5-.5s-.5,.224-.5,.5v8.042c0,.276,.224,.5,.5,.5Z" />
+                    </svg>
+                  </a>
+
+                  <div class="subtask-btns">
+                    <button class="btn btn-secondary" type="button" (click)="resetSubtaskForm()">Cancel</button>
+                    <button
+                      class="btn btn-primary"
+                      type="button"
+                      (click)="saveSubtask()"
+                      [disabled]="subtaskForm.invalid || !subtaskForm.dirty"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- Add a subtask -->
+            <a class="subtask-btn" *ngIf="!isCreatingSubtask" (click)="startCreatingSubtask()">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M23,11H13V1a1,1,0,0,0-1-1h0a1,1,0,0,0-1,1V11H1a1,1,0,0,0-1,1H0a1,1,0,0,0,1,1H11V23a1,1,0,0,0,1,1h0a1,1,0,0,0,1-1V13H23a1,1,0,0,0,1-1h0A1,1,0,0,0,23,11Z"
+                />
+              </svg>
+              <span>Add a subtask</span>
+            </a>
+
+            <div class="subtask-form" *ngIf="isCreatingSubtask" [formGroup]="subtaskForm">
+              <div class="subtask-inputs">
+                @let subtaskTitleRef = subtaskForm.get('title')!;
+                <input
+                  #subtaskTitleInput
+                  class="form-control subtask-title-input"
+                  type="text"
+                  formControlName="title"
+                  placeholder="Subtask name"
+                />
+
+                <!-- Error message for title -->
+                @if (subtaskTitleRef.invalid && (subtaskTitleRef.dirty || subtaskTitleRef.touched)) {
+                  <small class="form-text text-danger mt-1">This field is required.</small>
+                }
+                <input class="form-control subtask-desc-input" type="text" formControlName="description" placeholder="Description" />
+              </div>
+
+              <div class="subtask-options">
+                <div class="dropdown dropdown-select" [class.open]="subtaskDatePickerOpen">
+                  <div class="dropdown-btn datepicker-btn" [class.open]="subtaskDatePickerOpen" (click)="toggleSubtaskDatePicker()">
+                    <span>{{ selectedSubtaskDueDate ? formatTaskDate(selectedSubtaskDueDate) : 'Select date' }}</span>
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M19,2H18V1a1,1,0,0,0-2,0V2H8V1A1,1,0,0,0,6,1V2H5A5.006,5.006,0,0,0,0,7V19a5.006,5.006,0,0,0,5,5H19a5.006,5.006,0,0,0,5-5V7A5.006,5.006,0,0,0,19,2ZM2,7A3,3,0,0,1,5,4H19a3,3,0,0,1,3,3V8H2ZM19,22H5a3,3,0,0,1-3-3V10H22v9A3,3,0,0,1,19,22Z"
+                      />
+                    </svg>
+
+                    <input
+                      #selectedSubtaskDate
+                      class="datepicker-input"
+                      type="datetime-local"
+                      [(ngModel)]="selectedSubtaskDueDate"
+                      [ngModelOptions]="{ standalone: true }"
+                      (change)="selectDueDate(selectedSubtaskDueDate, subtaskForm)"
+                    />
+                  </div>
+                </div>
+
+                <!-- Priority Dropdown -->
+                <div class="dropdown dropdown-select" [class.open]="subtaskPriorityDropdownOpen">
+                  <div class="dropdown-btn" (click)="toggleSubtaskPriorityDropdown()">
+                    <div [ngClass]="selectedSubtaskPriority ? ['task-tag', 'task-priority', selectedSubtaskPriority] : ''">
+                      <span
+                        ><fa-icon *ngIf="selectedSubtaskPriority" icon="flag"></fa-icon
+                        >{{ getPriorityLabel(selectedSubtaskPriority) }}</span
+                      >
+                    </div>
+
+                    <fa-icon icon="chevron-down"></fa-icon>
+                  </div>
+
+                  <ul class="dropdown-menu" *ngIf="subtaskPriorityDropdownOpen">
+                    <li *ngFor="let priority of priorityValues" (click)="selectSubtaskPriority(priority)">
+                      <div class="task-tag task-priority" [ngClass]="priority">
+                        <fa-icon icon="flag"></fa-icon>
+                        <span>{{ getPriorityLabel(priority) }}</span>
+                      </div>
+                    </li>
+
+                    <li class="task-tag" (click)="selectSubtaskPriority(null)">
+                      <div class="task-tag NO_PRIORITY">
+                        <fa-icon icon="ban"></fa-icon>
+                        <span>No Priority</span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Category Dropdown -->
+                <div class="dropdown dropdown-select" [class.open]="subtaskCategoryDropdownOpen">
+                  <div class="dropdown-btn" (click)="toggleSubtaskCategoryDropdown()">
+                    <div
+                      *ngIf="selectedSubtaskCategory"
+                      class="task-tag task-category"
+                      [ngStyle]="getCategoryStyle(selectedSubtaskCategory)"
+                    >
+                      {{ selectedSubtaskCategory.name }}
+                    </div>
+
+                    <div *ngIf="!selectedSubtaskCategory">Select Category</div>
+
+                    <fa-icon icon="chevron-down"></fa-icon>
+                  </div>
+
+                  <ul class="dropdown-menu" *ngIf="subtaskCategoryDropdownOpen">
+                    <li
+                      class="category-option"
+                      *ngFor="let categoryOption of categoriesSharedCollection"
+                      (click)="selectSubtaskCategory(categoryOption)"
+                    >
+                      <div class="task-tag task-category" [ngStyle]="getCategoryStyle(categoryOption)">
+                        {{ categoryOption.name }}
+                      </div>
+                      <button type="button" class="delete-category-btn" (click)="deleteCategory(categoryOption, $event)">✕</button>
+                    </li>
+
+                    <li (click)="selectSubtaskCategory(null)">
+                      <div class="task-tag NO_CATEGORY">
+                        <fa-icon icon="ban"></fa-icon>
+                        <span>No Category</span>
+                      </div>
+                    </li>
+
+                    <div class="category-dropdown-footer">
+                      <button type="button" class="add-category-btn" [class.active]="addCategoryOpen" (click)="toggleAddCategory()">
+                        <fa-icon icon="plus"></fa-icon> Add category
+                      </button>
+                    </div>
+
+                    <div *ngIf="addCategoryOpen" class="add-category-form">
+                      <div class="add-category-input">
+                        <input
+                          #addCategoryInput
+                          class="category-label-input"
+                          type="text"
+                          placeholder="Enter a label..."
+                          [(ngModel)]="newCategoryName"
+                          [ngModelOptions]="{ standalone: true }"
+                          (keydown.enter)="addCategoryFromInput($event)"
+                        />
+                        <input type="color" [(ngModel)]="newCategoryColor" [ngModelOptions]="{ standalone: true }" class="color-picker" />
+                      </div>
+
+                      <small class="hint">
+                        Press
+                        <svg class="key-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                          <path
+                            d="M23,2c-.55,0-1,.45-1,1V11c0,1.65-1.35,3-3,3H2.58l5.14-5.3c.38-.4,.37-1.03-.02-1.41-.4-.38-1.03-.38-1.41,.02L.88,12.88c-1.17,1.17-1.17,3.07-.01,4.23l5.41,5.59c.2,.2,.46,.3,.72,.3s.5-.09,.7-.28c.4-.38,.41-1.02,.02-1.41l-5.14-5.3H19c2.76,0,5-2.24,5-5V3c0-.55-.45-1-1-1Z"
+                          />
+                        </svg>
+                        to add
+                      </small>
+                    </div>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="subtask-btns">
+                <button class="btn btn-secondary" type="button" (click)="resetSubtaskForm()">Cancel</button>
+                <button class="btn btn-primary" type="button" (click)="saveSubtask()" [disabled]="subtaskForm.invalid">Add task</button>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="modal-sidebar">
           <div class="mb-3">
             <label class="form-label" for="field_dueDate">Date</label>
-            <div class="d-flex">
-              <input
-                id="field_dueDate"
-                data-cy="dueDate"
-                type="datetime-local"
-                class="form-control"
-                name="dueDate"
-                formControlName="dueDate"
-                placeholder="YYYY-MM-DD HH:mm"
-              />
+
+            <div class="dropdown dropdown-select" [class.open]="datePickerOpen">
+              <div class="dropdown-btn datepicker-btn" [class.open]="datePickerOpen" (click)="toggleDatePicker()">
+                <span>{{ selectedDueDate ? formatTaskDate(selectedDueDate) : 'Select date' }}</span>
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M19,2H18V1a1,1,0,0,0-2,0V2H8V1A1,1,0,0,0,6,1V2H5A5.006,5.006,0,0,0,0,7V19a5.006,5.006,0,0,0,5,5H19a5.006,5.006,0,0,0,5-5V7A5.006,5.006,0,0,0,19,2ZM2,7A3,3,0,0,1,5,4H19a3,3,0,0,1,3,3V8H2ZM19,22H5a3,3,0,0,1-3-3V10H22v9A3,3,0,0,1,19,22Z"
+                  />
+                </svg>
+
+                <input
+                  #selectedDate
+                  class="datepicker-input"
+                  type="datetime-local"
+                  [(ngModel)]="selectedDueDate"
+                  [ngModelOptions]="{ standalone: true }"
+                  (change)="selectDueDate(selectedDueDate, editForm)"
+                />
+              </div>
             </div>
           </div>
 
@@ -105,13 +526,7 @@
                   *ngFor="let categoryOption of categoriesSharedCollection"
                   (click)="selectCategory(categoryOption)"
                 >
-                  <div
-                    class="task-tag task-category"
-                    [ngStyle]="{
-                      color: categoryOption.color,
-                      'background-color': getCategoryBackground(categoryOption.color),
-                    }"
-                  >
+                  <div class="task-tag task-category" [ngStyle]="getCategoryStyle(categoryOption)">
                     {{ categoryOption.name }}
                   </div>
                   <button type="button" class="delete-category-btn" (click)="deleteCategory(categoryOption, $event)">✕</button>
@@ -169,7 +584,7 @@
           type="submit"
           id="save-entity"
           data-cy="entityCreateSaveButton"
-          [disabled]="editForm.invalid || isSaving"
+          [disabled]="editForm.invalid || isSaving || !editForm.dirty"
           class="btn btn-primary"
         >
           Save
