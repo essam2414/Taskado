@@ -1,65 +1,69 @@
-<div>
-  <div class="auth-wrapper">
-    <div class="auth-container">
-      <div class="auth-header">
-        <button class="auth-back-btn" (click)="goBack()">
-          <fa-icon icon="arrow-left"></fa-icon>
-        </button>
+<div class="auth-wrapper">
+  <div class="auth-left login-left">
+    <img src="content/images/login.svg" alt="Login" class="auth-image" />
+    <h2>Welcome back 👋</h2>
+    <p>Log in to stay focused, manage your habits, and crush your day.</p>
+  </div>
 
-        <h1 class="auth-title" data-cy="loginTitle">Log in</h1>
+  <div class="auth-container">
+    <div class="auth-header">
+      <button class="auth-back-btn" (click)="goBack()">
+        <fa-icon icon="arrow-left"></fa-icon>
+      </button>
+
+      <h1 class="auth-title" data-cy="loginTitle">Log in</h1>
+    </div>
+
+    @if (authenticationError()) {
+      <div class="auth-alert" data-cy="loginError"><strong>Failed to sign in!</strong> Please check your credentials and try again.</div>
+    }
+
+    <form class="auth-form" (ngSubmit)="login()" [formGroup]="loginForm">
+      <div class="auth-input-group">
+        <label class="username-label" for="username">Username</label>
+        <input
+          type="text"
+          class="form-control"
+          name="username"
+          id="username"
+          placeholder="Your username"
+          formControlName="username"
+          #username
+          data-cy="username"
+        />
       </div>
 
-      @if (authenticationError()) {
-        <div class="auth-alert" data-cy="loginError"><strong>Failed to sign in!</strong> Please check your credentials and try again.</div>
-      }
+      <div class="auth-input-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          class="form-control"
+          name="password"
+          id="password"
+          placeholder="Your password"
+          formControlName="password"
+          data-cy="password"
+        />
+      </div>
 
-      <form class="auth-form" (ngSubmit)="login()" [formGroup]="loginForm">
-        <div class="auth-input-group">
-          <label class="username-label" for="username">Username</label>
-          <input
-            type="text"
-            class="form-control"
-            name="username"
-            id="username"
-            placeholder="Your username"
-            formControlName="username"
-            #username
-            data-cy="username"
-          />
-        </div>
+      <div class="remember-me">
+        <label for="rememberMe">
+          <input type="checkbox" name="rememberMe" id="rememberMe" formControlName="rememberMe" />
+          <span>Remember me</span>
+        </label>
+      </div>
 
-        <div class="auth-input-group">
-          <label for="password">Password</label>
-          <input
-            type="password"
-            class="form-control"
-            name="password"
-            id="password"
-            placeholder="Your password"
-            formControlName="password"
-            data-cy="password"
-          />
-        </div>
+      <button type="submit" class="auth-btn" data-cy="submit">Log in</button>
+    </form>
 
-        <div class="remember-me">
-          <label for="rememberMe">
-            <input type="checkbox" name="rememberMe" id="rememberMe" formControlName="rememberMe" />
-            <span>Remember me</span>
-          </label>
-        </div>
-
-        <button type="submit" class="auth-btn" data-cy="submit">Log in</button>
-      </form>
-
-      <div class="auth-links">
-        <div>
-          <span>Don&apos;t have an account yet?</span>
-          <a routerLink="/account/register">Sign up</a>.
-        </div>
-        <div>
-          <span>Forgot your password?</span>
-          <a routerLink="/account/reset/request" data-cy="forgetYourPasswordSelector">Recover password</a>.
-        </div>
+    <div class="auth-links">
+      <div>
+        <span>Don&apos;t have an account yet?</span>
+        <a routerLink="/account/register">Sign up</a>.
+      </div>
+      <div>
+        <span>Forgot your password?</span>
+        <a routerLink="/account/reset/request" data-cy="forgetYourPasswordSelector">Recover password</a>.
       </div>
     </div>
   </div>

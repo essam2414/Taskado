@@ -38,6 +38,7 @@
     <include file="config/liquibase/changelog/20250311004206_added_entity_constraints_Reminder.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250311020617_added_entity_constraints_ProductivityReport.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250402172251_added_entity_constraints_UserPreferences.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250424174800_added_guest_fields_to_user.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

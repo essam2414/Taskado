@@ -20,7 +20,6 @@ import { Widget } from './widgets/widgets.component';
 })
 export default class DashboardComponent implements OnInit, OnDestroy {
   account = signal<Account | null>(null);
-  isGuest = false;
 
   greetingMessage = '';
   currentDate = '';
@@ -37,7 +36,6 @@ export default class DashboardComponent implements OnInit, OnDestroy {
       .getAuthenticationState()
       .pipe(takeUntil(this.destroy$))
       .subscribe(account => this.account.set(account));
-    this.isGuest = sessionStorage.getItem('guest') === 'true';
     this.setGreeting();
     this.setCurrentDate();
 
