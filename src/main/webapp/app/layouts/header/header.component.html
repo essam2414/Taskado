@@ -1,7 +1,7 @@
 <div class="landing-header">
   <div class="header-left">
     <a class="logo" routerLink="/">
-      <img src="/content/images/logo.png" alt="Taskado Logo" class="logo-img" />
+      <img src="/content/images/logo.png" alt="" class="logo-img" />
       <h2 class="logo-text">taskado</h2>
     </a>
     <a class="team-info" href="https://github.com/uob-team-project/team45" target="_blank" rel="noopener noreferrer">
@@ -25,13 +25,13 @@
   </div>
 
   <!-- MOBILE MENU TOGGLE -->
-  <button class="menu-toggle" (click)="toggleSidebar()">
+  <button class="menu-toggle" (click)="toggleSidebar()" aria-label="Toggle sidebar">
     <fa-icon icon="bars"></fa-icon>
   </button>
 
   <!-- MOBILE SIDEBAR -->
   <div class="mobile-sidebar" [class.open]="sidebarOpen">
-    <button class="close-sidebar" (click)="toggleSidebar()">
+    <button class="close-sidebar" (click)="toggleSidebar()" aria-label="Close sidebar">
       <fa-icon icon="times"></fa-icon>
     </button>
 

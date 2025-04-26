@@ -9,8 +9,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import SharedModule from 'app/shared/shared.module';
 import FooterComponent from 'app/layouts/footer/footer.component';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
-import { Account } from 'app/core/auth/account.model';
 import { StateStorageService } from 'app/core/auth/state-storage.service';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -28,7 +26,11 @@ export default class LandingPageComponent implements AfterViewInit, OnInit {
   @ViewChild('track') trackRef!: ElementRef;
 
   reviews = [
-    { name: 'Sarah', role: 'Student', quote: 'This app helped me get things done.' },
+    {
+      name: 'Emma Rackham',
+      role: 'Paralegal',
+      quote: 'Helps me to organise my work load with my studies and has a cute cusomtomisable dashboard :)',
+    },
     { name: 'Alex', role: 'Designer', quote: 'Dark mode + font size = perfect.' },
     { name: 'Mina', role: 'Researcher', quote: 'Pomodoro kept me sane writing my thesis.' },
     { name: 'Zaid', role: 'Worker', quote: 'Everything I need is all in one place.' },
@@ -284,8 +286,8 @@ export default class LandingPageComponent implements AfterViewInit, OnInit {
     this.startAutoSlide();
   }
 
-  getAvatarUrl(review: { name: string; role: string; quote: string }): string {
-    const seed = `${review.name}-${review.role}-${review.quote}`;
+  getAvatarUrl(review: { name: string }): string {
+    const seed = review.name.trim();
     const backgroundColors = [
       '7FB3D5',
       'A569BD',

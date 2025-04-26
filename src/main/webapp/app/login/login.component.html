@@ -1,6 +1,6 @@
 <div class="auth-wrapper">
   <div class="auth-left login-left">
-    <img src="content/images/login.svg" alt="Login" class="auth-image" />
+    <img src="content/images/login.svg" alt="" class="auth-image" />
     <h2>Welcome back 👋</h2>
     <p>Log in to stay focused, manage your habits, and crush your day.</p>
   </div>
@@ -15,7 +15,9 @@
     </div>
 
     @if (authenticationError()) {
-      <div class="auth-alert" data-cy="loginError"><strong>Failed to sign in!</strong> Please check your credentials and try again.</div>
+      <div class="alert alert-danger" data-cy="loginError">
+        <strong>Failed to sign in!</strong> Please check your credentials and try again.
+      </div>
     }
 
     <form class="auth-form" (ngSubmit)="login()" [formGroup]="loginForm">

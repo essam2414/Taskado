@@ -1,28 +1,6 @@
-<div>
-  @if (success()) {
-    <div class="alert alert-success"><strong>Registration saved!</strong> Please check your email for confirmation.</div>
-  }
-
-  @if (error()) {
-    <div class="alert alert-danger"><strong>Registration failed!</strong> Please try again later.</div>
-  }
-
-  @if (errorUserExists()) {
-    <div class="alert alert-danger"><strong>Login name already registered!</strong> Please choose another one.</div>
-  }
-
-  @if (errorEmailExists()) {
-    <div class="alert alert-danger"><strong>Email is already in use!</strong> Please choose another one.</div>
-  }
-
-  @if (doNotMatch()) {
-    <div class="alert alert-danger">The password and its confirmation do not match!</div>
-  }
-</div>
-
 <div class="auth-wrapper">
   <div class="auth-left register-left">
-    <img src="content/images/register.svg" alt="Register" class="auth-image" />
+    <img src="content/images/register.svg" alt="" class="auth-image" />
     <h2>Welcome to Taskado</h2>
     <p>Create an account and start organizing your day with clarity and flow.</p>
   </div>
@@ -33,6 +11,28 @@
         <fa-icon icon="arrow-left"></fa-icon>
       </button>
       <h1 class="auth-title" data-cy="registerTitle">Sign up</h1>
+    </div>
+
+    <div>
+      @if (success()) {
+        <div class="alert alert-success"><strong>Registration saved!</strong> Please check your email for confirmation.</div>
+      }
+
+      @if (error()) {
+        <div class="alert alert-danger"><strong>Registration failed!</strong> Please try again later.</div>
+      }
+
+      @if (errorUserExists()) {
+        <div class="alert alert-danger"><strong>Login name already registered!</strong> Please choose another one.</div>
+      }
+
+      @if (errorEmailExists()) {
+        <div class="alert alert-danger"><strong>Email is already in use!</strong> Please choose another one.</div>
+      }
+
+      @if (doNotMatch()) {
+        <div class="alert alert-danger">The password and its confirmation do not match!</div>
+      }
     </div>
 
     @if (!success()) {

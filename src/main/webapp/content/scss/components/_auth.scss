@@ -86,6 +86,16 @@
   }
 }
 
+.auth-alert {
+  font-size: var(--font-sm);
+  color: var(--danger-color);
+  margin-bottom: 12px;
+}
+
+.alert {
+  font-size: var(--font-sm);
+}
+
 .auth-header {
   position: relative;
   display: flex;
