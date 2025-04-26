@@ -1,0 +1,40 @@
+<div class="modal-header">
+  <h4 class="modal-title">{{ isEditMode ? 'Edit Event' : 'Create Event' }}</h4>
+  <button type="button" class="close" aria-label="Close" (click)="dismiss()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <form [formGroup]="eventForm">
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input id="title" class="form-control" formControlName="title" required />
+    </div>
+
+    <div class="form-group">
+      <label for="eventDate">Date</label>
+      <input id="eventDate" type="date" class="form-control" formControlName="eventDate" required />
+    </div>
+
+    <div class="form-group">
+      <label for="startTime">Start Time</label>
+      <input id="startTime" type="time" class="form-control" formControlName="startTime" />
+    </div>
+
+    <div class="form-group">
+      <label for="endTime">End Time</label>
+      <input id="endTime" type="time" class="form-control" formControlName="endTime" />
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" class="form-control" formControlName="description"></textarea>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" (click)="dismiss()">Cancel</button>
+  <button class="btn btn-primary" (click)="save()" [disabled]="eventForm.invalid">Save</button>
+</div>
