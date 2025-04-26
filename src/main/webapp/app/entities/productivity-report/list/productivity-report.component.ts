@@ -53,6 +53,11 @@ export class ProductivityReportComponent implements OnInit {
   efficiencyScore: number | string = 'N/A';
   timestamp: dayjs.Dayjs | string = 'Unselected';
 
+  // Cards initialisation
+  popupOpen = false;
+  popupContent: string | null = null;
+  popupTitle = '';
+
   public readonly router = inject(Router);
   protected readonly productivityReportService = inject(ProductivityReportService);
   protected readonly activatedRoute = inject(ActivatedRoute);
@@ -122,6 +127,25 @@ export class ProductivityReportComponent implements OnInit {
         },
       });
     }, 500); // Delay to ensure Angular updates the DOM
+  }
+
+  openPopup(contentType: string): void {
+    this.popupOpen = true;
+    this.popupContent = contentType;
+
+    if (contentType === 'tasks') {
+      this.popupTitle = 'Task Details';
+    } else if (contentType === 'focus') {
+      this.popupTitle = 'Focus Details';
+    } else if (contentType === 'habits') {
+      this.popupTitle = 'Habit Details';
+    }
+  }
+
+  closePopup(): void {
+    this.popupOpen = false;
+    this.popupContent = null;
+    this.popupTitle = '';
   }
 
   navigateReport(): void {

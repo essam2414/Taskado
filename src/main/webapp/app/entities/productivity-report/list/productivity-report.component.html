@@ -92,80 +92,285 @@
     </div>
   }
 
-  <div style="display: flex; gap: 20px; align-items: flex-start">
-    <!-- Left Side: Cards -->
-    <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
-      <!-- Task Card -->
+  <!-- Main Cards Layout -->
+  <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 20px">
+    <!-- Overview Card -->
+    <div
+      class="app-card"
+      (click)="openPopup('overview')"
+      style="
+        flex: 1 1 400px;
+        min-width: 300px;
+        border: 2px solid #007bff;
+        border-radius: 10px;
+        padding: 20px;
+        box-sizing: border-box;
+        background-color: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        cursor: pointer;
+      "
+    >
+      <!-- Info Icon -->
       <div
-        class="app-card"
         style="
-          width: 450px;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          padding: 0;
-          box-sizing: border-box;
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: #007bff;
+          color: white;
+          border-radius: 50%;
+          width: 26px;
+          height: 26px;
           display: flex;
-          flex-direction: column;
-          align-items: stretch;
+          justify-content: center;
+          align-items: center;
+          font-size: 16px;
+          font-weight: bold;
         "
       >
-        <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Tasks</h4>
-        <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
-        <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
-          <strong>Tasks Planned: {{ tasksPlanned ?? 'N/A' }} </strong>
-          <strong>Tasks Completed: {{ tasksCompleted ?? 'N/A' }} </strong>
-          <strong>Average Completion Time: UNDER MAINTENANCE </strong>
-          <strong>Task Efficiency: {{ efficiencyScore ?? 'N/A' }} </strong>
-        </div>
+        i
       </div>
 
-      <!-- Pomodoro Card (Focus) -->
-      <div
-        class="app-card"
-        style="
-          width: 450px;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          padding: 0;
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: column;
-          align-items: stretch;
-        "
-      >
-        <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Focus</h4>
-        <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
-        <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
-          <strong>Pomodoro Sessions: {{ pomodoroSessionsCompleted ?? 'N/A' }} </strong>
-          <strong>Total Focus Time (min): {{ totalFocusTime ?? 'N/A' }} </strong>
-        </div>
-      </div>
-
-      <!-- Suggestions Card -->
-      <div
-        class="app-card"
-        style="
-          width: 450px;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          padding: 0;
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: column;
-          align-items: stretch;
-        "
-      >
-        <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Suggestions</h4>
-        <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
-        <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
-          <strong>Currently Unavailable</strong>
-        </div>
+      <h4 style="font-size: 25px; margin-top: 30px">Overview</h4>
+      <hr style="border: 1px solid #ccc" />
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
+        <strong>Efficiency Score: 75%</strong>
+        <strong>Focus Time: 3.5 hours</strong>
+        <strong>Suggestion: Take more short breaks!</strong>
       </div>
     </div>
 
-    <!-- Right Side: Graph -->
-    <div style="flex: 1; display: flex; justify-content: center">
-      <canvas #chartCanvas style="height: 600px !important; width: 100%"></canvas>
+    <!-- Tasks Card -->
+    <div
+      class="app-card"
+      (click)="openPopup('tasks')"
+      style="
+        flex: 1 1 400px;
+        min-width: 300px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        cursor: pointer;
+      "
+    >
+      <div
+        style="
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: #007bff;
+          color: white;
+          border-radius: 50%;
+          width: 26px;
+          height: 26px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 16px;
+          font-weight: bold;
+        "
+      >
+        i
+      </div>
+
+      <h4 style="font-size: 25px; margin-top: 30px">Tasks</h4>
+      <hr style="border: 1px solid #ccc" />
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
+        <strong>Tasks Planned: 10</strong>
+        <strong>Tasks Completed: 7</strong>
+      </div>
+    </div>
+
+    <!-- Habits Card -->
+    <div
+      class="app-card"
+      (click)="openPopup('habits')"
+      style="
+        flex: 1 1 400px;
+        min-width: 300px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        cursor: pointer;
+      "
+    >
+      <div
+        style="
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: #007bff;
+          color: white;
+          border-radius: 50%;
+          width: 26px;
+          height: 26px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 16px;
+          font-weight: bold;
+        "
+      >
+        i
+      </div>
+
+      <h4 style="font-size: 25px; margin-top: 30px">Habits</h4>
+      <hr style="border: 1px solid #ccc" />
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
+        <strong>Habits Completed: 4</strong>
+        <strong>Habit Streaks: 3 days</strong>
+      </div>
+    </div>
+
+    <!-- Focus Card -->
+    <div
+      class="app-card"
+      (click)="openPopup('focus')"
+      style="
+        flex: 1 1 400px;
+        min-width: 300px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        cursor: pointer;
+      "
+    >
+      <div
+        style="
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: #007bff;
+          color: white;
+          border-radius: 50%;
+          width: 26px;
+          height: 26px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 16px;
+          font-weight: bold;
+        "
+      >
+        i
+      </div>
+
+      <h4 style="font-size: 25px; margin-top: 30px">Focus</h4>
+      <hr style="border: 1px solid #ccc" />
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
+        <strong>Pomodoro Sessions: 5</strong>
+        <strong>Focus Time: 3.5 hours</strong>
+      </div>
+    </div>
+
+    <!-- Background Overlay (click to close) -->
+    <div
+      *ngIf="popupOpen"
+      (click)="closePopup()"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 999;
+        cursor: pointer;
+      "
+    ></div>
+
+    <!-- Popup Modal -->
+    <div
+      *ngIf="popupOpen"
+      style="
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 400px;
+        background: white;
+        border: 2px solid #007bff;
+        border-radius: 10px;
+        padding: 20px;
+        z-index: 1000;
+        animation: popIn 0.3s ease-in-out;
+      "
+    >
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px">
+        <h4 style="margin: 0">{{ popupTitle }}</h4>
+        <button
+          (click)="closePopup()"
+          style="background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer"
+        >
+          X
+        </button>
+      </div>
+      <div style="font-size: 18px">
+        <div *ngIf="popupContent === 'overview'">
+          <p><strong>Efficiency:</strong> 75%</p>
+          <p><strong>Best Focus Time:</strong> 10AM-12PM</p>
+          <p><strong>Suggestion:</strong> Take regular short breaks.</p>
+        </div>
+
+        <div *ngIf="popupContent === 'tasks'">
+          <p><strong>Completed Tasks:</strong></p>
+          <ul>
+            <li>Finish report</li>
+            <li>Submit assignment</li>
+            <li>Prepare meeting notes</li>
+          </ul>
+        </div>
+
+        <div *ngIf="popupContent === 'habits'">
+          <p><strong>Habits:</strong></p>
+          <ul>
+            <li>Morning Run - 3 days</li>
+            <li>Read Book - 2 days</li>
+          </ul>
+        </div>
+
+        <div *ngIf="popupContent === 'focus'">
+          <p><strong>Pomodoro Sessions:</strong></p>
+          <ul>
+            <li>Session 1: 25 min - Complete</li>
+            <li>Session 2: 25 min - Complete</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- Inline Popup Animation -->
+  <style>
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.9) translateY(-10px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+  </style>
+
+  <!--  &lt;!&ndash; Right Side: Graph &ndash;&gt;-->
+  <!--  <div style="flex: 1; display: flex; justify-content: center">-->
+  <!--    <canvas #chartCanvas style="height: 600px !important; width: 100%"></canvas>-->
+  <!--  </div>-->
 </div>
