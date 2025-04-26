@@ -191,7 +191,7 @@ export class ProductivityReportComponent implements OnInit {
     this.pomodoroSessionsCompleted = report.pomodoroSessionsCompleted ?? 'N/A';
     this.totalFocusTime = report.totalFocusTime ?? 'N/A';
     this.efficiencyScore = report.efficiencyScore ?? 'N/A';
-    this.timestamp = report.timestamp ?? 'Unselected';
+    this.timestamp = report.timestamp ? dayjs(report.timestamp).locale('en').format('D MMM YYYY') : 'Unselected';
 
     // Update chart data dynamically if the chart exists
     if (this.chart) {
