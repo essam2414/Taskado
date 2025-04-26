@@ -4,8 +4,9 @@
       <h2 id="page-heading" data-cy="DashboardHeading">Dashboard</h2>
     </div>
 
-    <div class="customize-btn" (click)="goToDashboardSettings()">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <button class="customize-btn" (click)="goToDashboardSettings()" aria-label="Customize dashboard">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" focusable="false">
+        <title>Customize dashboard</title>
         <path
           d="M2,6.091h1.849c.306,1.705,1.46,2.568,3.443,2.568s3.137-.863,3.442-2.568h11.266c.552,0,1-.448,1-1s-.448-1-1-1H10.734c-.306-1.705-1.459-2.568-3.442-2.568s-3.137,.863-3.443,2.568h-1.849c-.552,0-1,.448-1,1s.448,1,1,1ZM7.292,3.522c1.144,0,1.525,.227,1.525,1.568,0,1.332-.399,1.568-1.525,1.568-1.145,0-1.525-.227-1.525-1.568,0-1.332,.4-1.568,1.525-1.568Z"
         />
@@ -16,7 +17,7 @@
           d="M22,17.909H10.734c-.306-1.705-1.459-2.568-3.442-2.568s-3.137,.863-3.443,2.568h-1.849c-.552,0-1,.447-1,1s.448,1,1,1h1.849c.306,1.705,1.459,2.568,3.443,2.568s3.137-.863,3.442-2.568h11.266c.552,0,1-.447,1-1s-.448-1-1-1Zm-14.708,2.568c-1.145,0-1.525-.227-1.525-1.568,0-1.331,.4-1.568,1.525-1.568,1.144,0,1.525,.227,1.525,1.568,0,1.331-.399,1.568-1.525,1.568Z"
         />
       </svg>
-    </div>
+    </button>
   </div>
 
   <jhi-alert-error></jhi-alert-error>
@@ -36,6 +37,8 @@
           height="787"
           viewBox="0 0 900.31 787"
           xmlns:xlink="http://www.w3.org/1999/xlink"
+          aria-hidden="true"
+          focusable="false"
         >
           <g id="Group_2" data-name="Group 2" transform="translate(-510.055 -146.5)">
             <rect
@@ -441,8 +444,9 @@
       <div class="widget" [ngClass]="'widget-' + widget.size" cdkDrag>
         <div class="widget-header">
           <span class="widget-title">{{ widget.title }}</span>
-          <a *ngIf="widget.link" [routerLink]="[widget.link]" class="widget-link">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <a *ngIf="widget.link" [routerLink]="[widget.link]" class="widget-link" [attr.aria-label]="'Open ' + widget.title + ' page'">
+            <svg role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <title>Go to {{ widget.title }}</title>
               <path
                 d="M19.5,0H10.5c-.828,0-1.5,.671-1.5,1.5s.672,1.5,1.5,1.5h8.379L.439,21.439c-.586,.585-.586,1.536,0,2.121,.293,.293,.677,.439,1.061,.439s.768-.146,1.061-.439L21,5.121V13.5c0,.829,.672,1.5,1.5,1.5s1.5-.671,1.5-1.5V4.5c0-2.481-2.019-4.5-4.5-4.5Z"
               />
