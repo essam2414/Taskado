@@ -51,7 +51,8 @@ export class ProductivityReportComponent implements OnInit {
   pomodoroSessionsCompleted: number | string = 'N/A';
   totalFocusTime: number | string = 'N/A';
   efficiencyScore: number | string = 'N/A';
-  timestamp: dayjs.Dayjs | string = 'Unselected';
+  currentDate = dayjs(); // tracks the current "viewed" date
+  timestamp: string = this.currentDate.locale('en').format('D MMM YYYY');
 
   // Cards initialisation
   popupOpen = false;
@@ -127,6 +128,20 @@ export class ProductivityReportComponent implements OnInit {
         },
       });
     }, 500); // Delay to ensure Angular updates the DOM
+  }
+
+  goToPreviousDay(): void {
+    this.currentDate = this.currentDate.subtract(1, 'day');
+    this.timestamp = this.currentDate.locale('en').format('D MMM YYYY');
+  }
+
+  goToNextDay(): void {
+    const today = dayjs();
+
+    if (this.currentDate.isBefore(today, 'day')) {
+      this.currentDate = this.currentDate.add(1, 'day');
+      this.timestamp = this.currentDate.locale('en').format('D MMM YYYY');
+    }
   }
 
   openPopup(contentType: string): void {
