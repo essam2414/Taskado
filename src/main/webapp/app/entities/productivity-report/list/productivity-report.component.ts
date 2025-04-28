@@ -1,6 +1,6 @@
 import { Component, NgZone, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
-import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
+import { Observable, Subscription, combineLatest, filter, tap, firstValueFrom } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
@@ -12,8 +12,13 @@ import { IProductivityReport } from '../productivity-report.model';
 import { EntityArrayResponseType, ProductivityReportService } from '../service/productivity-report.service';
 import { ProductivityReportDeleteDialogComponent } from '../delete/productivity-report-delete-dialog.component';
 
+import { TaskService } from 'app/entities/task/service/task.service';
+import { HabitService } from 'app/entities/habit/service/habit.service';
+import { PomodoroSessionService } from 'app/entities/pomodoro-session/service/pomodoro-session.service';
+import { NewProductivityReport } from '../productivity-report.model';
+
 import { Chart, ChartDataset } from 'chart.js/auto';
-import dayjs from 'dayjs';
+import dayjs from 'dayjs/esm';
 
 @Component({
   standalone: true,
@@ -61,6 +66,9 @@ export class ProductivityReportComponent implements OnInit {
 
   public readonly router = inject(Router);
   protected readonly productivityReportService = inject(ProductivityReportService);
+  protected readonly taskService = inject(TaskService);
+  protected readonly habitService = inject(HabitService);
+  protected readonly pomodoroSessionService = inject(PomodoroSessionService);
   protected readonly activatedRoute = inject(ActivatedRoute);
   protected readonly sortService = inject(SortService);
   protected modalService = inject(NgbModal);
@@ -144,6 +152,65 @@ export class ProductivityReportComponent implements OnInit {
     }
   }
 
+  async generateReport(): Promise<void> {
+    const today = dayjs().startOf('day');
+
+    try {
+      // 1. Fetch all tasks
+      const tasks = (await firstValueFrom(this.taskService.query())).body ?? [];
+      const completedTasksToday = tasks.filter(t => t.completed && dayjs(t.updatedAt).isSame(today, 'day'));
+
+      // 2. Fetch all pomodoros
+      const pomodoros = (await firstValueFrom(this.pomodoroSessionService.query())).body ?? [];
+      const completedPomodorosToday = pomodoros.filter(p => p.completed && dayjs(p.startTime).isSame(today, 'day'));
+
+      // 3. Fetch all habits
+      const habits = (await firstValueFrom(this.habitService.query())).body ?? [];
+
+      // 4. Calculations
+      const tasksPlanned = tasks.length;
+      const tasksCompleted = completedTasksToday.length;
+      const pomodoroSessionsCompleted = completedPomodorosToday.length;
+      const totalFocusMinutes = completedPomodorosToday.reduce((sum, p) => sum + (p.duration ?? 0), 0);
+      const totalFocusTime = totalFocusMinutes / 60; // minutes to hours
+      const distractionsCount = 0; // Default
+
+      const totalPlanned = tasksPlanned + habits.length + pomodoros.length;
+      const totalCompleted = tasksCompleted + habits.length + pomodoroSessionsCompleted;
+      const efficiencyScore = totalPlanned > 0 ? Math.min(100, (totalCompleted / totalPlanned) * 100) : 0;
+
+      // 5. Build new Productivity Report (✅ ADD timestamp, completedTasks, completedHabits)
+      const newReport: NewProductivityReport = {
+        id: null,
+        tasksPlanned,
+        tasksCompleted,
+        pomodoroSessionsCompleted,
+        totalFocusTime,
+        distractionsCount,
+        efficiencyScore,
+        timestamp: dayjs(),
+        completedTasks: [], // required
+        completedHabits: [], // required
+      };
+
+      // 6. Save the report
+      this.productivityReportService.create(newReport).subscribe({
+        next: () => {
+          this.successMessage = '✅ Report generated and saved!';
+          this.load(); // Reload
+          setTimeout(() => this.loadReport(), 500);
+        },
+        error: err => {
+          console.error('⚠️ Error creating report:', err);
+          this.errorMessage = '⚠️ Failed to create report.';
+        },
+      });
+    } catch (error) {
+      console.error('⚠️ Error generating report:', error);
+      this.errorMessage = '⚠️ Failed to fetch data.';
+    }
+  }
+
   openPopup(contentType: string): void {
     this.popupOpen = true;
     this.popupContent = contentType;
@@ -192,38 +259,43 @@ export class ProductivityReportComponent implements OnInit {
     this.isDeleteModalOpen = false;
   }
 
-  generateReport(): void {
+  loadReport(): void {
     if (!this.productivityReports || this.productivityReports.length === 0) {
-      this.errorMessage = 'Not Enough Data Available';
+      this.errorMessage = 'No Productivity Reports available.';
       setTimeout(() => (this.errorMessage = null), 2500);
       return;
     }
 
-    // Load the first report into the UI
-    const report = this.productivityReports[0];
-    this.tasksPlanned = report.tasksPlanned ?? 'N/A';
-    this.tasksCompleted = report.tasksCompleted ?? 'N/A';
-    this.pomodoroSessionsCompleted = report.pomodoroSessionsCompleted ?? 'N/A';
-    this.totalFocusTime = report.totalFocusTime ?? 'N/A';
-    this.efficiencyScore = report.efficiencyScore ?? 'N/A';
-    this.timestamp = report.timestamp ? dayjs(report.timestamp).locale('en').format('D MMM YYYY') : 'Unselected';
+    // Find report matching today's date
+    const todayFormatted = this.currentDate.startOf('day');
+    const matchingReport = this.productivityReports.find(
+      report => report.timestamp && dayjs(report.timestamp).isSame(todayFormatted, 'day'),
+    );
 
-    // Update chart data dynamically if the chart exists
-    if (this.chart) {
-      this.chart.data.datasets[0].data = [
-        report.tasksPlanned ?? 0,
-        report.tasksCompleted ?? 0,
-        report.pomodoroSessionsCompleted ?? 0,
-        report.efficiencyScore ?? 0,
-      ] as ChartDataset<'bar'>['data']; // Explicitly cast to correct type
-
-      this.chart.update(); // Refresh the chart with new data
-    } else {
-      console.warn('⚠️ Chart is not initialized.');
+    if (!matchingReport) {
+      this.errorMessage = 'No report found for today.';
+      setTimeout(() => (this.errorMessage = null), 2500);
+      return;
     }
 
-    this.successMessage = '✅ Report Generated Successfully!';
-    setTimeout(() => (this.successMessage = null), 2500);
+    this.tasksPlanned = matchingReport.tasksPlanned ?? 'N/A';
+    this.tasksCompleted = matchingReport.tasksCompleted ?? 'N/A';
+    this.pomodoroSessionsCompleted = matchingReport.pomodoroSessionsCompleted ?? 'N/A';
+    this.totalFocusTime = matchingReport.totalFocusTime ?? 'N/A';
+    this.efficiencyScore = matchingReport.efficiencyScore ?? 'N/A';
+    this.timestamp = matchingReport.timestamp ? dayjs(matchingReport.timestamp).locale('en').format('D MMM YYYY') : 'Unselected';
+
+    // Update chart if it exists
+    // if (this.chart) {
+    //   this.chart.data.datasets[0].data = [
+    //     matchingReport.tasksPlanned ?? 0,
+    //     matchingReport.tasksCompleted ?? 0,
+    //     matchingReport.pomodoroSessionsCompleted ?? 0,
+    //     matchingReport.efficiencyScore ?? 0,
+    //   ] as ChartDataset<'bar'>['data'];
+    //
+    //   this.chart.update();
+    // }
   }
 
   delete(productivityReport: IProductivityReport): void {

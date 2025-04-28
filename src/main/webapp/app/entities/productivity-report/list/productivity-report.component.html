@@ -39,7 +39,6 @@
         <fa-icon icon="arrow-right"></fa-icon>
       </button>
 
-      <!-- Generate Report Button -->
       <button
         id="jh-create-entity"
         data-cy="entityCreateButton"
@@ -50,6 +49,17 @@
         <fa-icon icon="plus"></fa-icon>
         <span>Generate Report</span>
       </button>
+
+      <!--      <button-->
+      <!--        id="jh-create-entity"-->
+      <!--        data-cy="entityCreateButton"-->
+      <!--        class="btn-add jh-create-entity create-task desktop-only"-->
+      <!--        style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden"-->
+      <!--        [routerLink]="['/productivity-report/new']"-->
+      <!--      >-->
+      <!--        <fa-icon icon="plus"></fa-icon>-->
+      <!--        <span>Generate Report</span>-->
+      <!--      </button>-->
 
       <div class="dropdown dropdown-action" [class.open]="isDropdownOpen">
         <!-- Dropdown Toggle Button (Down Arrow) -->
@@ -141,9 +151,13 @@
       <h4 style="font-size: 25px; margin-top: 30px">Overview</h4>
       <hr style="border: 1px solid #ccc" />
       <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
-        <strong>Efficiency Score: 75%</strong>
-        <strong>Focus Time: 3.5 hours</strong>
+        <strong>Efficiency Score: {{ efficiencyScore }}%</strong>
+        <strong>Focus Time: {{ totalFocusTime }} hours</strong>
         <strong>Suggestion: Take more short breaks!</strong>
+        <strong>Tasks Planned: {{ tasksPlanned }}</strong>
+        <strong>Tasks Completed: {{ tasksCompleted }}</strong>
+        <strong>Pomodoro Sessions Completed: {{ pomodoroSessionsCompleted }}</strong>
+        <strong>Timestamp: {{ timestamp ?? 'Unselected' }}</strong>
       </div>
     </div>
 
