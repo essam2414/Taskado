@@ -139,16 +139,38 @@ export class ProductivityReportComponent implements OnInit {
   }
 
   goToPreviousDay(): void {
-    this.currentDate = this.currentDate.subtract(1, 'day');
-    this.timestamp = this.currentDate.locale('en').format('D MMM YYYY');
+    if (!this.productivityReports || this.productivityReports.length === 0) return;
+
+    const sortedReports = [...this.productivityReports].sort((a, b) => dayjs(a.timestamp).diff(dayjs(b.timestamp)));
+
+    // Find the first report that is BEFORE currentDate
+    const previousReport = [...sortedReports].reverse().find(report => dayjs(report.timestamp).isBefore(this.currentDate, 'day'));
+
+    if (previousReport) {
+      this.currentDate = dayjs(previousReport.timestamp);
+      this.timestamp = this.currentDate.locale('en').format('D MMM YYYY');
+      this.loadReport();
+    } else {
+      this.errorMessage = 'No previous report available.';
+      setTimeout(() => (this.errorMessage = null), 2500);
+    }
   }
 
   goToNextDay(): void {
-    const today = dayjs();
+    if (!this.productivityReports || this.productivityReports.length === 0) return;
 
-    if (this.currentDate.isBefore(today, 'day')) {
-      this.currentDate = this.currentDate.add(1, 'day');
+    const sortedReports = [...this.productivityReports].sort((a, b) => dayjs(a.timestamp).diff(dayjs(b.timestamp)));
+
+    // Find the first report that is AFTER currentDate
+    const nextReport = sortedReports.find(report => dayjs(report.timestamp).isAfter(this.currentDate, 'day'));
+
+    if (nextReport) {
+      this.currentDate = dayjs(nextReport.timestamp);
       this.timestamp = this.currentDate.locale('en').format('D MMM YYYY');
+      this.loadReport();
+    } else {
+      this.errorMessage = 'No next report available.';
+      setTimeout(() => (this.errorMessage = null), 2500);
     }
   }
 
