@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ElementRef, ViewChild } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -10,7 +10,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AlertError } from 'app/shared/alert/alert-error.model';
 import { EventManager, EventWithContent } from 'app/core/util/event-manager.service';
 import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
-import { ICategory } from 'app/entities/category/category.model';
+import { ICategory, NewCategory, CATEGORY_COLORS } from 'app/entities/category/category.model';
 import { CategoryService } from 'app/entities/category/service/category.service';
 import { IUser } from 'app/entities/user/user.model';
 import { UserService } from 'app/entities/user/service/user.service';
@@ -23,6 +23,7 @@ import { HabitFormGroup, HabitFormService } from './habit-form.service';
   selector: 'jhi-habit-update',
   templateUrl: './habit-update.component.html',
   imports: [SharedModule, FormsModule, ReactiveFormsModule],
+  styleUrls: ['../habit.component.scss'],
 })
 export class HabitUpdateComponent implements OnInit {
   isSaving = false;
@@ -30,6 +31,13 @@ export class HabitUpdateComponent implements OnInit {
 
   categoriesSharedCollection: ICategory[] = [];
   usersSharedCollection: IUser[] = [];
+
+  @ViewChild('addCategoryInput') addCategoryInputRef?: ElementRef<HTMLInputElement>;
+  categoryDropdownOpen = false;
+  selectedCategory: ICategory | null = null;
+  addCategoryOpen = false;
+  newCategoryName = '';
+  newCategoryColor = this.getRandomColor();
 
   protected dataUtils = inject(DataUtils);
   protected eventManager = inject(EventManager);
@@ -55,6 +63,128 @@ export class HabitUpdateComponent implements OnInit {
 
       this.loadRelationshipsOptions();
     });
+  }
+
+  toggleCategoryDropdown(): void {
+    this.categoryDropdownOpen = !this.categoryDropdownOpen;
+  }
+
+  selectCategory(category: ICategory | null): void {
+    this.selectedCategory = category ? { ...category } : null;
+    this.editForm.controls['category'].setValue(this.selectedCategory);
+    this.editForm.controls['category'].markAsDirty();
+    this.categoryDropdownOpen = false;
+  }
+
+  toggleAddCategory(): void {
+    this.addCategoryOpen = !this.addCategoryOpen;
+
+    if (this.addCategoryOpen) {
+      setTimeout(() => {
+        this.addCategoryInputRef?.nativeElement.focus();
+      });
+    }
+  }
+
+  addCategoryFromInput(event: Event): void {
+    const keyboardEvent = event as KeyboardEvent;
+
+    keyboardEvent.preventDefault();
+
+    const name = this.newCategoryName.trim();
+    const color = this.newCategoryColor;
+
+    if (!name) return;
+
+    const newCategory: NewCategory = {
+      id: null,
+      name,
+      color,
+    };
+
+    this.categoryService.create(newCategory).subscribe({
+      next: res => {
+        const added = res.body;
+        if (added) {
+          this.categoriesSharedCollection.push(added);
+          this.newCategoryName = '';
+          this.newCategoryColor = this.getRandomColor();
+          this.addCategoryOpen = false;
+        }
+      },
+    });
+  }
+
+  getRandomColor(): string {
+    const random = Math.floor(Math.random() * CATEGORY_COLORS.length);
+    return CATEGORY_COLORS[random].value;
+  }
+
+  loadCategories(): void {
+    this.categoryService.query().subscribe({
+      next: (res: HttpResponse<ICategory[]>) => {
+        this.categoriesSharedCollection = res.body ?? [];
+
+        if (this.habit?.category?.id) {
+          const fullCategory = this.categoriesSharedCollection.find(c => c.id === this.habit?.category?.id);
+          if (fullCategory) {
+            this.selectedCategory = fullCategory;
+            this.editForm.controls['category'].setValue(fullCategory);
+          }
+        }
+      },
+    });
+  }
+
+  deleteCategory(category: ICategory, event: Event): void {
+    event.stopPropagation(); // ✅ So it doesn’t trigger selectCategory()
+
+    if (!category.id) return;
+
+    this.categoryService.delete(category.id).subscribe(() => {
+      this.categoriesSharedCollection = this.categoriesSharedCollection.filter(c => c.id !== category.id);
+
+      // Clear it from the selected form if it was selected
+      if (this.editForm.controls['category'].value?.id === category.id) {
+        this.editForm.controls['category'].setValue(null);
+        this.selectedCategory = null;
+      }
+    });
+  }
+
+  getCategoryStyle(category: ICategory | null): Record<string, string> {
+    if (!category?.color) return {};
+    return {
+      color: category.color,
+      'background-color': this.getCategoryBackground(category.color) ?? '',
+    };
+  }
+
+  getCategoryBackground(color: string | null | undefined): string | null {
+    if (!color) return null;
+
+    const div = document.createElement('div');
+    div.style.color = color;
+
+    document.body.appendChild(div);
+    const computedColor = getComputedStyle(div).color;
+    document.body.removeChild(div);
+
+    const match = computedColor.match(/rgba?\((\d+), (\d+), (\d+)/);
+    if (!match) return null;
+
+    const [_, r, g, b] = match;
+    return `rgba(${r}, ${g}, ${b}, 0.18)`; // your custom alpha
+  }
+
+  hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+    if (!/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) return null;
+    let c = hex.substring(1).split('');
+    if (c.length === 3) c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+    const r = parseInt(c[0] + c[1], 16);
+    const g = parseInt(c[2] + c[3], 16);
+    const b = parseInt(c[4] + c[5], 16);
+    return { r, g, b };
   }
 
   byteSize(base64String: string): string {
