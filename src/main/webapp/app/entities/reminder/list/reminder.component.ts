@@ -11,6 +11,7 @@ import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigati
 import { IReminder } from '../reminder.model';
 import { EntityArrayResponseType, ReminderService } from '../service/reminder.service';
 import { ReminderDeleteDialogComponent } from '../delete/reminder-delete-dialog.component';
+import dayjs, { Dayjs } from 'dayjs';
 
 @Component({
   standalone: true,
@@ -29,8 +30,21 @@ import { ReminderDeleteDialogComponent } from '../delete/reminder-delete-dialog.
 })
 export class ReminderComponent implements OnInit {
   subscription: Subscription | null = null;
-  reminders?: IReminder[];
+  reminders: IReminder[] = [];
+  filteredReminders: IReminder[] = [];
   isLoading = false;
+  showAddForm = false;
+  newReminder: Partial<IReminder> = {
+    title: '',
+    description: '',
+    reminderDate: null,
+    repeatType: '',
+    repeatInterval: undefined,
+    linkedEntityType: '',
+    linkedEntityId: undefined,
+  };
+
+  activeFilter: 'search' | 'today' | 'scheduled' | 'all' | 'completed' | 'flagged' = 'all';
 
   sortState = sortStateSignal({});
 
@@ -41,16 +55,16 @@ export class ReminderComponent implements OnInit {
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
 
-  trackId = (item: IReminder): number => this.reminderService.getReminderIdentifier(item);
+  trackId(index: number, item: IReminder): number {
+    return this.reminderService.getReminderIdentifier(item);
+  }
 
   ngOnInit(): void {
     this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
       .pipe(
         tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
         tap(() => {
-          if (!this.reminders || this.reminders.length === 0) {
-            this.load();
-          }
+          this.load();
         }),
       )
       .subscribe();
@@ -59,7 +73,6 @@ export class ReminderComponent implements OnInit {
   delete(reminder: IReminder): void {
     const modalRef = this.modalService.open(ReminderDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.reminder = reminder;
-    // unsubscribe not needed because closed completes on modal close
     modalRef.closed
       .pipe(
         filter(reason => reason === ITEM_DELETED_EVENT),
@@ -76,6 +89,59 @@ export class ReminderComponent implements OnInit {
     });
   }
 
+  parseDate(dateValue: Dayjs | null | undefined): Dayjs | null {
+    return dateValue ?? null;
+  }
+
+  toggleAddForm(): void {
+    this.showAddForm = !this.showAddForm;
+  }
+
+  onAddReminder(): void {
+    if (!this.newReminder.title || !this.newReminder.reminderDate) return;
+
+    const newItem: IReminder = {
+      id: Math.floor(Math.random() * 100000),
+      title: this.newReminder.title,
+      description: this.newReminder.description ?? '',
+      repeatType: this.newReminder.repeatType ?? '',
+      repeatInterval: this.newReminder.repeatInterval,
+      linkedEntityType: this.newReminder.linkedEntityType ?? '',
+      linkedEntityId: this.newReminder.linkedEntityId,
+    };
+
+    this.reminders.push(newItem);
+    this.filterReminders();
+    this.newReminder = {
+      title: '',
+      description: '',
+      reminderDate: null,
+      repeatType: '',
+      repeatInterval: undefined,
+      linkedEntityType: '',
+      linkedEntityId: undefined,
+    };
+    this.toggleAddForm();
+  }
+
+  setFilter(selectedFilter: typeof this.activeFilter): void {
+    this.activeFilter = selectedFilter;
+    this.filterReminders();
+  }
+
+  filterReminders(): void {
+    const today = dayjs();
+    this.filteredReminders = this.reminders.filter(r => {
+      const date = dayjs(r.reminderDate);
+
+      if (this.activeFilter === 'all') return true;
+      if (this.activeFilter === 'search') return `${r.title} ${r.description ?? ''}`.toLowerCase().includes('test');
+      if (this.activeFilter === 'today') return date.isSame(today, 'day');
+      if (this.activeFilter === 'scheduled') return date.isAfter(today);
+      return true;
+    });
+  }
+
   navigateToWithComponentValues(event: SortState): void {
     this.handleNavigation(event);
   }
@@ -87,6 +153,7 @@ export class ReminderComponent implements OnInit {
   protected onResponseSuccess(response: EntityArrayResponseType): void {
     const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
     this.reminders = this.refineData(dataFromBody);
+    this.filterReminders();
   }
 
   protected refineData(data: IReminder[]): IReminder[] {

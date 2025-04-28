@@ -1,143 +1,135 @@
 <div>
-  <h2 id="page-heading" data-cy="ReminderHeading">
-    <span>Reminders</span>
+  <!-- SIDEBAR -->
+  <div class="entity-header">
+    <div class="entity-header-left">
+      <h3>Reminders</h3>
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading">
-        <fa-icon icon="sync" [animation]="isLoading ? 'spin' : undefined"></fa-icon>
-        <span>Refresh list</span>
-      </button>
-
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-reminder"
-        [routerLink]="['/reminder/new']"
-      >
-        <fa-icon icon="plus"></fa-icon>
-        <span>Create a new Reminder</span>
-      </button>
+      <!-- Navigation Items (Filter Buttons) -->
+      <div class="entity-filters">
+        <button class="btn-filter" (click)="setFilter('search')"><fa-icon icon="search"></fa-icon> Search</button>
+        <button class="btn-filter" (click)="setFilter('today')"><fa-icon icon="sun"></fa-icon> Today</button>
+        <button class="btn-filter" (click)="setFilter('scheduled')"><fa-icon icon="calendar-alt"></fa-icon> Scheduled</button>
+        <button class="btn-filter" (click)="setFilter('all')"><fa-icon icon="list"></fa-icon> All</button>
+      </div>
     </div>
-  </h2>
 
-  <jhi-alert-error></jhi-alert-error>
+    <!-- Add Reminder Button -->
+    <button class="btn-add" (click)="toggleAddForm()">+ Add Reminder</button>
+  </div>
 
-  <jhi-alert></jhi-alert>
-
-  @if (reminders?.length === 0) {
-    <div class="alert alert-warning" id="no-result">
-      <span>No Reminders found</span>
+  <!-- MAIN CONTENT AREA -->
+  <div>
+    <!-- Header row: Title + Count Badge -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 style="margin: 0">{{ activeFilter }}</h3>
+      <span class="badge bg-secondary fs-6">{{ filteredReminders.length }}</span>
     </div>
-  }
 
-  @if (reminders && reminders.length > 0) {
-    <div class="table-responsive table-entities" id="entities">
-      <table class="table table-striped" aria-describedby="page-heading">
-        <thead>
-          <tr jhiSort [sortState]="sortState" (sortChange)="navigateToWithComponentValues($event)">
-            <th scope="col" jhiSortBy="id">
-              <div class="d-flex">
-                <span>ID</span>
+    <!-- JHipster Alerts (optional) -->
+    <jhi-alert-error></jhi-alert-error>
+    <jhi-alert></jhi-alert>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="title">
-              <div class="d-flex">
-                <span>Title</span>
+    <!-- Add Reminder Form (Shown/Hidden) -->
+    <div class="card mb-4" style="border: 1px solid #e0e0e0" *ngIf="showAddForm">
+      <div class="card-body">
+        <h5 class="card-title">Add a New Reminder</h5>
+        <form (ngSubmit)="onAddReminder()" #reminderForm="ngForm">
+          <!-- Title (required) -->
+          <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" id="title" name="title" class="form-control" required [(ngModel)]="newReminder.title" />
+          </div>
+          <!-- Description -->
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description" name="description" class="form-control" [(ngModel)]="newReminder.description"></textarea>
+          </div>
+          <!-- Reminder Date (required) -->
+          <div class="mb-3">
+            <label for="reminderDate" class="form-label">Reminder Date</label>
+            <input
+              type="datetime-local"
+              id="reminderDate"
+              name="reminderDate"
+              class="form-control"
+              required
+              [(ngModel)]="newReminder.reminderDate"
+            />
+          </div>
+          <!-- Repeat Type -->
+          <div class="mb-3">
+            <label for="repeatType" class="form-label">Repeat Type</label>
+            <input type="text" id="repeatType" name="repeatType" class="form-control" [(ngModel)]="newReminder.repeatType" />
+          </div>
+          <!-- Repeat Interval -->
+          <div class="mb-3">
+            <label for="repeatInterval" class="form-label">Repeat Interval</label>
+            <input type="number" id="repeatInterval" name="repeatInterval" class="form-control" [(ngModel)]="newReminder.repeatInterval" />
+          </div>
+          <!-- Linked Entity Type -->
+          <div class="mb-3">
+            <label for="linkedEntityType" class="form-label">Linked Entity Type</label>
+            <input
+              type="text"
+              id="linkedEntityType"
+              name="linkedEntityType"
+              class="form-control"
+              [(ngModel)]="newReminder.linkedEntityType"
+            />
+          </div>
+          <!-- Linked Entity ID -->
+          <div class="mb-3">
+            <label for="linkedEntityId" class="form-label">Linked Entity ID</label>
+            <input type="number" id="linkedEntityId" name="linkedEntityId" class="form-control" [(ngModel)]="newReminder.linkedEntityId" />
+          </div>
 
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="description">
-              <div class="d-flex">
-                <span>Description</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="reminderDate">
-              <div class="d-flex">
-                <span>Reminder Date</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="repeatType">
-              <div class="d-flex">
-                <span>Repeat Type</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="repeatInterval">
-              <div class="d-flex">
-                <span>Repeat Interval</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="linkedEntityType">
-              <div class="d-flex">
-                <span>Linked Entity Type</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="linkedEntityId">
-              <div class="d-flex">
-                <span>Linked Entity Id</span>
-
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col" jhiSortBy="user.id">
-              <div class="d-flex">
-                <span>User</span>
-                <fa-icon class="p-1" icon="sort"></fa-icon>
-              </div>
-            </th>
-            <th scope="col"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (reminder of reminders; track trackId(reminder)) {
-            <tr data-cy="entityTable">
-              <td>
-                <a [routerLink]="['/reminder', reminder.id, 'view']">{{ reminder.id }}</a>
-              </td>
-              <td>{{ reminder.title }}</td>
-              <td>{{ reminder.description }}</td>
-              <td>{{ reminder.reminderDate | formatMediumDatetime }}</td>
-              <td>{{ reminder.repeatType }}</td>
-              <td>{{ reminder.repeatInterval }}</td>
-              <td>{{ reminder.linkedEntityType }}</td>
-              <td>{{ reminder.linkedEntityId }}</td>
-              <td>
-                {{ reminder.user?.id }}
-              </td>
-              <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/reminder', reminder.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
-                    <fa-icon icon="eye"></fa-icon>
-                    <span class="d-none d-md-inline">View</span>
-                  </a>
-
-                  <a [routerLink]="['/reminder', reminder.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline">Edit</span>
-                  </a>
-
-                  <button type="submit" (click)="delete(reminder)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline">Delete</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+          <button type="submit" class="btn btn-success" [disabled]="reminderForm.invalid">Save</button>
+          <button type="button" class="btn btn-secondary" (click)="toggleAddForm()">Cancel</button>
+        </form>
+      </div>
     </div>
-  }
+
+    <!-- No Reminders Found -->
+    <div class="alert alert-info" *ngIf="filteredReminders.length === 0 && !showAddForm">
+      <strong>No Reminders found</strong>
+    </div>
+
+    <!-- Reminders List -->
+    <div *ngIf="filteredReminders.length > 0">
+      <div class="entity-list" *ngFor="let reminder of filteredReminders">
+        <div class="app-card">
+          <!-- Reminder Fields -->
+          <div>
+            <strong>{{ reminder.title }}</strong
+            ><br />
+            <small *ngIf="reminder.description">
+              {{ reminder.description }} </small
+            ><br />
+            <!-- Convert string date to Dayjs => toDate() for Angular pipe -->
+            <small>
+              {{ parseDate(reminder.reminderDate)?.toDate() | date: 'medium' }} </small
+            ><br />
+            <small *ngIf="reminder.repeatType"> Repeat Type: {{ reminder.repeatType }} </small><br />
+            <small *ngIf="reminder.repeatInterval"> Repeat Interval: {{ reminder.repeatInterval }} </small><br />
+            <small *ngIf="reminder.linkedEntityType"> Linked Entity Type: {{ reminder.linkedEntityType }} </small><br />
+            <small *ngIf="reminder.linkedEntityId"> Linked Entity ID: {{ reminder.linkedEntityId }} </small><br />
+            <!-- If you want a 'status' for completed/flagged, add fields to your entity -->
+          </div>
+
+          <!-- Actions -->
+          <div>
+            <a [routerLink]="['/reminder', reminder.id, 'view']" class="btn btn-outline-primary btn-sm me-2" data-cy="entityDetailsButton">
+              <fa-icon icon="eye"></fa-icon> View
+            </a>
+            <a [routerLink]="['/reminder', reminder.id, 'edit']" class="btn btn-outline-secondary btn-sm me-2" data-cy="entityEditButton">
+              <fa-icon icon="pencil-alt"></fa-icon> Edit
+            </a>
+            <button type="button" class="btn btn-outline-danger btn-sm" (click)="delete(reminder)" data-cy="entityDeleteButton">
+              <fa-icon icon="times"></fa-icon> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
