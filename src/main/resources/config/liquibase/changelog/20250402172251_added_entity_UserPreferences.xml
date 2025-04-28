@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity UserPreferences.
+    -->
+    <changeSet id="20250402172251-1" author="jhipster">
+        <createTable tableName="user_preferences">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="dark_mode" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="sidebar_color_light" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="sidebar_color_dark" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="accent_color" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="font_size_level" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="dyslexia_mode" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="high_contrast" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="reduce_motion" type="boolean">
+                <constraints nullable="true" />
+            </column>
+            <column name="dashboard_widgets_json" type="${clobType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="dashboard_theme" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+</databaseChangeLog>

@@ -1,4 +1,4 @@
-/* General Dropdown Styles */
+/* Base Dropdown Styles */
 .dropdown {
   position: relative;
   width: 100%;
@@ -7,19 +7,17 @@
   .dropdown-menu {
     display: none;
     position: absolute;
-    width: 100%;
     max-height: 200px;
     margin-top: 4px;
+    padding: 6px;
     border-radius: 8px;
-    padding: 8px;
+    overflow-y: auto;
+    z-index: 10;
 
     color: var(--text-secondary);
-
     background: var(--card-bg);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     border: 1px solid rgba(0, 0, 0, 0.08);
-    z-index: 10;
-    overflow-y: auto;
   }
 
   &.open .dropdown-menu {
@@ -27,30 +25,35 @@
   }
 }
 
-/* Select Dropdown (e.g. selecting category/priority) */
+/* Dropdown Button Shared */
+.dropdown-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: all 0.3s ease-in-out;
+
+  fa-icon {
+    transition: transform 0.3s;
+  }
+}
+
+/* Select Dropdown (Category / Priority) */
 .dropdown-select {
   width: 100%;
   max-width: 300px;
 
   .dropdown-btn {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-
-    background: var(--bg-color-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.2s ease;
+    background: var(--input-bg);
+    color: var(--text-secondary);
+    font-weight: 400;
 
     &:hover {
-      background: var(--card-bg);
+      background: var(--bg-color-secondary);
       color: var(--text-primary);
-    }
-
-    fa-icon {
-      transition: transform 0.3s;
     }
   }
 
@@ -58,30 +61,36 @@
     transform: rotate(180deg);
   }
 
+  .dropdown-menu {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
   .dropdown-menu li {
     list-style: none;
-    padding: 8px 16px;
+    padding: 8px;
     border-radius: 4px;
     cursor: pointer;
     transition: background 0.2s ease;
 
+    display: flex;
+
     &:hover {
-      background: var(--bg-color-secondary);
+      background: var(--input-bg);
     }
   }
 }
 
-/* Action Dropdown (e.g. account settings) */
+/* Action Dropdown (Account etc.) */
 .dropdown-action {
   width: 200px;
 
   .dropdown-btn {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
     padding: 8px;
     color: var(--text-secondary);
-    transition: color 0.2s ease;
 
     &:hover {
       color: var(--text-primary);
@@ -89,10 +98,8 @@
   }
 
   .dropdown-menu {
-    width: 100%;
     display: none;
     flex-direction: column;
-    padding: 10px;
   }
 
   &.open .dropdown-menu {
@@ -102,27 +109,30 @@
   .dropdown-item {
     display: flex;
     align-items: center;
-    padding: 10px 14px;
-    gap: 8px;
-    font-size: 14px;
+    gap: 12px;
+    padding: 8px 10px;
     border-radius: 6px;
     cursor: pointer;
+    color: var(--text-secondary);
     transition:
       background 0.2s ease,
-      color 0.2s ease;
+      color 0.2s ease,
+      opacity 0.2s ease;
+    opacity: 0.9;
+    font-weight: 300;
+    font-size: var(--font-sm);
 
-    color: var(--text-secondary);
-    fa-icon {
-      opacity: 0.7;
-      transition: opacity 0.2s ease;
+    fa-icon,
+    svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
     }
 
     &:hover {
       background: rgba(86, 77, 242, 0.1);
       color: var(--text-primary);
-      fa-icon {
-        opacity: 1;
-      }
+      opacity: 1;
     }
 
     &.delete {

@@ -27,8 +27,12 @@ describe('Task Form Service', () => {
             completed: expect.any(Object),
             createdAt: expect.any(Object),
             updatedAt: expect.any(Object),
+            order: expect.any(Object),
             category: expect.any(Object),
+            parentTask: expect.any(Object),
             user: expect.any(Object),
+            section: expect.any(Object),
+            productivityReports: expect.any(Object),
           }),
         );
       });
@@ -46,8 +50,12 @@ describe('Task Form Service', () => {
             completed: expect.any(Object),
             createdAt: expect.any(Object),
             updatedAt: expect.any(Object),
+            order: expect.any(Object),
             category: expect.any(Object),
+            parentTask: expect.any(Object),
             user: expect.any(Object),
+            section: expect.any(Object),
+            productivityReports: expect.any(Object),
           }),
         );
       });

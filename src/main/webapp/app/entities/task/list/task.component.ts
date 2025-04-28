@@ -1,17 +1,30 @@
-import { Component, HostListener, NgZone, OnInit, inject } from '@angular/core';
+import { Component, HostListener, NgZone, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
-import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
+import { Observable, Subscription, combineLatest, filter, tap, combineLatest as combineLatestRx } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { HttpResponse } from '@angular/common/http';
 
 import SharedModule from 'app/shared/shared.module';
-import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
+import { SortDirective, SortByDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
 import { FormsModule } from '@angular/forms';
 import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
-import { ITask } from '../task.model';
+import { ITask, NewTask } from '../task.model';
 import { EntityArrayResponseType, TaskService } from '../service/task.service';
-import { TaskDeleteDialogComponent } from '../delete/task-delete-dialog.component';
 import dayjs from 'dayjs/esm';
+import { CdkDrag, CdkDragDrop, CdkDropList, CdkDropListGroup, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { ISection, NewSection } from 'app/entities/section/section.model';
+import { SectionService } from 'app/entities/section/service/section.service';
+import { SectionDeleteDialogComponent } from 'app/entities/section/delete/section-delete-dialog.component';
+import { TaskModalComponent } from '../modal/task-modal.component';
+import { TaskDeleteDialogComponent } from '../delete/task-delete-dialog.component';
+import { HttpHeaders } from '@angular/common/http';
+import { AlertService } from 'app/core/util/alert.service';
+import { ICategory } from 'app/entities/category/category.model';
+import { CategoryService } from 'app/entities/category/service/category.service';
+import { Priority } from 'app/entities/enumerations/priority.model';
+
+type AllowedPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' | null;
 
 @Component({
   standalone: true,
@@ -27,39 +40,72 @@ import dayjs from 'dayjs/esm';
     DurationPipe,
     FormatMediumDatetimePipe,
     FormatMediumDatePipe,
+    CdkDrag,
+    CdkDropList,
+    CdkDropListGroup,
   ],
 })
 export class TaskComponent implements OnInit {
   subscription: Subscription | null = null;
-  tasks?: ITask[];
+  tasks: ITask[] = [];
+  categories: ICategory[] = [];
   isLoading = false;
+  isDragging = false;
+
   newTaskTitle = '';
 
+  @ViewChild('quickAddDate') dateInputRef!: ElementRef<HTMLInputElement>;
+  quickAddDueDate: string | null = null;
+  dateDropdownOpen = false;
+
+  quickAddPriority: AllowedPriority = null;
+  priorityValues = Object.keys(Priority) as (keyof typeof Priority)[];
+  priorityDropdownOpen = false;
+
+  quickAddCategory: ICategory | null = null;
+  categoryDropdownOpen = false;
+  categoriesSharedCollection: ICategory[] = [];
+
+  filtersOpen = false;
   activeFilter = 'inbox';
   filters = [
     { label: 'Inbox', value: 'inbox', icon: 'inbox' },
     { label: 'Today', value: 'today', icon: 'calendar-day' },
     { label: 'Completed', value: 'completed', icon: 'circle-check' },
   ];
+  filtersMap: Record<string, ITask[]> = {};
+
+  unsectionedTasks: ITask[] = [];
+  sectionsMap: Record<number, ITask[]> = {};
+  sections: ISection[] = [];
+
+  collapsedSections: Record<number, boolean> = {};
+  editingSectionId: number | null = null;
+  originalSectionName = '';
 
   sortState = sortStateSignal({});
   openMenuTaskId: number | null = null;
+  settingsOpen = false;
 
   public readonly router = inject(Router);
   protected readonly taskService = inject(TaskService);
   protected readonly activatedRoute = inject(ActivatedRoute);
   protected readonly sortService = inject(SortService);
+  protected categoryService = inject(CategoryService);
   protected modalService = inject(NgbModal);
+  protected sectionService = inject(SectionService);
   protected ngZone = inject(NgZone);
+  private readonly alertService = inject(AlertService);
 
   trackId = (item: ITask): number => this.taskService.getTaskIdentifier(item);
 
   ngOnInit(): void {
+    // Load tasks and sections when the component initializes.
     this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
       .pipe(
-        tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
+        tap(([params, data]) => this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]))),
         tap(() => {
-          if (!this.tasks || this.tasks.length === 0) {
+          if (this.tasks.length === 0) {
             this.load();
           }
         }),
@@ -67,28 +113,271 @@ export class TaskComponent implements OnInit {
       .subscribe();
   }
 
-  setFilter(selectedFilter: string): void {
-    this.activeFilter = selectedFilter;
+  /* ─────────────────────────────*
+   *   Data Loading & Mapping    *
+   *─────────────────────────────*/
+  load(): void {
+    this.queryBackend().subscribe({
+      next: (res: EntityArrayResponseType) => {
+        const dataFromBody = this.fillComponentAttributesFromResponseBody(res.body);
+        this.tasks = this.refineData(dataFromBody);
+        this.loadSections();
+        this.loadCategories();
+      },
+    });
   }
 
-  getFilteredTasks(): ITask[] {
-    if (!this.tasks) return [];
-
-    if (this.activeFilter === 'today') {
-      return this.tasks.filter(task => task.dueDate && dayjs(task.dueDate).isSame(dayjs(), 'day') && !task.completed);
-    }
-    if (this.activeFilter === 'completed') {
-      return this.tasks.filter(task => task.completed);
-    }
-    return this.tasks.filter(task => !task.completed);
+  loadSections(): void {
+    this.sectionService.query().subscribe({
+      next: (res: HttpResponse<ISection[]>) => {
+        this.sections = res.body ?? [];
+        this.refreshTaskLayout();
+      },
+    });
   }
 
+  loadCategories(): void {
+    this.categoryService.query().subscribe({
+      next: (res: HttpResponse<ICategory[]>) => {
+        this.categories = res.body ?? [];
+        this.categoriesSharedCollection = res.body ?? [];
+
+        for (const task of this.tasks) {
+          if (task.category?.id) {
+            const matched = this.categories.find(cat => cat.id === task.category?.id);
+            if (matched) {
+              task.category = matched;
+            }
+          }
+        }
+
+        this.refreshTaskLayout();
+      },
+    });
+  }
+
+  buildFiltersMap(): void {
+    this.filtersMap = {};
+
+    for (const f of this.filters) {
+      this.filtersMap[f.value] = [];
+    }
+
+    for (const task of this.tasks) {
+      if (task.parentTask) continue; // skip subtasks
+
+      const isToday = task.dueDate && dayjs(task.dueDate).isSame(dayjs(), 'day');
+      if (task.completed) {
+        this.filtersMap['completed'].push(task);
+      } else {
+        this.filtersMap['inbox'].push(task);
+
+        if (isToday) {
+          this.filtersMap['today'].push(task);
+        }
+      }
+    }
+  }
+
+  buildSectionsMap(): void {
+    // Reset our arrays.
+    this.unsectionedTasks = [];
+    this.sectionsMap = {};
+
+    // Create an empty array for each section.
+    for (const section of this.sections) {
+      this.sectionsMap[section.id] = [];
+    }
+
+    // Distribute tasks: if task has a section, add it there; otherwise, add to unsectioned.
+    for (const task of this.filteredTasks) {
+      if (task.section?.id) {
+        this.sectionsMap[task.section.id].push(task);
+      } else {
+        this.unsectionedTasks.push(task);
+      }
+    }
+  }
+
+  refreshTaskLayout(): void {
+    this.buildFiltersMap();
+    this.buildSectionsMap();
+  }
+
+  /* ─────────────────────────────*
+   *       Drag & Drop Logic     *
+   *─────────────────────────────*/
+  drop(event: CdkDragDrop<ITask[]>, targetSection: ISection | null): void {
+    // Retrieve the source and target arrays based on the container id.
+    const sourceArray = this.getTaskArrayByContainerId(event.previousContainer.id);
+    const targetArray = this.getTaskArrayByContainerId(event.container.id);
+
+    if (event.previousContainer === event.container) {
+      if (event.currentIndex === event.previousIndex) return;
+      moveItemInArray(targetArray, event.previousIndex, event.currentIndex);
+    } else {
+      transferArrayItem(sourceArray, targetArray, event.previousIndex, event.currentIndex);
+      // Update the dragged task's section based on the target container.
+      const draggedTask = event.item.data as ITask;
+      draggedTask.section = targetSection ?? null;
+    }
+
+    // If the target container is unsectioned, ensure we update the unsectionedTasks array.
+    if (event.container.id === 'unsectioned') {
+      this.unsectionedTasks = targetArray;
+    }
+
+    // Update order for tasks in the target array.
+    this.updateOrder(targetArray);
+
+    const silentHeaders = new HttpHeaders({ 'X-Silent-Alert': 'true' });
+
+    // Prepare update calls for each task in the target array.
+    const updates = targetArray.map(task =>
+      this.taskService['http'].put(`${this.taskService['resourceUrl']}/${task.id}`, task, {
+        observe: 'response',
+        headers: silentHeaders,
+      }),
+    );
+    combineLatestRx(updates).subscribe(() => {
+      this.load();
+      this.alertService.addAlert({
+        type: 'success',
+        message: 'Tasks reordered successfully.',
+        toast: true,
+      });
+    });
+  }
+
+  /* ─────────────────────────────*
+   *        Filter Methods    *
+   *─────────────────────────────*/
   get activeFilterLabel(): string {
     return this.filters.find(f => f.value === this.activeFilter)?.label ?? '';
   }
 
+  get activeFilterIcon(): string {
+    return this.filters.find(f => f.value === this.activeFilter)?.icon ?? 'filter';
+  }
+
+  get filteredTasks(): ITask[] {
+    return this.filtersMap[this.activeFilter] ?? [];
+  }
+
+  setFilter(selectedFilter: string): void {
+    this.activeFilter = selectedFilter;
+    this.buildSectionsMap();
+  }
+
+  toggleFilters(): void {
+    this.filtersOpen = !this.filtersOpen;
+  }
+
+  /* ─────────────────────────────*
+   *  Section Editing Methods    *
+   *─────────────────────────────*/
+  startEditing(section: ISection): void {
+    this.editingSectionId = section.id;
+    this.originalSectionName = section.name ?? '';
+  }
+
+  stopEditing(): void {
+    this.editingSectionId = null;
+  }
+
+  saveSection(section: ISection, event?: Event): void {
+    if (event) {
+      (event.target as HTMLInputElement).blur();
+    }
+    // Update the section using the service.
+    this.sectionService.update(section).subscribe(() => {
+      this.editingSectionId = null;
+    });
+  }
+
+  cancelEdit(section: ISection): void {
+    // Revert to the original name and cancel editing.
+    section.name = this.originalSectionName;
+    this.editingSectionId = null;
+  }
+
+  addSection(): void {
+    const newSection: NewSection = { id: null, name: 'New Section' };
+    this.sectionService.create(newSection).subscribe({
+      next: (res: HttpResponse<ISection>) => {
+        const created = res.body;
+        if (created) {
+          this.sections.push(created);
+          this.buildSectionsMap();
+          // Optionally scroll the new section into view.
+          setTimeout(() => {
+            const el = document.getElementById(`section-${created.id}`);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }
+      },
+    });
+    this.settingsOpen = false;
+  }
+
+  deleteSection(section: ISection): void {
+    const modalRef = this.modalService.open(SectionDeleteDialogComponent, { centered: true, size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.section = section;
+    modalRef.closed
+      .pipe(
+        filter(reason => reason === ITEM_DELETED_EVENT),
+        tap(() => this.load()),
+      )
+      .subscribe();
+  }
+
+  toggleSection(section: ISection): void {
+    this.collapsedSections[section.id] = !this.collapsedSections[section.id];
+  }
+
+  /* ─────────────────────────────*
+   *   Task CRUD Modal Methods   *
+   *─────────────────────────────*/
+  addTask(title?: string): void {
+    const taskTitle = title?.trim() ?? '';
+    const modalRef = this.modalService.open(TaskModalComponent, { centered: true, size: 'lg', backdrop: 'static' });
+
+    modalRef.componentInstance.task = {
+      title: taskTitle,
+      completed: false,
+      priority: this.quickAddPriority ?? undefined,
+      category: this.quickAddCategory ?? undefined,
+      dueDate: this.quickAddDueDate ? dayjs(this.quickAddDueDate) : undefined,
+    } as ITask;
+
+    modalRef.closed.subscribe(result => {
+      if (result) {
+        this.tasks.push(result);
+        this.newTaskTitle = '';
+        this.quickAddPriority = null;
+        this.quickAddCategory = null;
+        this.quickAddDueDate = null;
+        this.refreshTaskLayout();
+      }
+    });
+  }
+
+  editTask(task: ITask): void {
+    const modalRef = this.modalService.open(TaskModalComponent, { centered: true, size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.task = { ...task };
+    modalRef.closed.subscribe(result => {
+      if (result) {
+        const index = this.tasks.findIndex(t => t.id === result.id);
+        if (index !== -1) {
+          this.tasks[index] = result;
+          this.refreshTaskLayout();
+        }
+      }
+    });
+  }
+
   delete(task: ITask): void {
-    const modalRef = this.modalService.open(TaskDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+    const modalRef = this.modalService.open(TaskDeleteDialogComponent, { centered: true, size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.task = task;
     modalRef.closed
       .pipe(
@@ -98,22 +387,101 @@ export class TaskComponent implements OnInit {
       .subscribe();
   }
 
+  /* ─────────────────────────────*
+   *        Quick Add Methods    *
+   *─────────────────────────────*/
+
+  toggleDateDropdown(): void {
+    this.dateDropdownOpen = !this.dateDropdownOpen;
+    if (!this.dateDropdownOpen) {
+      setTimeout(() => {
+        this.dateInputRef.nativeElement.blur();
+      }, 0);
+    }
+    this.priorityDropdownOpen = false;
+    this.categoryDropdownOpen = false;
+  }
+
+  togglePriorityDropdown(): void {
+    this.priorityDropdownOpen = !this.priorityDropdownOpen;
+    this.dateDropdownOpen = false;
+    this.categoryDropdownOpen = false;
+  }
+
+  toggleCategoryDropdown(): void {
+    this.categoryDropdownOpen = !this.categoryDropdownOpen;
+    this.priorityDropdownOpen = false;
+    this.dateDropdownOpen = false;
+  }
+
+  get noDropdownOpen(): boolean {
+    return !this.dateDropdownOpen && !this.priorityDropdownOpen && !this.categoryDropdownOpen;
+  }
+
+  getPriorityLabel(priority: keyof typeof Priority | null): string {
+    const labels: Record<keyof typeof Priority, string> = {
+      LOW: 'Low Priority',
+      MEDIUM: 'Medium Priority',
+      HIGH: 'High Priority',
+      CRITICAL: 'Critical Priority',
+    };
+
+    return priority ? labels[priority] : 'Select Priority';
+  }
+
+  selectQuickAddPriority(priority: string | null): void {
+    if (priority === null) {
+      this.quickAddPriority = null;
+    } else if (['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'].includes(priority)) {
+      this.quickAddPriority = priority as AllowedPriority;
+    } else {
+      this.quickAddPriority = null;
+      console.warn('Invalid priority value:', priority);
+    }
+
+    this.priorityDropdownOpen = false;
+  }
+
+  selectQuickAddCategory(category: ICategory | null): void {
+    this.quickAddCategory = category;
+    this.categoryDropdownOpen = false;
+  }
+
+  /* ─────────────────────────────*
+   *     Miscellaneous Methods   *
+   *─────────────────────────────*/
   toggleCompleted(task: ITask): void {
     task.completed = !task.completed;
-    this.taskService.update(task).subscribe(() => {
-      this.tasks = this.refineData([...(this.tasks ?? [])]);
-    });
+    this.taskService.update(task).subscribe(() => this.load());
   }
 
   toggleMenu(taskId: number): void {
     this.openMenuTaskId = this.openMenuTaskId === taskId ? null : taskId;
   }
 
+  toggleSettings(): void {
+    this.settingsOpen = !this.settingsOpen;
+  }
+
   @HostListener('document:click', ['$event'])
-  closeMenu(event: Event): void {
-    const clickedInside = (event.target as HTMLElement).closest('.task-menu');
-    if (!clickedInside) {
-      this.openMenuTaskId = null; // Close menu
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+
+    // 1) Close your Quick Add dropdowns if click is outside them
+    if (!target.closest('.dropdown-btn') && !target.closest('.dropdown-menu')) {
+      this.priorityDropdownOpen = false;
+      this.dateDropdownOpen = false;
+      this.categoryDropdownOpen = false;
+    }
+
+    // 2) Close the “task settings” menu if click is outside .task-settings
+    if (!target.closest('.task-settings')) {
+      this.settingsOpen = false;
+    }
+
+    // 3) Close the “ellipsis” menu if click is outside .task-dropdown
+    if (!target.closest('.task-dropdown')) {
+      this.openMenuTaskId = null;
     }
   }
 
@@ -121,30 +489,84 @@ export class TaskComponent implements OnInit {
     if (!dueDate) return '';
     const date = dayjs(dueDate);
     const now = dayjs();
+    if (date.isSame(now, 'day')) return 'Today ' + date.format('HH:mm');
+    if (date.isSame(now.add(1, 'day'), 'day')) return 'Tomorrow ' + date.format('HH:mm');
+    if (date.isAfter(now) && date.diff(now, 'days') < 6) return date.format('dddd HH:mm');
     const isNextYear = date.year() > now.year();
     return date.format(`D MMM${isNextYear ? ' YYYY' : ''} HH:mm`);
   }
 
-  addTask(): void {
-    if (this.newTaskTitle.trim()) {
-      this.router.navigate(['/task/new'], { queryParams: { title: this.newTaskTitle } });
-    }
+  getDueDateClass(dueDate: dayjs.Dayjs | string | null | undefined): string {
+    if (!dueDate) return '';
+
+    const date = dayjs(dueDate);
+    const now = dayjs();
+
+    if (date.isBefore(now, 'minute')) return 'past-task';
+    if (date.isSame(now, 'day')) return 'due-today';
+
+    return '';
   }
 
-  editTask(task: ITask): void {
-    this.router.navigate(['/task', task.id, 'edit']);
+  getCategoryStyle(category: ICategory | null): Record<string, string> {
+    if (!category?.color) return {};
+    return {
+      color: category.color,
+      'background-color': this.getCategoryBackground(category.color) ?? '',
+    };
   }
 
-  load(): void {
-    this.queryBackend().subscribe({
-      next: (res: EntityArrayResponseType) => {
-        this.onResponseSuccess(res);
-      },
-    });
+  getCategoryBackground(color: string | null | undefined): string | null {
+    if (!color) return null;
+    const div = document.createElement('div');
+    div.style.color = color;
+    document.body.appendChild(div);
+    const computedColor = getComputedStyle(div).color;
+    document.body.removeChild(div);
+    const match = computedColor.match(/rgba?\((\d+), (\d+), (\d+)/);
+    if (!match) return null;
+    const [_, r, g, b] = match;
+    return `rgba(${r}, ${g}, ${b}, 0.18)`;
   }
 
-  navigateToWithComponentValues(event: SortState): void {
-    this.handleNavigation(event);
+  hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+    if (!/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) return null;
+    let c = hex.substring(1).split('');
+    if (c.length === 3) c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+    const r = parseInt(c[0] + c[1], 16);
+    const g = parseInt(c[2] + c[3], 16);
+    const b = parseInt(c[4] + c[5], 16);
+    return { r, g, b };
+  }
+
+  getSubtasks(task: ITask): ITask[] {
+    return this.tasks.filter(t => t.parentTask?.id === task.id);
+  }
+
+  getCompletedSubtasks(task: ITask): number {
+    return this.getSubtasks(task).filter(t => t.completed).length;
+  }
+
+  isAllSubtasksCompleted(task: ITask): boolean {
+    const subs = this.getSubtasks(task);
+    return subs.length > 0 && subs.every(t => t.completed);
+  }
+
+  /* ─────────────────────────────*
+   *  Protected/Private Methods  *
+   *─────────────────────────────*/
+  protected refineData(data: ITask[]): ITask[] {
+    return data.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }
+
+  protected fillComponentAttributesFromResponseBody(data: ITask[] | null): ITask[] {
+    return data ?? [];
+  }
+
+  protected queryBackend(): Observable<EntityArrayResponseType> {
+    this.isLoading = true;
+    const queryObject: any = { sort: this.sortService.buildSortParam(this.sortState()) };
+    return this.taskService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
   }
 
   protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
@@ -156,35 +578,24 @@ export class TaskComponent implements OnInit {
     this.tasks = this.refineData(dataFromBody);
   }
 
-  protected refineData(data: ITask[]): ITask[] {
-    const { predicate, order } = this.sortState();
-    let sortedData = predicate && order ? data.sort(this.sortService.startSort({ predicate, order })) : data;
-    sortedData = sortedData.sort((a, b) => Number(a.completed) - Number(b.completed));
-    return sortedData;
-  }
-
-  protected fillComponentAttributesFromResponseBody(data: ITask[] | null): ITask[] {
-    return data ?? [];
-  }
-
-  protected queryBackend(): Observable<EntityArrayResponseType> {
-    this.isLoading = true;
-    const queryObject: any = {
-      sort: this.sortService.buildSortParam(this.sortState()),
-    };
-    return this.taskService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
-  }
-
   protected handleNavigation(sortState: SortState): void {
-    const queryParamsObj = {
-      sort: this.sortService.buildSortParam(sortState),
-    };
-
+    const queryParamsObj = { sort: this.sortService.buildSortParam(sortState) };
     this.ngZone.run(() => {
-      this.router.navigate(['./'], {
-        relativeTo: this.activatedRoute,
-        queryParams: queryParamsObj,
-      });
+      this.router.navigate(['./'], { relativeTo: this.activatedRoute, queryParams: queryParamsObj });
     });
+  }
+
+  // Helper: Return the array of tasks for a given container ID.
+  private getTaskArrayByContainerId(containerId: string): ITask[] {
+    if (containerId === 'unsectioned') {
+      return this.unsectionedTasks;
+    }
+    const sectionId = Number(containerId.split('-')[1]);
+    return this.sectionsMap[sectionId] ?? [];
+  }
+
+  // Helper: Update the "order" property for each task in the provided array.
+  private updateOrder(tasks: ITask[]): void {
+    tasks.forEach((task, idx) => (task.order = idx + 1));
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { VERSION } from 'app/app.constants';
 import { Router, RouterModule } from '@angular/router';
@@ -10,9 +10,10 @@ import { Router, RouterModule } from '@angular/router';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   version = '';
   sidebarOpen = false;
+  activeSection = 'hero';
 
   private readonly router = inject(Router);
 
@@ -22,11 +23,22 @@ export class HeaderComponent {
     }
   }
 
+  ngOnInit(): void {
+    window.addEventListener('sectionChange', (e: any) => {
+      this.activeSection = e.detail;
+    });
+  }
+
   login(): void {
     this.router.navigate(['/login']);
   }
 
   toggleSidebar(): void {
     this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  setActive(section: string): void {
+    this.activeSection = section;
+    this.toggleSidebar();
   }
 }

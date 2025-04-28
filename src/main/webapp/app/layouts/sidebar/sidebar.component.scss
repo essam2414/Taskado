@@ -1,5 +1,3 @@
-@import '../../../content/scss/variables';
-
 .sidebar {
   backdrop-filter: blur(25px) saturate(180%);
   -webkit-backdrop-filter: blur(25px) saturate(180%);
@@ -15,7 +13,6 @@
   padding: 16px;
   border-radius: 12px;
 
-  /* ✅ Added subtle shadow for floating effect */
   box-shadow:
     0 8px 16px rgba(0, 0, 0, 0.08),
     0 2px 4px rgba(0, 0, 0, 0.06);
@@ -42,18 +39,16 @@
   justify-content: space-between;
   padding-bottom: 20px;
   margin-bottom: 30px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .sidebar-topbar .icon {
   width: 20px;
   height: 20px;
-  font-size: 20px;
   fill: currentColor;
 }
 
 /* Account */
-
 .user-info {
   display: inline-flex;
   align-items: center;
@@ -65,7 +60,6 @@
 
   text-decoration: none;
   font-weight: 500;
-  font-size: 16px;
 }
 
 .user-info:hover {
@@ -74,30 +68,25 @@
 }
 
 /* Profile Picture */
-.profile-image,
-.letter-avatar {
-  width: 28px;
-  height: 28px;
-  margin-right: 8px;
+.profile-pic {
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: uppercase;
-  color: white;
-  background-color: #ddd;
-  overflow: hidden;
-  object-fit: cover;
-}
 
-.letter-avatar {
-  font-family: Arial, sans-serif;
+  box-shadow:
+    0 0 0 1px var(--card-bg),
+    0 0 0 1.5px var(--border-color);
+
+  margin-right: 8px;
+
+  background-color: var(--avatar-bg);
 }
 
 /* Topbar Controls */
-
 .topbar-controls {
   display: flex;
   align-items: center;
@@ -109,8 +98,8 @@
   align-items: center;
   justify-content: center;
 
-  width: 40px; /* Set a square size */
-  height: 40px; /* Set a square size */
+  width: 40px;
+  height: 40px;
   border-radius: 5px;
 
   color: var(--sidebar-text-color);
@@ -126,7 +115,10 @@
 }
 
 .toggle-btn {
-  transition: transform 0.3s ease-in-out;
+  transition:
+    transform 0.3s ease-in-out,
+    background 0.3s ease-in-out,
+    color 0.3s ease-in-out;
 }
 
 .sidebar.collapsed .toggle-btn {
@@ -135,7 +127,6 @@
 
 /* Navigation Menu */
 .nav-menu a {
-  font-size: 14px;
   font-weight: 400;
   color: var(--navmenu-text);
 
@@ -175,7 +166,6 @@
 .sidebar-bottom .icon {
   width: 16px;
   height: 16px;
-  font-size: 16px;
   margin-right: 10px;
   fill: currentColor;
   overflow: visible;
@@ -195,8 +185,6 @@
   padding: 14px 20px;
   border-radius: 5px;
 
-  font-size: 14px;
-  font-weight: 300;
   text-decoration: none;
 
   color: var(--sidebar-text-color);
@@ -209,5 +197,5 @@
 
 .sidebar-bottom a.active {
   background-color: var(--sidebar-hover-bg);
-  font-weight: 600;
+  font-weight: 500;
 }

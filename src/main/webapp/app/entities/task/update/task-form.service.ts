@@ -29,7 +29,7 @@ type TaskFormRawValue = FormValueOf<ITask>;
 
 type NewTaskFormRawValue = FormValueOf<NewTask>;
 
-type TaskFormDefaults = Pick<NewTask, 'id' | 'dueDate' | 'completed' | 'createdAt' | 'updatedAt'>;
+type TaskFormDefaults = Pick<NewTask, 'id' | 'dueDate' | 'completed' | 'createdAt' | 'updatedAt' | 'productivityReports'>;
 
 type TaskFormGroupContent = {
   id: FormControl<TaskFormRawValue['id'] | NewTask['id']>;
@@ -40,8 +40,12 @@ type TaskFormGroupContent = {
   completed: FormControl<TaskFormRawValue['completed']>;
   createdAt: FormControl<TaskFormRawValue['createdAt']>;
   updatedAt: FormControl<TaskFormRawValue['updatedAt']>;
+  order: FormControl<TaskFormRawValue['order']>;
   category: FormControl<TaskFormRawValue['category']>;
+  parentTask: FormControl<TaskFormRawValue['parentTask']>;
   user: FormControl<TaskFormRawValue['user']>;
+  section: FormControl<TaskFormRawValue['section']>;
+  productivityReports: FormControl<TaskFormRawValue['productivityReports']>;
 };
 
 export type TaskFormGroup = FormGroup<TaskFormGroupContent>;
@@ -70,8 +74,12 @@ export class TaskFormService {
       completed: new FormControl(taskRawValue.completed),
       createdAt: new FormControl(taskRawValue.createdAt),
       updatedAt: new FormControl(taskRawValue.updatedAt),
+      order: new FormControl(taskRawValue.order),
       category: new FormControl(taskRawValue.category),
+      parentTask: new FormControl(taskRawValue.parentTask),
       user: new FormControl(taskRawValue.user),
+      section: new FormControl(taskRawValue.section),
+      productivityReports: new FormControl(taskRawValue.productivityReports ?? []),
     });
   }
 
@@ -98,6 +106,7 @@ export class TaskFormService {
       completed: false,
       createdAt: currentTime,
       updatedAt: currentTime,
+      productivityReports: [],
     };
   }
 
@@ -118,6 +127,7 @@ export class TaskFormService {
       dueDate: task.dueDate ? task.dueDate.format(DATE_TIME_FORMAT) : undefined,
       createdAt: task.createdAt ? task.createdAt.format(DATE_TIME_FORMAT) : undefined,
       updatedAt: task.updatedAt ? task.updatedAt.format(DATE_TIME_FORMAT) : undefined,
+      productivityReports: task.productivityReports ?? [],
     };
   }
 }

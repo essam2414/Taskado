@@ -51,11 +51,22 @@ public class Task implements Serializable {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    @Column(name = "jhi_order")
+    private Integer order;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "category", "parentTask", "user", "section", "productivityReports" }, allowSetters = true)
+    private Task parentTask;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnoreProperties(value = { "tasks" }, allowSetters = true)
+    private Section section;
 
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "completedTasks")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -168,6 +179,19 @@ public class Task implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    public Integer getOrder() {
+        return this.order;
+    }
+
+    public Task order(Integer order) {
+        this.setOrder(order);
+        return this;
+    }
+
+    public void setOrder(Integer order) {
+        this.order = order;
+    }
+
     public Category getCategory() {
         return this.category;
     }
@@ -181,6 +205,19 @@ public class Task implements Serializable {
         return this;
     }
 
+    public Task getParentTask() {
+        return this.parentTask;
+    }
+
+    public void setParentTask(Task task) {
+        this.parentTask = task;
+    }
+
+    public Task parentTask(Task task) {
+        this.setParentTask(task);
+        return this;
+    }
+
     public User getUser() {
         return this.user;
     }
@@ -191,6 +228,19 @@ public class Task implements Serializable {
 
     public Task user(User user) {
         this.setUser(user);
+        return this;
+    }
+
+    public Section getSection() {
+        return this.section;
+    }
+
+    public void setSection(Section section) {
+        this.section = section;
+    }
+
+    public Task section(Section section) {
+        this.setSection(section);
         return this;
     }
 
@@ -256,6 +306,7 @@ public class Task implements Serializable {
             ", completed='" + getCompleted() + "'" +
             ", createdAt='" + getCreatedAt() + "'" +
             ", updatedAt='" + getUpdatedAt() + "'" +
+            ", order=" + getOrder() +
             "}";
     }
 }

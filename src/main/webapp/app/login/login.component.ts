@@ -6,13 +6,13 @@ import SharedModule from 'app/shared/shared.module';
 import { LoginService } from 'app/login/login.service';
 import { AccountService } from 'app/core/auth/account.service';
 import { HeaderComponent } from 'app/layouts/header/header.component';
+import { UserPreferencesService } from 'app/entities/user-preferences/service/user-preferences.service';
 
 @Component({
   standalone: true,
   selector: 'jhi-login',
   imports: [SharedModule, FormsModule, ReactiveFormsModule, RouterModule, HeaderComponent],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
 })
 export default class LoginComponent implements OnInit, AfterViewInit {
   username = viewChild.required<ElementRef>('username');
@@ -28,6 +28,7 @@ export default class LoginComponent implements OnInit, AfterViewInit {
   private readonly accountService = inject(AccountService);
   private readonly loginService = inject(LoginService);
   private readonly router = inject(Router);
+  private readonly userPreferencesService = inject(UserPreferencesService);
 
   ngOnInit(): void {
     // if already authenticated then navigate to home page
@@ -48,6 +49,7 @@ export default class LoginComponent implements OnInit, AfterViewInit {
         this.authenticationError.set(false);
         if (!this.router.getCurrentNavigation()) {
           // There were no routing during login (eg from navigationToStoredUrl)
+          this.userPreferencesService.getOrCreateAndApply();
           this.router.navigate(['/dashboard']);
         }
       },

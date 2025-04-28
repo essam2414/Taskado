@@ -53,7 +53,8 @@ public class TaskAsserts {
             .satisfies(e -> assertThat(e.getPriority()).as("check priority").isEqualTo(actual.getPriority()))
             .satisfies(e -> assertThat(e.getCompleted()).as("check completed").isEqualTo(actual.getCompleted()))
             .satisfies(e -> assertThat(e.getCreatedAt()).as("check createdAt").isEqualTo(actual.getCreatedAt()))
-            .satisfies(e -> assertThat(e.getUpdatedAt()).as("check updatedAt").isEqualTo(actual.getUpdatedAt()));
+            .satisfies(e -> assertThat(e.getUpdatedAt()).as("check updatedAt").isEqualTo(actual.getUpdatedAt()))
+            .satisfies(e -> assertThat(e.getOrder()).as("check order").isEqualTo(actual.getOrder()));
     }
 
     /**
@@ -66,6 +67,8 @@ public class TaskAsserts {
         assertThat(expected)
             .as("Verify Task relationships")
             .satisfies(e -> assertThat(e.getCategory()).as("check category").isEqualTo(actual.getCategory()))
+            .satisfies(e -> assertThat(e.getParentTask()).as("check parentTask").isEqualTo(actual.getParentTask()))
+            .satisfies(e -> assertThat(e.getSection()).as("check section").isEqualTo(actual.getSection()))
             .satisfies(e ->
                 assertThat(e.getProductivityReports()).as("check productivityReports").isEqualTo(actual.getProductivityReports())
             );

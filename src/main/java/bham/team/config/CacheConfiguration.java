@@ -65,6 +65,9 @@ public class CacheConfiguration {
             createCache(cm, bham.team.domain.ProductivityReport.class.getName() + ".pomodoroSessions");
             createCache(cm, bham.team.domain.ProductivityReport.class.getName() + ".completedTasks");
             createCache(cm, bham.team.domain.ProductivityReport.class.getName() + ".completedHabits");
+            createCache(cm, bham.team.domain.Section.class.getName());
+            createCache(cm, bham.team.domain.Section.class.getName() + ".tasks");
+            createCache(cm, bham.team.domain.UserPreferences.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }
