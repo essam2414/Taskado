@@ -63,6 +63,9 @@ export class ProductivityReportComponent implements OnInit {
   popupOpen = false;
   popupContent: string | null = null;
   popupTitle = '';
+  currentReport: IProductivityReport | null = null;
+  currentReportIndex = -1;
+  reportCreatedTime = 'Unselected';
 
   public readonly router = inject(Router);
   protected readonly productivityReportService = inject(ProductivityReportService);
@@ -141,14 +144,8 @@ export class ProductivityReportComponent implements OnInit {
   goToPreviousDay(): void {
     if (!this.productivityReports || this.productivityReports.length === 0) return;
 
-    const sortedReports = [...this.productivityReports].sort((a, b) => dayjs(a.timestamp).diff(dayjs(b.timestamp)));
-
-    // Find the first report that is BEFORE currentDate
-    const previousReport = [...sortedReports].reverse().find(report => dayjs(report.timestamp).isBefore(this.currentDate, 'day'));
-
-    if (previousReport) {
-      this.currentDate = dayjs(previousReport.timestamp);
-      this.timestamp = this.currentDate.locale('en').format('D MMM YYYY');
+    if (this.currentReportIndex > 0) {
+      this.currentReportIndex--;
       this.loadReport();
     } else {
       this.errorMessage = 'No previous report available.';
@@ -159,14 +156,8 @@ export class ProductivityReportComponent implements OnInit {
   goToNextDay(): void {
     if (!this.productivityReports || this.productivityReports.length === 0) return;
 
-    const sortedReports = [...this.productivityReports].sort((a, b) => dayjs(a.timestamp).diff(dayjs(b.timestamp)));
-
-    // Find the first report that is AFTER currentDate
-    const nextReport = sortedReports.find(report => dayjs(report.timestamp).isAfter(this.currentDate, 'day'));
-
-    if (nextReport) {
-      this.currentDate = dayjs(nextReport.timestamp);
-      this.timestamp = this.currentDate.locale('en').format('D MMM YYYY');
+    if (this.currentReportIndex < this.productivityReports.length - 1) {
+      this.currentReportIndex++;
       this.loadReport();
     } else {
       this.errorMessage = 'No next report available.';
@@ -174,34 +165,47 @@ export class ProductivityReportComponent implements OnInit {
     }
   }
 
+  updateDashboard(): void {
+    if (!this.currentReport) {
+      return;
+    }
+
+    this.tasksPlanned = this.currentReport.tasksPlanned ?? 'N/A';
+    this.tasksCompleted = this.currentReport.tasksCompleted ?? 'N/A';
+    this.pomodoroSessionsCompleted = this.currentReport.pomodoroSessionsCompleted ?? 'N/A';
+    this.totalFocusTime = this.currentReport.totalFocusTime ?? 'N/A';
+    this.efficiencyScore = this.currentReport.efficiencyScore ?? 'N/A';
+
+    this.reportCreatedTime = this.currentReport.timestamp
+      ? dayjs(this.currentReport.timestamp).locale('en').format('h:mm A')
+      : 'Unselected';
+
+    this.timestamp = this.currentReport.timestamp ? dayjs(this.currentReport.timestamp).locale('en').format('D MMM YYYY') : 'Unselected';
+  }
+
   async generateReport(): Promise<void> {
-    const today = dayjs().startOf('day');
+    const now = dayjs();
 
     try {
-      // 1. Fetch all tasks
       const tasks = (await firstValueFrom(this.taskService.query())).body ?? [];
-      const completedTasksToday = tasks.filter(t => t.completed && dayjs(t.updatedAt).isSame(today, 'day'));
+      const completedTasksToday = tasks.filter(t => t.completed && dayjs(t.updatedAt).isSame(now, 'day'));
 
-      // 2. Fetch all pomodoros
       const pomodoros = (await firstValueFrom(this.pomodoroSessionService.query())).body ?? [];
-      const completedPomodorosToday = pomodoros.filter(p => p.completed && dayjs(p.startTime).isSame(today, 'day'));
+      const completedPomodorosToday = pomodoros.filter(p => p.completed && dayjs(p.startTime).isSame(now, 'day'));
 
-      // 3. Fetch all habits
       const habits = (await firstValueFrom(this.habitService.query())).body ?? [];
 
-      // 4. Calculations
       const tasksPlanned = tasks.length;
       const tasksCompleted = completedTasksToday.length;
       const pomodoroSessionsCompleted = completedPomodorosToday.length;
       const totalFocusMinutes = completedPomodorosToday.reduce((sum, p) => sum + (p.duration ?? 0), 0);
-      const totalFocusTime = totalFocusMinutes / 60; // minutes to hours
-      const distractionsCount = 0; // Default
+      const totalFocusTime = totalFocusMinutes / 60;
+      const distractionsCount = 0;
 
       const totalPlanned = tasksPlanned + habits.length + pomodoros.length;
       const totalCompleted = tasksCompleted + habits.length + pomodoroSessionsCompleted;
       const efficiencyScore = totalPlanned > 0 ? Math.min(100, (totalCompleted / totalPlanned) * 100) : 0;
 
-      // 5. Build new Productivity Report (✅ ADD timestamp, completedTasks, completedHabits)
       const newReport: NewProductivityReport = {
         id: null,
         tasksPlanned,
@@ -210,17 +214,36 @@ export class ProductivityReportComponent implements OnInit {
         totalFocusTime,
         distractionsCount,
         efficiencyScore,
-        timestamp: dayjs(),
-        completedTasks: [], // required
-        completedHabits: [], // required
+        timestamp: now,
+        completedTasks: [],
+        completedHabits: [],
       };
 
-      // 6. Save the report
       this.productivityReportService.create(newReport).subscribe({
-        next: () => {
-          this.successMessage = '✅ Report generated and saved!';
-          this.load(); // Reload
-          setTimeout(() => this.loadReport(), 500);
+        next: response => {
+          const createdReport = response.body;
+          if (createdReport) {
+            this.successMessage = '✅ Report created!';
+            setTimeout(() => {
+              this.successMessage = null;
+            }, 3000);
+
+            if (!this.productivityReports) {
+              this.productivityReports = [];
+            }
+
+            this.productivityReports.push(createdReport);
+
+            // Re-filter to keep only latest report per day
+            this.productivityReports = this.keepLatestReportPerDay(this.productivityReports);
+
+            // Update current index to latest day (the end of the list)
+            this.currentReportIndex = this.productivityReports.length - 1;
+            this.currentReport = this.productivityReports[this.currentReportIndex];
+            this.updateDashboard();
+          } else {
+            this.errorMessage = '⚠️ Failed to create report (empty response)';
+          }
         },
         error: err => {
           console.error('⚠️ Error creating report:', err);
@@ -283,41 +306,18 @@ export class ProductivityReportComponent implements OnInit {
 
   loadReport(): void {
     if (!this.productivityReports || this.productivityReports.length === 0) {
-      this.errorMessage = 'No Productivity Reports available.';
-      setTimeout(() => (this.errorMessage = null), 2500);
+      this.errorMessage = 'No reports available.';
       return;
     }
 
-    // Find report matching today's date
-    const todayFormatted = this.currentDate.startOf('day');
-    const matchingReport = this.productivityReports.find(
-      report => report.timestamp && dayjs(report.timestamp).isSame(todayFormatted, 'day'),
-    );
+    const sortedReports = [...this.productivityReports].sort((a, b) => dayjs(a.timestamp).diff(dayjs(b.timestamp)));
 
-    if (!matchingReport) {
-      this.errorMessage = 'No report found for today.';
-      setTimeout(() => (this.errorMessage = null), 2500);
-      return;
+    if (this.currentReportIndex < 0 || this.currentReportIndex >= sortedReports.length) {
+      this.currentReportIndex = 0;
     }
 
-    this.tasksPlanned = matchingReport.tasksPlanned ?? 'N/A';
-    this.tasksCompleted = matchingReport.tasksCompleted ?? 'N/A';
-    this.pomodoroSessionsCompleted = matchingReport.pomodoroSessionsCompleted ?? 'N/A';
-    this.totalFocusTime = matchingReport.totalFocusTime ?? 'N/A';
-    this.efficiencyScore = matchingReport.efficiencyScore ?? 'N/A';
-    this.timestamp = matchingReport.timestamp ? dayjs(matchingReport.timestamp).locale('en').format('D MMM YYYY') : 'Unselected';
-
-    // Update chart if it exists
-    // if (this.chart) {
-    //   this.chart.data.datasets[0].data = [
-    //     matchingReport.tasksPlanned ?? 0,
-    //     matchingReport.tasksCompleted ?? 0,
-    //     matchingReport.pomodoroSessionsCompleted ?? 0,
-    //     matchingReport.efficiencyScore ?? 0,
-    //   ] as ChartDataset<'bar'>['data'];
-    //
-    //   this.chart.update();
-    // }
+    this.currentReport = sortedReports[this.currentReportIndex];
+    this.updateDashboard();
   }
 
   delete(productivityReport: IProductivityReport): void {
@@ -336,6 +336,7 @@ export class ProductivityReportComponent implements OnInit {
     this.queryBackend().subscribe({
       next: (res: EntityArrayResponseType) => {
         this.onResponseSuccess(res);
+        this.loadReport();
       },
     });
   }
@@ -350,7 +351,27 @@ export class ProductivityReportComponent implements OnInit {
 
   protected onResponseSuccess(response: EntityArrayResponseType): void {
     const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
-    this.productivityReports = this.refineData(dataFromBody);
+    const refinedData = this.refineData(dataFromBody);
+
+    this.productivityReports = this.keepLatestReportPerDay(refinedData);
+    this.currentReportIndex = this.productivityReports.length - 1;
+  }
+
+  protected keepLatestReportPerDay(data: IProductivityReport[]): IProductivityReport[] {
+    const latestReportsMap = new Map<string, IProductivityReport>();
+
+    data.forEach(report => {
+      if (report.timestamp) {
+        const day = dayjs(report.timestamp).format('YYYY-MM-DD'); // only keep date part
+        const existing = latestReportsMap.get(day);
+
+        if (!existing || dayjs(report.timestamp).isAfter(dayjs(existing.timestamp))) {
+          latestReportsMap.set(day, report);
+        }
+      }
+    });
+
+    return Array.from(latestReportsMap.values()).sort((a, b) => dayjs(a.timestamp).diff(dayjs(b.timestamp)));
   }
 
   protected refineData(data: IProductivityReport[]): IProductivityReport[] {
