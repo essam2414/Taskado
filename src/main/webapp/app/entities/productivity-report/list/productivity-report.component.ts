@@ -37,7 +37,7 @@ import dayjs from 'dayjs/esm';
 })
 export class ProductivityReportComponent implements OnInit {
   subscription: Subscription | null = null;
-  productivityReports?: IProductivityReport[];
+  productivityReports: IProductivityReport[] = [];
   isLoading = false;
 
   errorMessage: string | null = null;
@@ -84,7 +84,7 @@ export class ProductivityReportComponent implements OnInit {
       .pipe(
         tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
         tap(() => {
-          if (!this.productivityReports || this.productivityReports.length === 0) {
+          if (this.productivityReports.length === 0) {
             this.load();
           }
         }),
@@ -142,7 +142,7 @@ export class ProductivityReportComponent implements OnInit {
   }
 
   goToPreviousDay(): void {
-    if (!this.productivityReports || this.productivityReports.length === 0) return;
+    if (this.productivityReports.length === 0) return;
 
     if (this.currentReportIndex > 0) {
       this.currentReportIndex--;
@@ -154,7 +154,7 @@ export class ProductivityReportComponent implements OnInit {
   }
 
   goToNextDay(): void {
-    if (!this.productivityReports || this.productivityReports.length === 0) return;
+    if (this.productivityReports.length === 0) return;
 
     if (this.currentReportIndex < this.productivityReports.length - 1) {
       this.currentReportIndex++;
@@ -228,10 +228,6 @@ export class ProductivityReportComponent implements OnInit {
               this.successMessage = null;
             }, 3000);
 
-            if (!this.productivityReports) {
-              this.productivityReports = [];
-            }
-
             this.productivityReports.push(createdReport);
 
             // Re-filter to keep only latest report per day
@@ -286,16 +282,35 @@ export class ProductivityReportComponent implements OnInit {
 
   // Call this function when the delete button is clicked
   openDeleteModal(): void {
+    if (!this.currentReport) {
+      this.errorMessage = '⚠️ No report selected.';
+      setTimeout(() => (this.errorMessage = null), 3000);
+      return;
+    }
     this.isDeleteModalOpen = true;
   }
 
-  // Confirm the deletion
   confirmDelete(): void {
-    this.closeDeleteModal();
-  }
+    if (!this.currentReport?.id) {
+      this.errorMessage = '⚠️ No report selected for deletion.';
+      this.closeDeleteModal();
+      return;
+    }
 
-  // Cancel the deletion
-  cancelDelete(): void {
+    const modalRef = this.modalService.open(ProductivityReportDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
+    modalRef.componentInstance.productivityReport = this.currentReport;
+
+    modalRef.closed
+      .pipe(
+        filter(reason => reason === ITEM_DELETED_EVENT), // comma here ✅
+        tap(() => {
+          this.successMessage = '✅ Report deleted!';
+          setTimeout(() => (this.successMessage = null), 3000);
+          this.load(); // reload fresh data
+        }),
+      )
+      .subscribe(); // end with .subscribe()
+
     this.closeDeleteModal();
   }
 
@@ -305,7 +320,7 @@ export class ProductivityReportComponent implements OnInit {
   }
 
   loadReport(): void {
-    if (!this.productivityReports || this.productivityReports.length === 0) {
+    if (this.productivityReports.length === 0) {
       this.errorMessage = 'No reports available.';
       return;
     }
