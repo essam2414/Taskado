@@ -181,8 +181,10 @@
       <h4 style="font-size: 25px; margin-top: 30px">Tasks</h4>
       <hr style="border: 1px solid #ccc" />
       <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
-        <strong>Tasks Planned: {{ tasksPlanned }}</strong>
-        <strong>Tasks Completed: {{ tasksCompleted }}</strong>
+        <strong>You completed {{ tasksCompleted }} tasks out of the available {{ tasksPlanned }}</strong>
+        <div style="position: relative; height: 225px; margin-top: 10px">
+          <canvas id="tasksChart"></canvas>
+        </div>
       </div>
     </div>
 
@@ -226,8 +228,10 @@
       <h4 style="font-size: 25px; margin-top: 30px">Habits</h4>
       <hr style="border: 1px solid #ccc" />
       <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
-        <strong>Habits Completed: {{ completedHabitNames.length }}</strong>
-        <strong>Habit Streak: {{ habitStreak }}</strong>
+        <strong>You completed {{ completedHabitNames.length }} Habits and achieved a streak of {{ habitStreak }}</strong>
+        <div style="height: 200px; margin-top: 10px">
+          <canvas id="habitsChart"></canvas>
+        </div>
       </div>
     </div>
 

@@ -49,6 +49,8 @@ export class ProductivityReportComponent implements OnInit {
   sortState = sortStateSignal({});
 
   public chart: Chart | null = null;
+  public taskChart: Chart | null = null;
+  public habitChart: Chart | null = null;
 
   // Default values before report generation
   tasksPlanned: number | string = 'N/A';
@@ -92,56 +94,82 @@ export class ProductivityReportComponent implements OnInit {
           }
         }),
       )
-      .subscribe({
-        next: () => {
-          setTimeout(() => this.loadChart(), 100); // Ensure chart loads AFTER data is available
-        },
-      });
+      .subscribe();
   }
 
-  loadChart(): void {
-    setTimeout(() => {
-      const canvas = document.querySelector('canvas') as HTMLCanvasElement;
-      const ctx = canvas.getContext('2d');
+  renderTasksChart(): void {
+    const canvas = document.getElementById('tasksChart') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-      if (!ctx) {
-        console.error('⚠️ Failed to get chart context!');
-        return;
-      }
+    if (this.taskChart) {
+      this.taskChart.destroy();
+    }
 
-      // Destroy previous chart instance if it exists
-      if (this.chart) {
-        this.chart.destroy();
-      }
+    const tasksPlanned = typeof this.tasksPlanned === 'number' ? this.tasksPlanned : 0;
+    const tasksCompleted = typeof this.tasksCompleted === 'number' ? this.tasksCompleted : 0;
+    const tasksRemaining = Math.max(tasksPlanned - tasksCompleted, 0);
 
-      // Initial values set to zero
-      const initialData = [0, 0, 0, 0];
-
-      this.chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Tasks Planned', 'Tasks Completed', 'Pomodoro Sessions', 'Efficiency Score'],
-          datasets: [
-            {
-              label: 'Productivity Metrics',
-              data: initialData,
-              backgroundColor: ['#007bff', '#28a745', '#ff6384', '#ffc107'],
-              borderWidth: 1,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: true },
+    this.taskChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Completed', 'Remaining'],
+        datasets: [
+          {
+            data: [tasksCompleted, tasksRemaining],
+            backgroundColor: ['#28a745', '#dc3545'],
+            hoverBackgroundColor: ['#218838', '#c82333'],
+            borderWidth: 1,
           },
-          scales: {
-            y: { beginAtZero: true },
-          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' },
         },
-      });
-    }, 500); // Delay to ensure Angular updates the DOM
+      },
+    });
+  }
+
+  renderHabitsChart(): void {
+    const canvas = document.getElementById('habitsChart') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    if (this.habitChart) {
+      this.habitChart.destroy();
+    }
+
+    const habitsCompleted = this.completedHabitNames.length;
+    const streakLength = typeof this.habitStreak === 'string' ? parseInt(this.habitStreak, 10) || 0 : this.habitStreak;
+
+    this.habitChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Habits Completed', 'Habit Streak (days)'],
+        datasets: [
+          {
+            label: 'Habits Data',
+            data: [habitsCompleted, streakLength],
+            backgroundColor: ['#007bff', '#ffc107'],
+            borderRadius: 8,
+          },
+        ],
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          x: { beginAtZero: true, ticks: { precision: 0 } },
+        },
+      },
+    });
   }
 
   goToPreviousDay(): void {
@@ -189,6 +217,9 @@ export class ProductivityReportComponent implements OnInit {
 
     this.completedHabitNames = this.currentReport.completedHabits?.map(habit => habit.name) ?? [];
     this.habitStreak = this.completedHabitNames.length > 0 ? `${this.completedHabitNames.length} days` : 'N/A';
+
+    this.renderTasksChart();
+    this.renderHabitsChart();
   }
 
   async generateReport(): Promise<void> {
@@ -393,8 +424,22 @@ export class ProductivityReportComponent implements OnInit {
       this.efficiencyScore = 'N/A';
       this.timestamp = 'Unselected';
       this.reportCreatedTime = 'Unselected';
+
+      // Destroy task chart if exists
+      if (this.taskChart) {
+        this.taskChart.destroy();
+        this.taskChart = null;
+      }
+
+      // Destroy habit chart if exists
+      if (this.habitChart) {
+        this.habitChart.destroy();
+        this.habitChart = null;
+      }
     } else {
       this.currentReportIndex = this.productivityReports.length - 1;
+      this.currentReport = this.productivityReports[this.currentReportIndex];
+      this.updateDashboard();
     }
   }
 
