@@ -66,6 +66,9 @@ export class ProductivityReportComponent implements OnInit {
   currentReport: IProductivityReport | null = null;
   currentReportIndex = -1;
   reportCreatedTime = 'Unselected';
+  completedTaskTitles: (string | null | undefined)[] = [];
+  completedHabitNames: (string | null | undefined)[] = [];
+  habitStreak: number | string = 'N/A';
 
   public readonly router = inject(Router);
   protected readonly productivityReportService = inject(ProductivityReportService);
@@ -181,6 +184,11 @@ export class ProductivityReportComponent implements OnInit {
       : 'Unselected';
 
     this.timestamp = this.currentReport.timestamp ? dayjs(this.currentReport.timestamp).locale('en').format('D MMM YYYY') : 'Unselected';
+
+    this.completedTaskTitles = this.currentReport.completedTasks?.map(task => task.title) ?? [];
+
+    this.completedHabitNames = this.currentReport.completedHabits?.map(habit => habit.name) ?? [];
+    this.habitStreak = this.completedHabitNames.length > 0 ? `${this.completedHabitNames.length} days` : 'N/A';
   }
 
   async generateReport(): Promise<void> {
@@ -262,6 +270,8 @@ export class ProductivityReportComponent implements OnInit {
       this.popupTitle = 'Focus Details';
     } else if (contentType === 'habits') {
       this.popupTitle = 'Habit Details';
+    } else if (contentType === 'overview') {
+      this.popupTitle = 'Overview';
     }
   }
 
@@ -278,6 +288,13 @@ export class ProductivityReportComponent implements OnInit {
     setTimeout(() => {
       this.errorMessage = null;
     }, 2500);
+  }
+
+  updateReport(): void {
+    this.successMessage = '✅ Report Updated!';
+    setTimeout(() => {
+      this.successMessage = null;
+    }, 3000);
   }
 
   // Call this function when the delete button is clicked
@@ -320,11 +337,6 @@ export class ProductivityReportComponent implements OnInit {
   }
 
   loadReport(): void {
-    if (this.productivityReports.length === 0) {
-      this.errorMessage = 'No reports available.';
-      return;
-    }
-
     const sortedReports = [...this.productivityReports].sort((a, b) => dayjs(a.timestamp).diff(dayjs(b.timestamp)));
 
     if (this.currentReportIndex < 0 || this.currentReportIndex >= sortedReports.length) {
@@ -369,7 +381,21 @@ export class ProductivityReportComponent implements OnInit {
     const refinedData = this.refineData(dataFromBody);
 
     this.productivityReports = this.keepLatestReportPerDay(refinedData);
-    this.currentReportIndex = this.productivityReports.length - 1;
+
+    if (this.productivityReports.length === 0) {
+      // 🔁 CLEAR the dashboard if no reports are left
+      this.currentReport = null;
+      this.currentReportIndex = -1;
+      this.tasksPlanned = 'N/A';
+      this.tasksCompleted = 'N/A';
+      this.pomodoroSessionsCompleted = 'N/A';
+      this.totalFocusTime = 'N/A';
+      this.efficiencyScore = 'N/A';
+      this.timestamp = 'Unselected';
+      this.reportCreatedTime = 'Unselected';
+    } else {
+      this.currentReportIndex = this.productivityReports.length - 1;
+    }
   }
 
   protected keepLatestReportPerDay(data: IProductivityReport[]): IProductivityReport[] {

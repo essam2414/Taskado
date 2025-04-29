@@ -50,17 +50,6 @@
         <span>Generate Report</span>
       </button>
 
-      <!--      <button-->
-      <!--        id="jh-create-entity"-->
-      <!--        data-cy="entityCreateButton"-->
-      <!--        class="btn-add jh-create-entity create-task desktop-only"-->
-      <!--        style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden"-->
-      <!--        [routerLink]="['/productivity-report/new']"-->
-      <!--      >-->
-      <!--        <fa-icon icon="plus"></fa-icon>-->
-      <!--        <span>Generate Report</span>-->
-      <!--      </button>-->
-
       <div class="dropdown dropdown-action" [class.open]="isDropdownOpen">
         <!-- Dropdown Toggle Button (Down Arrow) -->
         <button class="btn-add dropdown-toggle" (click)="isDropdownOpen = !isDropdownOpen">
@@ -70,8 +59,10 @@
 
         <!-- Dropdown Menu -->
         <div class="dropdown-menu" [ngClass]="{ show: isDropdownOpen }">
-          <button class="dropdown-item" (click)="generateReport()">Update</button>
-          <button class="dropdown-item delete" (click)="openDeleteModal()"><span>Delete</span> <fa-icon icon="trash-alt"></fa-icon></button>
+          <button class="dropdown-item" [routerLink]="['/productivity-report/new']" (click)="isDropdownOpen = false">Update</button>
+          <button class="dropdown-item delete" (click)="confirmDelete(); isDropdownOpen = false">
+            <span>Delete</span> <fa-icon icon="trash-alt"></fa-icon>
+          </button>
         </div>
       </div>
     </div>
@@ -84,89 +75,6 @@
   <div *ngIf="successMessage" class="alert alert-success" id="success-message" style="margin-top: 10px">
     <span>{{ successMessage }}</span>
   </div>
-
-  <!-- Confirmation Modal -->
-  <div
-    *ngIf="isDeleteModalOpen"
-    style="
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1050;
-    "
-  >
-    <div
-      style="
-        background: white;
-        border-radius: 10px;
-        padding: 30px 40px;
-        text-align: center;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-        animation: popIn 0.3s ease;
-        max-width: 400px;
-        width: 90%;
-      "
-    >
-      <h3 style="margin-bottom: 20px; font-size: 24px; color: #333">Are you sure you want to delete this report?</h3>
-
-      <div style="display: flex; gap: 20px; justify-content: center">
-        <button
-          (click)="confirmDelete()"
-          style="
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-          "
-          onmouseover="this.style.backgroundColor='#c82333'"
-          onmouseout="this.style.backgroundColor='#dc3545'"
-        >
-          Yes
-        </button>
-
-        <button
-          (click)="closeDeleteModal()"
-          style="
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-          "
-          onmouseover="this.style.backgroundColor='#5a6268'"
-          onmouseout="this.style.backgroundColor='#6c757d'"
-        >
-          No
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <style>
-    @keyframes popIn {
-      0% {
-        transform: scale(0.95);
-        opacity: 0;
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-  </style>
 
   <hr style="margin-top: 10px; margin-bottom: 20px; border: 1px solid #ccc" />
 
@@ -273,8 +181,8 @@
       <h4 style="font-size: 25px; margin-top: 30px">Tasks</h4>
       <hr style="border: 1px solid #ccc" />
       <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
-        <strong>Tasks Planned: 10</strong>
-        <strong>Tasks Completed: 7</strong>
+        <strong>Tasks Planned: {{ tasksPlanned }}</strong>
+        <strong>Tasks Completed: {{ tasksCompleted }}</strong>
       </div>
     </div>
 
@@ -318,15 +226,14 @@
       <h4 style="font-size: 25px; margin-top: 30px">Habits</h4>
       <hr style="border: 1px solid #ccc" />
       <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
-        <strong>Habits Completed: 4</strong>
-        <strong>Habit Streaks: 3 days</strong>
+        <strong>Habits Completed: {{ completedHabitNames.length }}</strong>
+        <strong>Habit Streak: {{ habitStreak }}</strong>
       </div>
     </div>
 
     <!-- Focus Card -->
     <div
       class="app-card"
-      (click)="openPopup('focus')"
       style="
         flex: 1 1 400px;
         min-width: 300px;
@@ -363,8 +270,8 @@
       <h4 style="font-size: 25px; margin-top: 30px">Focus</h4>
       <hr style="border: 1px solid #ccc" />
       <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
-        <strong>Pomodoro Sessions: 5</strong>
-        <strong>Focus Time: 3.5 hours</strong>
+        <strong>Focus Time: {{ totalFocusTime }} hours</strong>
+        <strong>Pomodoro Sessions Completed: {{ pomodoroSessionsCompleted }}</strong>
       </div>
     </div>
 
@@ -420,19 +327,23 @@
 
         <div *ngIf="popupContent === 'tasks'">
           <p><strong>Completed Tasks:</strong></p>
-          <ul>
-            <li>Finish report</li>
-            <li>Submit assignment</li>
-            <li>Prepare meeting notes</li>
+          <ul *ngIf="completedTaskTitles.length > 0; else noTasks">
+            <li *ngFor="let title of completedTaskTitles">{{ title }}</li>
           </ul>
+          <ng-template #noTasks>
+            <p>No tasks available.</p>
+          </ng-template>
         </div>
 
         <div *ngIf="popupContent === 'habits'">
-          <p><strong>Habits:</strong></p>
-          <ul>
-            <li>Morning Run - 3 days</li>
-            <li>Read Book - 2 days</li>
+          <p><strong>Habits Completed:</strong> {{ completedHabitNames.length }}</p>
+          <ul *ngIf="completedHabitNames.length > 0; else noHabits">
+            <li *ngFor="let habitName of completedHabitNames">{{ habitName }}</li>
           </ul>
+
+          <ng-template #noHabits>
+            <p>No habits completed.</p>
+          </ng-template>
         </div>
 
         <div *ngIf="popupContent === 'focus'">
