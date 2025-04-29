@@ -100,6 +100,20 @@ public final class SecurityUtils {
         return hasCurrentUserAnyOfAuthorities(authority);
     }
 
+    public static Optional<Long> getCurrentUserId() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = securityContext.getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof Jwt jwt) {
+            Object userId = jwt.getClaims().get("id");
+            if (userId instanceof Integer) {
+                return Optional.of(((Integer) userId).longValue());
+            } else if (userId instanceof Long) {
+                return Optional.of((Long) userId);
+            }
+        }
+        return Optional.empty();
+    }
+
     private static Stream<String> getAuthorities(Authentication authentication) {
         return authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority);
     }

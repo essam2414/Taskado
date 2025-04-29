@@ -1,12 +1,12 @@
 .custom-checkbox {
-  width: clamp(16px, 3vw, 24px);
-  height: clamp(16px, 3vw, 24px);
+  width: clamp(16px, 3vw, 22px);
+  height: clamp(16px, 3vw, 22px);
   border-radius: 50%;
   border: 1px solid var(--border-color);
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   appearance: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   background-color: transparent;

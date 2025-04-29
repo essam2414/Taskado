@@ -44,7 +44,6 @@
 /* Select Dropdown (Category / Priority) */
 .dropdown-select {
   width: 100%;
-  max-width: 300px;
 
   .dropdown-btn {
     background: var(--input-bg);
@@ -77,6 +76,14 @@
     transition: background 0.2s ease;
 
     display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .select-icon svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
 
     &:hover {
       background: var(--input-bg);

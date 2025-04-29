@@ -117,21 +117,34 @@ export class TaskComponent implements OnInit {
    *   Data Loading & Mapping    *
    *─────────────────────────────*/
   load(): void {
-    this.queryBackend().subscribe({
-      next: (res: EntityArrayResponseType) => {
-        const dataFromBody = this.fillComponentAttributesFromResponseBody(res.body);
+    combineLatest([this.queryBackend(), this.sectionService.query(), this.categoryService.query()]).subscribe(
+      ([taskRes, sectionRes, categoryRes]) => {
+        const dataFromBody = this.fillComponentAttributesFromResponseBody(taskRes.body);
         this.tasks = this.refineData(dataFromBody);
-        this.loadSections();
-        this.loadCategories();
+
+        this.sections = sectionRes.body ?? [];
+        this.categories = categoryRes.body ?? [];
+        this.categoriesSharedCollection = categoryRes.body ?? [];
+
+        // Replace task.category with full category object
+        for (const task of this.tasks) {
+          if (task.category?.id) {
+            const matched = this.categories.find(cat => cat.id === task.category?.id);
+            if (matched) {
+              task.category = matched;
+            }
+          }
+        }
+
+        this.refreshTaskLayout();
       },
-    });
+    );
   }
 
   loadSections(): void {
     this.sectionService.query().subscribe({
       next: (res: HttpResponse<ISection[]>) => {
         this.sections = res.body ?? [];
-        this.refreshTaskLayout();
       },
     });
   }
@@ -150,8 +163,6 @@ export class TaskComponent implements OnInit {
             }
           }
         }
-
-        this.refreshTaskLayout();
       },
     });
   }
@@ -191,6 +202,10 @@ export class TaskComponent implements OnInit {
 
     // Distribute tasks: if task has a section, add it there; otherwise, add to unsectioned.
     for (const task of this.filteredTasks) {
+      if (task.parentTask) {
+        continue; // Skip subtasks
+      }
+
       if (task.section?.id) {
         this.sectionsMap[task.section.id].push(task);
       } else {
@@ -365,6 +380,10 @@ export class TaskComponent implements OnInit {
   editTask(task: ITask): void {
     const modalRef = this.modalService.open(TaskModalComponent, { centered: true, size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.task = { ...task };
+    modalRef.componentInstance.refreshParent?.subscribe(() => {
+      this.load();
+    });
+
     modalRef.closed.subscribe(result => {
       if (result) {
         const index = this.tasks.findIndex(t => t.id === result.id);

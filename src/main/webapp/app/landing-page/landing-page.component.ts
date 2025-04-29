@@ -29,7 +29,8 @@ export default class LandingPageComponent implements AfterViewInit, OnInit {
     {
       name: 'Emma Rackham',
       role: 'Paralegal',
-      quote: 'Helps me to organise my work load with my studies and has a cute cusomtomisable dashboard :)',
+      quote:
+        'I suggested adding theme colors, and they made it happen! The dashboard looks amazing - really excited to use Taskado when it launches.',
     },
     { name: 'Alex', role: 'Designer', quote: 'Dark mode + font size = perfect.' },
     { name: 'Mina', role: 'Researcher', quote: 'Pomodoro kept me sane writing my thesis.' },

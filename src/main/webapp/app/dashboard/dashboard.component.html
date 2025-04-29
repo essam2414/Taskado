@@ -444,7 +444,14 @@
       <div class="widget" [ngClass]="'widget-' + widget.size" cdkDrag>
         <div class="widget-header">
           <span class="widget-title">{{ widget.title }}</span>
-          <a *ngIf="widget.link" [routerLink]="[widget.link]" class="widget-link" [attr.aria-label]="'Open ' + widget.title + ' page'">
+          <div *ngIf="!widget.component" class="status-badge">Under Construction 🛠️</div>
+
+          <a
+            *ngIf="widget.link && widget.component"
+            [routerLink]="[widget.link]"
+            class="widget-link"
+            [attr.aria-label]="'Open ' + widget.title + ' page'"
+          >
             <svg role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <title>Go to {{ widget.title }}</title>
               <path
@@ -453,8 +460,20 @@
             </svg>
           </a>
         </div>
+        <div class="widget-content">
+          <ng-container *ngIf="widget.component" [ngComponentOutlet]="widget.component" />
 
-        <ng-container *ngIf="widget.component" class="widget-content" [ngComponentOutlet]="widget.component" />
+          <div *ngIf="!widget.component" class="coming-soon-widget">
+            <a *ngIf="widget.link" [routerLink]="widget.link" class="btn btn-secondary btn-rounded">
+              Visit page
+              <svg role="img" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M19.5,0H10.5c-.828,0-1.5,.671-1.5,1.5s.672,1.5,1.5,1.5h8.379L.439,21.439c-.586,.585-.586,1.536,0,2.121,.293,.293,.677,.439,1.061,.439s.768-.146,1.061-.439L21,5.121V13.5c0,.829,.672,1.5,1.5,1.5s1.5-.671,1.5-1.5V4.5c0-2.481-2.019-4.5-4.5-4.5Z"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
       </div>
     }
   </div>

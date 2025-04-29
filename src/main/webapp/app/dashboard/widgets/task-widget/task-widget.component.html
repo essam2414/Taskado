@@ -1,4 +1,4 @@
-<div>
+<div class="task-widget">
   @if (tasks().length === 0) {
     <div class="task-list-empty">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" aria-hidden="true" focusable="false">
@@ -306,4 +306,23 @@
       </div>
     </div>
   }
+
+  <div class="quick-add" [class.active]="newTaskTitle.trim()">
+    <input
+      type="text"
+      class="task-input btn-content"
+      [(ngModel)]="newTaskTitle"
+      placeholder="Start typing to add a task..."
+      (keyup.enter)="addTask(newTaskTitle)"
+    />
+
+    <button
+      class="btn-add-icon jh-create-entity create-task"
+      (click)="addTask(newTaskTitle)"
+      [disabled]="!newTaskTitle.trim()"
+      aria-label="Add task"
+    >
+      <fa-icon icon="plus"></fa-icon>
+    </button>
+  </div>
 </div>

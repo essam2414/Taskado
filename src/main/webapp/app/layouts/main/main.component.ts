@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, Renderer2, computed } from '@angular/core';
+import { Component, OnInit, inject, Renderer2 } from '@angular/core';
 import { Router, RouterOutlet, RouterModule, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -9,6 +9,7 @@ import { SidebarService } from 'app/layouts/sidebar/sidebar.service';
 import FooterComponent from '../footer/footer.component';
 import PageRibbonComponent from '../profiles/page-ribbon.component';
 import { HeaderComponent } from 'app/layouts/header/header.component';
+import { interval } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -21,6 +22,7 @@ import { HeaderComponent } from 'app/layouts/header/header.component';
 export default class MainComponent implements OnInit {
   account = inject(AccountService).trackCurrentAccount();
   guestTimeLeft: string | null = null;
+  currentRouteIsLandingPage = false;
 
   public readonly sidebarService = inject(SidebarService);
 
@@ -29,18 +31,25 @@ export default class MainComponent implements OnInit {
 
   private readonly accountService = inject(AccountService);
 
+  private intervalId: any;
+
   ngOnInit(): void {
-    this.accountService.identity().subscribe();
+    this.accountService.identity().subscribe(() => {
+      this.updateGuestTimeLeft(); // initial call
+      this.intervalId = setInterval(() => this.updateGuestTimeLeft(), 1000); // update every second
+    });
 
     // Change background on landing page
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         const url = event.url.split('?')[0].split('#')[0];
 
-        const landingRoutes = ['/', '/login', '/account/register', '/account/reset/request'];
+        const landingRoutes = ['/', '/login', '/account/register', '/account/reset/request', '/gdpr-policy'];
         const dashboardRoutes = ['/dashboard'];
 
-        if (landingRoutes.includes(url)) {
+        this.currentRouteIsLandingPage = landingRoutes.includes(url);
+
+        if (this.currentRouteIsLandingPage) {
           this.renderer.addClass(document.body, 'landing-bg');
           this.renderer.removeClass(document.body, 'dashboard-bg');
         } else if (dashboardRoutes.includes(url)) {
@@ -52,6 +61,12 @@ export default class MainComponent implements OnInit {
         }
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
   }
 
   login(): void {
@@ -67,16 +82,20 @@ export default class MainComponent implements OnInit {
     return !!this.account()?.guest;
   }
 
-  get guestSessionTimeLeft(): string | null {
+  private updateGuestTimeLeft(): void {
     const expiry = this.account()?.guestExpiresAt;
-    if (!expiry) return null;
+    if (!expiry) {
+      this.guestTimeLeft = null;
+      return;
+    }
 
     const diff = new Date(expiry).getTime() - Date.now();
-
-    if (diff <= 0) return 'Session expired';
-
-    const mins = Math.floor(diff / 60000);
-    const secs = Math.floor((diff % 60000) / 1000);
-    return `${mins}m ${secs}s left`;
+    if (diff <= 0) {
+      this.guestTimeLeft = 'Session expired';
+    } else {
+      const mins = Math.floor(diff / 60000);
+      const secs = Math.floor((diff % 60000) / 1000);
+      this.guestTimeLeft = `${mins}m ${secs}s left`;
+    }
   }
 }
