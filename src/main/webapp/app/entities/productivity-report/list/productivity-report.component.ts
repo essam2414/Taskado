@@ -20,6 +20,30 @@ import { NewProductivityReport } from '../productivity-report.model';
 import { Chart, ChartDataset } from 'chart.js/auto';
 import dayjs from 'dayjs/esm';
 
+// Plugin to draw efficiency score text inside the gauge
+const gaugeCenterTextPlugin = {
+  id: 'centerText',
+  beforeDraw(chart: any) {
+    const { width, height } = chart;
+    const ctx = chart.ctx;
+
+    const raw = chart?.data?.datasets?.[0]?.data?.[0];
+    const rawValue: number = typeof raw === 'number' ? raw : parseFloat(String(raw)) || 0;
+    const text = `${Math.round(rawValue)}%`;
+
+    ctx.restore();
+    ctx.font = `${(height / 114).toFixed(2)}em sans-serif`;
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#333';
+
+    const textX = Math.round((width - ctx.measureText(text).width) / 2);
+    const textY = height / 1.5;
+
+    ctx.fillText(text, textX, textY);
+    ctx.save();
+  },
+};
+
 @Component({
   standalone: true,
   selector: 'jhi-productivity-report',
@@ -52,6 +76,7 @@ export class ProductivityReportComponent implements OnInit {
   public taskChart: Chart | null = null;
   public habitChart: Chart | null = null;
   public focusChart: Chart | null = null;
+  public efficiencyGauge: Chart | null = null;
 
   // Default values before report generation
   tasksPlanned: number | string = 'N/A';
@@ -243,6 +268,57 @@ export class ProductivityReportComponent implements OnInit {
     }
   }
 
+  renderEfficiencyGauge(): void {
+    const canvas = document.getElementById('efficiencyGauge') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    if (this.efficiencyGauge) {
+      this.efficiencyGauge.destroy();
+    }
+
+    const score = typeof this.efficiencyScore === 'number' ? this.efficiencyScore : parseFloat(this.efficiencyScore) || 0;
+
+    const remainder = 100 - score;
+
+    // 🎨 Determine color
+    let fillColor = '#28a745'; // green
+    if (score < 50) {
+      fillColor = '#dc3545'; // red
+    } else if (score < 75) {
+      fillColor = '#ffc107'; // yellow
+    }
+
+    this.efficiencyGauge = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Efficiency', 'Remaining'],
+        datasets: [
+          {
+            data: [score, remainder],
+            backgroundColor: [fillColor, '#e0e0e0'],
+            borderWidth: 0,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        rotation: -90,
+        circumference: 180,
+        cutout: '70%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: context => `${String(context.label)}: ${Number(context.raw)}%`,
+            },
+          },
+        },
+      },
+      plugins: [gaugeCenterTextPlugin],
+    });
+  }
+
   updateDashboard(): void {
     if (!this.currentReport) {
       return;
@@ -268,6 +344,7 @@ export class ProductivityReportComponent implements OnInit {
     this.renderTasksChart();
     this.renderHabitsChart();
     this.renderFocusChart();
+    this.renderEfficiencyGauge();
   }
 
   async generateReport(): Promise<void> {
@@ -275,12 +352,22 @@ export class ProductivityReportComponent implements OnInit {
 
     try {
       const tasks = (await firstValueFrom(this.taskService.query())).body ?? [];
-      const completedTasksToday = tasks.filter(t => t.completed && dayjs(t.updatedAt).isSame(now, 'day'));
+      const completedTasksToday = tasks.filter(t => t.completed && t.updatedAt && dayjs(t.updatedAt).isSame(now, 'day'));
 
       const pomodoros = (await firstValueFrom(this.pomodoroSessionService.query())).body ?? [];
       const completedPomodorosToday = pomodoros.filter(p => p.completed && dayjs(p.startTime).isSame(now, 'day'));
 
       const habits = (await firstValueFrom(this.habitService.query())).body ?? [];
+      const completedHabitsToday = habits.filter(habit => {
+        if (!habit.completedDates) return false;
+        try {
+          const parsedDates: string[] = JSON.parse(habit.completedDates);
+          return parsedDates.some(dateStr => dayjs(dateStr).isSame(now, 'day'));
+        } catch (err) {
+          console.warn('Failed to parse completedDates for habit:', habit.name, err);
+          return false;
+        }
+      });
 
       const tasksPlanned = tasks.length;
       const tasksCompleted = completedTasksToday.length;
@@ -290,7 +377,7 @@ export class ProductivityReportComponent implements OnInit {
       const distractionsCount = 0;
 
       const totalPlanned = tasksPlanned + habits.length + pomodoros.length;
-      const totalCompleted = tasksCompleted + habits.length + pomodoroSessionsCompleted;
+      const totalCompleted = tasksCompleted + completedHabitsToday.length + pomodoroSessionsCompleted;
       const efficiencyScore = totalPlanned > 0 ? Math.min(100, (totalCompleted / totalPlanned) * 100) : 0;
 
       const newReport: NewProductivityReport = {
@@ -302,8 +389,8 @@ export class ProductivityReportComponent implements OnInit {
         distractionsCount,
         efficiencyScore,
         timestamp: now,
-        completedTasks: [],
-        completedHabits: [],
+        completedTasks: completedTasksToday,
+        completedHabits: completedHabitsToday,
       };
 
       this.productivityReportService.create(newReport).subscribe({
@@ -316,11 +403,7 @@ export class ProductivityReportComponent implements OnInit {
             }, 3000);
 
             this.productivityReports.push(createdReport);
-
-            // Re-filter to keep only latest report per day
             this.productivityReports = this.keepLatestReportPerDay(this.productivityReports);
-
-            // Update current index to latest day (the end of the list)
             this.currentReportIndex = this.productivityReports.length - 1;
             this.currentReport = this.productivityReports[this.currentReportIndex];
             this.updateDashboard();
@@ -473,23 +556,12 @@ export class ProductivityReportComponent implements OnInit {
       this.timestamp = 'Unselected';
       this.reportCreatedTime = 'Unselected';
       this.habitStreak = 'N/A';
-
-      // Destroy task chart if exists
-      if (this.taskChart) {
-        this.taskChart.destroy();
-        this.taskChart = null;
-      }
-
-      // Destroy habit chart if exists
-      if (this.habitChart) {
-        this.habitChart.destroy();
-        this.habitChart = null;
-      }
-
-      if (this.focusChart) {
-        this.focusChart.destroy();
-        this.focusChart = null;
-      }
+      this.completedTaskTitles = [];
+      this.completedHabitNames = [];
+      this.renderTasksChart();
+      this.renderHabitsChart();
+      this.renderFocusChart();
+      this.renderEfficiencyGauge();
     } else {
       this.currentReportIndex = this.productivityReports.length - 1;
       this.currentReport = this.productivityReports[this.currentReportIndex];
