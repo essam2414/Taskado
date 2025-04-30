@@ -9,12 +9,12 @@
   --border-color: #ccc;
   --hover-bg: #ebebeb;
   --avatar-bg: #f0f0f0;
-  --input-bg: #f7f7f7;
+  --input-bg: var(--bg-color-secondary);
 
   // text colors
-  --text-primary: #2c2c38;
-  --text-secondary: #6b6b78;
-  --text-muted: #a9a9b3;
+  --text-primary: #1f2937;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
   --text-accent: var(--accent-color);
 
   // default fonts
@@ -23,6 +23,7 @@
 
   // font sizes
   --font-scale: 1;
+  --font-3xs: clamp(calc(0.4rem * var(--font-scale)), 0.6vw, calc(0.5rem * var(--font-scale)));
   --font-2xs: clamp(calc(0.5rem * var(--font-scale)), 0.8vw, calc(0.6rem * var(--font-scale)));
   --font-xs: clamp(calc(0.6rem * var(--font-scale)), 1vw, calc(0.75rem * var(--font-scale)));
   --font-sm: clamp(calc(0.75rem * var(--font-scale)), 1.3vw, calc(0.875rem * var(--font-scale)));
@@ -39,8 +40,8 @@
   --navmenu-text: #888;
   --navmenu-hover-text: #2c2c38;
 
-  --success-color: #11b364;
-  --danger-color: #f04438;
+  --success-color: #0f7b45;
+  --danger-color: #d32f2f;
   --warning-color: #f79009;
   --info-color: #1363ff;
 

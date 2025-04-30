@@ -1,7 +1,7 @@
 <!-- Guest Mode Banner (Visible Only for Guests) -->
 <div *ngIf="isGuest" class="guest-banner">
   <div class="guest-header">
-    Guest mode: <span class="time">{{ guestSessionTimeLeft }}.</span>
+    Guest mode: <span class="time">{{ guestTimeLeft }}.</span>
   </div>
 
   <div class="guest-content">
@@ -18,8 +18,8 @@
 </div>
 
 <!-- Main Layout -->
-<div class="layout" [class.expanded]="!sidebarService.isCollapsed() && account() !== null">
-  @if (account() !== null) {
+<div class="layout" [class.expanded]="!sidebarService.isCollapsed() && account() !== null && !currentRouteIsLandingPage">
+  @if (account() !== null && !currentRouteIsLandingPage) {
     <jhi-sidebar></jhi-sidebar>
   }
 

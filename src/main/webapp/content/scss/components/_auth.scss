@@ -128,9 +128,7 @@
 
 .auth-input-group input {
   width: 100%;
-  border: 1px solid #e1e3e6;
-  background-color: rgba(255, 255, 255, 0.4); // soft glass look
-  border: 1px solid #dcdfe4;
+  background-color: var(--card-bg);
 
   background-image: none !important;
   box-shadow: none !important;
@@ -146,12 +144,6 @@
 
   &::placeholder {
     color: #6e6e78;
-  }
-
-  &:focus {
-    background-color: #f9f9f9;
-    border-color: #564df2;
-    outline: none;
   }
 
   &:disabled {

@@ -35,6 +35,9 @@ public class Section implements Serializable {
     @JsonIgnoreProperties(value = { "category", "user", "section", "productivityReports" }, allowSetters = true)
     private Set<Task> tasks = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Long getId() {
@@ -91,6 +94,19 @@ public class Section implements Serializable {
     public Section removeTasks(Task task) {
         this.tasks.remove(task);
         task.setSection(null);
+        return this;
+    }
+
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Section user(User user) {
+        this.setUser(user);
         return this;
     }
 

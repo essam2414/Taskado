@@ -9,6 +9,7 @@ import { IUserPreferences, NewUserPreferences } from '../user-preferences.model'
 import { AccountService } from 'app/core/auth/account.service';
 import { UserService } from 'app/entities/user/service/user.service';
 import { dashboardWidgets, Widget } from 'app/dashboard/widgets/widgets.component';
+import { IUser } from 'app/entities/user/user.model';
 
 export type PartialUpdateUserPreferences = Partial<IUserPreferences> & Pick<IUserPreferences, 'id'>;
 
@@ -20,12 +21,15 @@ export class UserPreferencesService {
   widgets: Widget[] = [];
   visibleWidgets: Widget[] = [];
 
+  currentPreferences: IUserPreferences | null = null;
+
   protected readonly http = inject(HttpClient);
   protected readonly applicationConfigService = inject(ApplicationConfigService);
   protected readonly accountService = inject(AccountService);
   protected readonly userService = inject(UserService);
 
   protected resourceUrl = this.applicationConfigService.getEndpointFor('api/user-preferences');
+  private loadingPrefsPromise: Promise<IUserPreferences> | null = null;
 
   create(userPreferences: NewUserPreferences): Observable<EntityResponseType> {
     return this.http.post<IUserPreferences>(this.resourceUrl, userPreferences, { observe: 'response' });
@@ -87,43 +91,63 @@ export class UserPreferencesService {
   }
 
   async getOrCreateAndApply(): Promise<IUserPreferences> {
-    const account = await firstValueFrom(this.accountService.identity());
-    if (!account?.login) throw new Error('No user logged in');
-
-    const userRes = await firstValueFrom(this.userService.query({ 'login.equals': account.login }));
-    const fullUser = userRes.body?.find(u => u.login === account.login);
-    if (!fullUser?.id) throw new Error('Could not find user ID');
-
-    const prefsRes = await firstValueFrom(this.query({}));
-    const prefsList = prefsRes.body ?? [];
-    let prefs = prefsList.find(p => p.user?.id === fullUser.id);
-
-    if (!prefs) {
-      const newPrefs: NewUserPreferences = {
-        id: null,
-        darkMode: false,
-        highContrast: false,
-        dyslexiaMode: false,
-        reduceMotion: false,
-        fontSizeLevel: 2,
-        accentColor: '#564df2',
-        sidebarColorLight: '#fdf1f6',
-        sidebarColorDark: '#1d1d1d',
-        dashboardTheme: 'Default',
-        dashboardWidgetsJson: JSON.stringify(dashboardWidgets.map(w => w.id)),
-        user: {
-          id: fullUser.id,
-          login: fullUser.login,
-        },
-      };
-      const created = await firstValueFrom(this.create(newPrefs));
-      prefs = created.body!;
+    if (this.loadingPrefsPromise) {
+      return this.loadingPrefsPromise;
     }
 
-    this.applyPreferencesToDOM(prefs);
-    this.applyDashboardTheme(prefs.dashboardTheme ?? 'Default');
-    this.loadWidgets(prefs.dashboardWidgetsJson);
-    return prefs;
+    this.loadingPrefsPromise = (async () => {
+      const account = await firstValueFrom(this.accountService.identity());
+      if (!account?.login) throw new Error('No user logged in');
+
+      const fullUser = await firstValueFrom(this.http.get<IUser>('api/account'));
+      if (!fullUser.id) throw new Error('Could not find user ID');
+
+      let prefs: IUserPreferences | null = null;
+
+      try {
+        const prefsRes = await firstValueFrom(this.find(fullUser.id));
+        prefs = prefsRes.body ?? null;
+      } catch (error: any) {
+        if (error.status === 404) {
+          const newPrefs: NewUserPreferences = {
+            id: null,
+            darkMode: false,
+            highContrast: false,
+            dyslexiaMode: false,
+            reduceMotion: false,
+            fontSizeLevel: 2,
+            accentColor: '#564df2',
+            sidebarColorLight: '#fdf1f6',
+            sidebarColorDark: '#1d1d1d',
+            dashboardTheme: 'Default',
+            dashboardWidgetsJson: JSON.stringify(dashboardWidgets.map(w => w.id)),
+            user: {
+              id: fullUser.id,
+              login: fullUser.login,
+            },
+          };
+          const created = await firstValueFrom(this.create(newPrefs));
+          prefs = created.body!;
+        } else {
+          throw error;
+        }
+      }
+
+      if (!prefs) throw new Error('Failed to fetch or create preferences.');
+
+      this.currentPreferences = prefs;
+
+      this.applyPreferencesToDOM(prefs);
+      this.applyDashboardTheme(prefs.dashboardTheme ?? 'Default');
+      this.loadWidgets(prefs.dashboardWidgetsJson);
+      return prefs;
+    })();
+
+    try {
+      return await this.loadingPrefsPromise;
+    } finally {
+      this.loadingPrefsPromise = null;
+    }
   }
 
   applyPreferencesToDOM(prefs: IUserPreferences): void {

@@ -12,6 +12,10 @@
   margin: 0 -20px;
   margin-bottom: 12px;
   border-bottom: 0.5px solid var(--border-color);
+
+  @media (max-width: 768px) {
+    padding: 15px 20px;
+  }
 }
 
 .modal-header .close {
@@ -39,6 +43,20 @@
 
 .modal-body {
   padding: 15px 20px;
+
+  @media (max-width: 768px) {
+    padding: 15px 0px;
+  }
+
+  .form-control,
+  .dropdown-btn {
+    background-color: var(--bg-color);
+  }
+
+  .form-control:focus {
+    background-color: var(--input-bg);
+    border-color: transparent;
+  }
 }
 
 .modal-footer {

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal, Injector } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -30,18 +30,23 @@ export default class DashboardComponent implements OnInit, OnDestroy {
   private readonly accountService = inject(AccountService);
   private readonly router = inject(Router);
   private readonly userPreferencesService = inject(UserPreferencesService);
+  private readonly injector = inject(Injector);
 
   ngOnInit(): void {
     this.accountService
       .getAuthenticationState()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(account => this.account.set(account));
+      .subscribe(account => {
+        this.account.set(account);
+        if (account?.login) {
+          this.userPreferencesService.getOrCreateAndApply().then(prefs => {
+            this.visibleWidgets = this.userPreferencesService.visibleWidgets;
+          });
+        }
+      });
+
     this.setGreeting();
     this.setCurrentDate();
-
-    this.userPreferencesService.getOrCreateAndApply().then(prefs => {
-      this.visibleWidgets = this.userPreferencesService.visibleWidgets;
-    });
   }
 
   goToDashboardSettings(): void {
@@ -81,6 +86,16 @@ export default class DashboardComponent implements OnInit, OnDestroy {
 
   getOrdinalSuffix(day: number): string {
     return ['st', 'nd', 'rd'][(day % 10) - 1] && ![11, 12, 13].includes(day) ? ['st', 'nd', 'rd'][(day % 10) - 1] : 'th';
+  }
+
+  createInjector(widget: Widget): Injector {
+    return Injector.create({
+      providers: [
+        { provide: 'title', useValue: widget.title },
+        { provide: 'link', useValue: widget.link },
+      ],
+      parent: this.injector,
+    });
   }
 
   login(): void {

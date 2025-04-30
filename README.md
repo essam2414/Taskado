@@ -1,3 +1,5 @@
+# Taskado
+
 This application was generated using JHipster 8.7.3 for the team project 2024-2025 module at the university of Birmingham.
 
 # Team 45
@@ -289,7 +291,7 @@ update src/main/webapp/app/app.config.ts
 
 ### Packaging as jar
 
-To build the final jar and optimize the teamproject24 application for production, run:
+To build the final jar and optimize the Taskado application for production, run:
 
 ```
 ./mvnw -Pprod clean verify

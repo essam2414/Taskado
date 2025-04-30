@@ -37,4 +37,9 @@ public interface UserPreferencesRepository extends JpaRepository<UserPreferences
 
     @Query("select userPreferences from UserPreferences userPreferences left join fetch userPreferences.user where userPreferences.id =:id")
     Optional<UserPreferences> findOneWithToOneRelationships(@Param("id") Long id);
+
+    @Query(
+        "select userPreferences from UserPreferences userPreferences left join fetch userPreferences.user where userPreferences.user.id = :userId"
+    )
+    Optional<UserPreferences> findOneByUserId(@Param("userId") Long userId);
 }

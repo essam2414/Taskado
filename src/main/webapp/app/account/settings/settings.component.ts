@@ -118,13 +118,16 @@ export default class SettingsComponent implements OnInit {
         this.user = account;
         this.settingsForm.patchValue(account);
 
-        this.userPreferencesService.getOrCreateAndApply().then(prefs => {
+        const prefs = this.userPreferencesService.currentPreferences;
+        if (prefs) {
           this.preferences = prefs;
           this.applyPreferences(prefs);
 
           this.selectedDashboardTheme = prefs.dashboardTheme ?? 'Default';
           this.widgets = this.userPreferencesService.widgets;
-        });
+        } else {
+          console.warn('[Settings] Preferences not loaded yet.');
+        }
       }
     });
   }

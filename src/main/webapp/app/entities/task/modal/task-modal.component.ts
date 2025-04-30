@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, inject, HostListener, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { combineLatest, Observable } from 'rxjs';
@@ -39,6 +39,7 @@ export class TaskModalComponent implements OnInit {
   subtasks: ITask[] = [];
   editingSubtaskId: number | null = null;
   isCreatingSubtask = false;
+  @Output() refreshParent = new EventEmitter<void>();
 
   @ViewChild('subtaskTitleInput') subtaskTitleInputRef!: ElementRef<HTMLInputElement>;
   @ViewChild('selectedSubtaskDate') subtaskDateInputRef!: ElementRef<HTMLInputElement>;
@@ -168,6 +169,11 @@ export class TaskModalComponent implements OnInit {
 
     if (this.editingSubtaskId) {
       subtask.id = this.editingSubtaskId;
+
+      const existingSubtask = this.subtasks.find(s => s.id === this.editingSubtaskId);
+      if (existingSubtask?.user) {
+        subtask.user = existingSubtask.user;
+      }
     } else {
       subtask.id = null;
     }
@@ -177,6 +183,7 @@ export class TaskModalComponent implements OnInit {
     request.subscribe(() => {
       this.resetSubtaskForm();
       this.loadSubtasks();
+      this.refreshParent.emit();
     });
   }
 
@@ -260,6 +267,7 @@ export class TaskModalComponent implements OnInit {
     this.taskService.update(updatedTask).subscribe(() => {
       task.completed = updatedTask.completed;
       this.loadSubtasks();
+      this.refreshParent.emit();
     });
   }
 
@@ -553,8 +561,8 @@ export class TaskModalComponent implements OnInit {
   }
 
   protected onSaveSuccess(task: ITask): void {
-    const updatedTask = this.taskFormService.getTask(this.editForm);
-    this.activeModal.close({ ...task, ...updatedTask });
+    this.fillCategory(task);
+    this.activeModal.close(task);
   }
 
   protected onSaveError(): void {
@@ -563,5 +571,12 @@ export class TaskModalComponent implements OnInit {
 
   protected onSaveFinalize(): void {
     this.isSaving = false;
+  }
+
+  private fillCategory(task: ITask): void {
+    if (task.category?.id) {
+      const full = this.categoriesSharedCollection.find(c => c.id === task.category?.id);
+      if (full) task.category = full;
+    }
   }
 }

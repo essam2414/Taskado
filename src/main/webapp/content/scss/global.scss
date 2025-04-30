@@ -175,7 +175,7 @@ li {
   }
 
   .mobile-only {
-    display: flex !important;
+    display: block !important;
   }
 
   .mobile-only.dropdown .dropdown-menu {
@@ -183,7 +183,7 @@ li {
   }
 
   .mobile-only.dropdown.open .dropdown-menu {
-    display: flex;
+    display: block;
   }
 }
 

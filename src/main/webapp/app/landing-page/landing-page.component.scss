@@ -205,16 +205,16 @@
 
       .priority {
         background-color: rgba(255, 152, 0, 0.2);
-        color: #ff9800;
+        color: #bf360c;
       }
 
       .category {
         background-color: rgba(0, 188, 212, 0.2);
-        color: #00bcd4;
+        color: #006064;
       }
 
       .date {
-        color: #11b364;
+        color: var(--success-color);
       }
 
       .title {
@@ -244,7 +244,7 @@
 
       .priority {
         background-color: rgba(244, 67, 54, 0.2);
-        color: #f44336;
+        color: #b71c1c;
       }
 
       .floating-checkbox {
@@ -277,11 +277,11 @@
 
       .category {
         background-color: rgba(181, 151, 255, 0.2);
-        color: #8e5cff;
+        color: #5c3dff;
       }
 
       .date {
-        color: #11b364;
+        color: var(--success-color);
       }
     }
   }

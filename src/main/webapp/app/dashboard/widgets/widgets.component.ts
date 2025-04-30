@@ -23,5 +23,12 @@ export const dashboardWidgets: Widget[] = [
     link: '/productivity-report',
     enabled: true,
   },
-  { id: 'pomodoro-session', title: 'Focus Timer', component: null, size: 'small', link: '/pomodoro-session', enabled: true },
+  {
+    id: 'pomodoro-session',
+    title: 'Focus Timer',
+    component: null,
+    size: 'small',
+    link: '/pomodoro-session',
+    enabled: true,
+  },
 ];

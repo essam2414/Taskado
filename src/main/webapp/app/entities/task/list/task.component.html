@@ -18,21 +18,20 @@
 
       <!-- Dropdown filters for mobile -->
       <div class="mobile-only dropdown dropdown-select" [class.open]="filtersOpen">
-        <button class="dropdown-btn" (click)="toggleFilters()">
+        <div class="dropdown-btn" [class.open]="filtersOpen" (click)="toggleFilters()">
           <span><fa-icon class="filter-icon" [icon]="activeFilterIcon"></fa-icon> {{ activeFilterLabel }}</span>
           <fa-icon [icon]="'chevron-down'"></fa-icon>
-        </button>
+        </div>
 
-        <div class="dropdown-menu">
-          <button
+        <ul class="dropdown-menu">
+          <li
             *ngFor="let filter of filters"
-            class="dropdown-item"
             [class.active]="activeFilter === filter.value"
             (click)="setFilter(filter.value); toggleFilters()"
           >
             {{ filter.label }}
-          </button>
-        </div>
+          </li>
+        </ul>
       </div>
     </div>
 
@@ -46,7 +45,7 @@
       <span>New task</span>
     </button>
 
-    <button class="btn-add-icon jh-create-entity create-task mobile-only" (click)="addTask()">
+    <button class="btn-add-icon jh-create-entity create-task mobile-only" (click)="addTask()" aria-label="Add task">
       <fa-icon icon="plus"></fa-icon>
     </button>
   </div>
@@ -189,6 +188,7 @@
             (blur)="stopEditing()"
             (keydown.enter)="saveSection(section, $event)"
             class="section-title-input"
+            aria-label="Edit section title"
           />
           <div *ngIf="editingSectionId === section.id" class="section-name-btns">
             <button class="btn btn-primary" (click)="saveSection(section)">Save</button>
@@ -431,7 +431,12 @@
         </div>
       </div>
 
-      <button class="btn-add-icon jh-create-entity create-task" (click)="addTask(newTaskTitle)" [disabled]="!newTaskTitle.trim()">
+      <button
+        class="btn-add-icon jh-create-entity create-task"
+        (click)="addTask(newTaskTitle)"
+        [disabled]="!newTaskTitle.trim()"
+        aria-label="Add task"
+      >
         <fa-icon icon="plus"></fa-icon>
       </button>
     </div>
