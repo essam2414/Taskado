@@ -51,6 +51,7 @@ export class ProductivityReportComponent implements OnInit {
   public chart: Chart | null = null;
   public taskChart: Chart | null = null;
   public habitChart: Chart | null = null;
+  public focusChart: Chart | null = null;
 
   // Default values before report generation
   tasksPlanned: number | string = 'N/A';
@@ -172,6 +173,52 @@ export class ProductivityReportComponent implements OnInit {
     });
   }
 
+  renderFocusChart(): void {
+    const canvas = document.getElementById('focusChart') as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    if (this.focusChart) {
+      this.focusChart.destroy();
+    }
+
+    const focusTime = typeof this.totalFocusTime === 'number' ? this.totalFocusTime : parseFloat(this.totalFocusTime) || 0;
+
+    this.focusChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Focus Time'],
+        datasets: [
+          {
+            label: 'Hours Focused',
+            data: [focusTime],
+            backgroundColor: ['#17a2b8'],
+            borderRadius: 8,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            suggestedMax: 6, // You can adjust based on your daily goal
+            ticks: { precision: 0 },
+          },
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: context => `${context.dataset.label}: ${context.raw as number} hours`,
+            },
+          },
+        },
+      },
+    });
+  }
+
   goToPreviousDay(): void {
     if (this.productivityReports.length === 0) return;
 
@@ -216,10 +263,11 @@ export class ProductivityReportComponent implements OnInit {
     this.completedTaskTitles = this.currentReport.completedTasks?.map(task => task.title) ?? [];
 
     this.completedHabitNames = this.currentReport.completedHabits?.map(habit => habit.name) ?? [];
-    this.habitStreak = this.completedHabitNames.length > 0 ? `${this.completedHabitNames.length} days` : 'N/A';
+    this.habitStreak = this.calculateHabitStreak();
 
     this.renderTasksChart();
     this.renderHabitsChart();
+    this.renderFocusChart();
   }
 
   async generateReport(): Promise<void> {
@@ -424,6 +472,7 @@ export class ProductivityReportComponent implements OnInit {
       this.efficiencyScore = 'N/A';
       this.timestamp = 'Unselected';
       this.reportCreatedTime = 'Unselected';
+      this.habitStreak = 'N/A';
 
       // Destroy task chart if exists
       if (this.taskChart) {
@@ -435,6 +484,11 @@ export class ProductivityReportComponent implements OnInit {
       if (this.habitChart) {
         this.habitChart.destroy();
         this.habitChart = null;
+      }
+
+      if (this.focusChart) {
+        this.focusChart.destroy();
+        this.focusChart = null;
       }
     } else {
       this.currentReportIndex = this.productivityReports.length - 1;
@@ -489,5 +543,33 @@ export class ProductivityReportComponent implements OnInit {
         queryParams: queryParamsObj,
       });
     });
+  }
+
+  private calculateHabitStreak(): number {
+    let streak = 0;
+
+    // Sort reports in reverse chronological order
+    const sortedReports = [...this.productivityReports]
+      .filter(r => !!r.timestamp)
+      .sort((a, b) => dayjs(b.timestamp).diff(dayjs(a.timestamp)));
+
+    for (const report of sortedReports) {
+      const date = dayjs(report.timestamp);
+      const daysAgo = dayjs().startOf('day').diff(date.startOf('day'), 'day');
+
+      // Only consider streaks up to today
+      if (daysAgo < 0) continue;
+
+      const isConsecutive = daysAgo === streak;
+      const hasHabits = (report.completedHabits?.length ?? 0) > 0;
+
+      if (isConsecutive && hasHabits) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+
+    return streak;
   }
 }

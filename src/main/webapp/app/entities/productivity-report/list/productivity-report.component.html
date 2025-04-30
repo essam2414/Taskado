@@ -132,12 +132,8 @@
       <hr style="border: 1px solid #ccc" />
       <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
         <strong>Efficiency Score: {{ efficiencyScore }}%</strong>
-        <strong>Focus Time: {{ totalFocusTime }} hours</strong>
-        <strong>Suggestion: Take more short breaks!</strong>
-        <strong>Tasks Planned: {{ tasksPlanned }}</strong>
-        <strong>Tasks Completed: {{ tasksCompleted }}</strong>
-        <strong>Pomodoro Sessions Completed: {{ pomodoroSessionsCompleted }}</strong>
-        <strong>Created Time: {{ reportCreatedTime ?? 'Unselected' }}</strong>
+        <strong>Suggestion: Drink some milk?</strong>
+        <strong>Created at: {{ reportCreatedTime ?? 'Unselected' }}</strong>
       </div>
     </div>
 
@@ -274,8 +270,10 @@
       <h4 style="font-size: 25px; margin-top: 30px">Focus</h4>
       <hr style="border: 1px solid #ccc" />
       <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
-        <strong>Focus Time: {{ totalFocusTime }} hours</strong>
-        <strong>Pomodoro Sessions Completed: {{ pomodoroSessionsCompleted }}</strong>
+        <strong>You focused for {{ totalFocusTime }} hours across {{ pomodoroSessionsCompleted }} pomodoro sessions</strong>
+        <div style="height: 200px; margin-top: 10px">
+          <canvas id="focusChart"></canvas>
+        </div>
       </div>
     </div>
 
