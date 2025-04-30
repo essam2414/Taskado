@@ -1,104 +1,70 @@
 <div>
   <h2 id="page-heading" data-cy="ProductivityReportHeading" style="display: flex; justify-content: space-between; align-items: center">
-    <span>Productivity Insights</span>
+    <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden">Productivity Insights</span>
 
     <div style="display: flex; align-items: center; gap: 20px">
-      <!-- Generate Report Button -->
-      <button
-        id="generateReport"
-        class="btn"
-        (click)="generateReport()"
-        style="
-          padding: 12px 20px;
-          font-size: 16px;
-          font-weight: bold;
-          border-radius: 6px;
-          background-color: #28a745;
-          color: white;
-          border: none;
-          cursor: pointer;
-          transition: background 0.3s;
-          display: flex;
-          align-items: center;
-          height: 44px;
-        "
-        onmouseover="this.style.backgroundColor='#218838'"
-        onmouseout="this.style.backgroundColor='#28a745'"
-      >
-        ➕ Generate Report
-      </button>
-
       <!-- Previous Button -->
       <button
         id="Previous"
         data-cy="entityPrevButton"
-        class="btn"
-        (click)="navigateReport()"
-        style="
-          padding: 12px 20px;
-          font-size: 16px;
-          font-weight: bold;
-          border-radius: 6px;
-          background-color: #007bff;
-          color: white;
-          border: none;
-          cursor: pointer;
-          transition: background 0.3s;
-          display: flex;
-          align-items: center;
-          height: 44px;
-        "
-        onmouseover="this.style.backgroundColor='#0056b3'"
-        onmouseout="this.style.backgroundColor='#007bff'"
+        class="btn-add jh-create-entity create-task desktop-only"
+        (click)="goToPreviousDay()"
       >
-        <span style="font-size: 20px; margin-right: 8px">&#8592;</span> Previous
+        <fa-icon icon="arrow-left"></fa-icon>
+        <span>Previous</span>
       </button>
 
       <!-- Report Date -->
-      <span
+      <div
         id="reportDate"
+        class="btn-add jh-create-entity create-task desktop-only"
         style="
-          font-size: 18px;
-          font-weight: bold;
-          color: #007bff;
-          padding: 10px 20px;
-          border-radius: 6px;
-          text-align: center;
-          border: 2px solid #007bff;
-          background: #f8f9fa;
+          pointer-events: none;
+          font-size: 16px;
+          font-weight: 600;
           display: flex;
           align-items: center;
+          justify-content: center;
           height: 44px;
+          gap: 6px;
         "
       >
-        📅 {{ timestamp ?? 'Unselected' }}
-      </span>
+        <span style="font-size: 18px">📅</span>
+        <span>{{ timestamp ?? 'Unselected' }}</span>
+      </div>
 
       <!-- Next Button -->
-      <button
-        id="Next"
-        data-cy="entityNextButton"
-        class="btn"
-        (click)="navigateReport()"
-        style="
-          padding: 12px 20px;
-          font-size: 16px;
-          font-weight: bold;
-          border-radius: 6px;
-          background-color: #007bff;
-          color: white;
-          border: none;
-          cursor: pointer;
-          transition: background 0.3s;
-          display: flex;
-          align-items: center;
-          height: 44px;
-        "
-        onmouseover="this.style.backgroundColor='#0056b3'"
-        onmouseout="this.style.backgroundColor='#007bff'"
-      >
-        Next <span style="font-size: 20px; margin-left: 8px">&#8594;</span>
+      <button id="Next" data-cy="entityNextButton" class="btn-add jh-create-entity create-task desktop-only" (click)="goToNextDay()">
+        <span>Next</span>
+        <fa-icon icon="arrow-right"></fa-icon>
       </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn-add jh-create-entity create-task desktop-only"
+        (click)="generateReport()"
+        style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span>Generate Report</span>
+      </button>
+
+      <div class="dropdown dropdown-action" [class.open]="isDropdownOpen">
+        <!-- Dropdown Toggle Button (Down Arrow) -->
+        <button class="btn-add dropdown-toggle" (click)="isDropdownOpen = !isDropdownOpen">
+          <span>Options</span>
+          <fa-icon icon="caret-down"></fa-icon>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div class="dropdown-menu" [ngClass]="{ show: isDropdownOpen }">
+          <button class="dropdown-item" [routerLink]="['/productivity-report/new']" (click)="isDropdownOpen = false">Update</button>
+          <button class="dropdown-item delete" (click)="confirmDelete(); isDropdownOpen = false">
+            <span>Delete</span> <fa-icon icon="trash-alt"></fa-icon>
+          </button>
+        </div>
+      </div>
     </div>
   </h2>
 
@@ -121,80 +87,295 @@
     </div>
   }
 
-  <div style="display: flex; gap: 20px; align-items: flex-start">
-    <!-- Left Side: Cards -->
-    <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start">
-      <!-- Task Card -->
+  <!-- Main Cards Layout -->
+  <div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; margin-top: 20px">
+    <!-- Overview Card -->
+    <div
+      class="app-card"
+      (click)="openPopup('overview')"
+      style="
+        flex: 1 1 400px;
+        min-width: 300px;
+        border: 2px solid #007bff;
+        border-radius: 10px;
+        padding: 20px;
+        box-sizing: border-box;
+        background-color: #f8f9fa;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        cursor: pointer;
+      "
+    >
+      <!-- Info Icon -->
       <div
-        class="app-card"
         style="
-          width: 450px;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          padding: 0;
-          box-sizing: border-box;
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: #007bff;
+          color: white;
+          border-radius: 50%;
+          width: 26px;
+          height: 26px;
           display: flex;
-          flex-direction: column;
-          align-items: stretch;
+          justify-content: center;
+          align-items: center;
+          font-size: 16px;
+          font-weight: bold;
         "
       >
-        <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Tasks</h4>
-        <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
-        <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
-          <strong>Tasks Planned: {{ tasksPlanned ?? 'N/A' }} </strong>
-          <strong>Tasks Completed: {{ tasksCompleted ?? 'N/A' }} </strong>
-          <strong>Average Completion Time: UNDER MAINTENANCE </strong>
-          <strong>Task Efficiency: {{ efficiencyScore ?? 'N/A' }} </strong>
-        </div>
+        i
       </div>
 
-      <!-- Pomodoro Card (Focus) -->
+      <h4 style="font-size: 25px; margin-top: 30px">Overview</h4>
+      <hr style="border: 1px solid #ccc" />
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
+        <strong>Your Productivity Score:</strong>
+        <div style="position: relative; height: 200px; margin-top: 8px">
+          <canvas id="efficiencyGauge"></canvas>
+        </div>
+        <strong>Suggestion: Drink some milk?</strong>
+        <strong>Report created at: {{ reportCreatedTime ?? 'Unselected' }}</strong>
+      </div>
+    </div>
+
+    <!-- Tasks Card -->
+    <div
+      class="app-card"
+      (click)="openPopup('tasks')"
+      style="
+        flex: 1 1 400px;
+        min-width: 300px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        cursor: pointer;
+      "
+    >
       <div
-        class="app-card"
         style="
-          width: 450px;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          padding: 0;
-          box-sizing: border-box;
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: #007bff;
+          color: white;
+          border-radius: 50%;
+          width: 26px;
+          height: 26px;
           display: flex;
-          flex-direction: column;
-          align-items: stretch;
+          justify-content: center;
+          align-items: center;
+          font-size: 16px;
+          font-weight: bold;
         "
       >
-        <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Focus</h4>
-        <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
-        <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
-          <strong>Pomodoro Sessions: {{ pomodoroSessionsCompleted ?? 'N/A' }} </strong>
-          <strong>Total Focus Time (min): {{ totalFocusTime ?? 'N/A' }} </strong>
-        </div>
+        i
       </div>
 
-      <!-- Suggestions Card -->
-      <div
-        class="app-card"
-        style="
-          width: 450px;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          padding: 0;
-          box-sizing: border-box;
-          display: flex;
-          flex-direction: column;
-          align-items: stretch;
-        "
-      >
-        <h4 style="font-size: 25px; text-align: center; margin: 20px 0 0 0; padding: 10px; line-height: 1">Suggestions</h4>
-        <hr style="width: 100%; border: 1px solid #ccc; margin: 0" />
-        <div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; font-size: 18px">
-          <strong>Currently Unavailable</strong>
+      <h4 style="font-size: 25px; margin-top: 30px">Tasks</h4>
+      <hr style="border: 1px solid #ccc" />
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
+        <strong>You completed {{ tasksCompleted }} tasks out of the available {{ tasksPlanned }}</strong>
+        <div style="position: relative; height: 225px; margin-top: 10px">
+          <canvas id="tasksChart"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- Right Side: Graph -->
-    <div style="flex: 1; display: flex; justify-content: center">
-      <canvas #chartCanvas style="height: 600px !important; width: 100%"></canvas>
+    <!-- Habits Card -->
+    <div
+      class="app-card"
+      (click)="openPopup('habits')"
+      style="
+        flex: 1 1 400px;
+        min-width: 300px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        cursor: pointer;
+      "
+    >
+      <div
+        style="
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: #007bff;
+          color: white;
+          border-radius: 50%;
+          width: 26px;
+          height: 26px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 16px;
+          font-weight: bold;
+        "
+      >
+        i
+      </div>
+
+      <h4 style="font-size: 25px; margin-top: 30px">Habits</h4>
+      <hr style="border: 1px solid #ccc" />
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
+        <strong>You completed {{ completedHabitNames.length }} Habits and achieved a streak of {{ habitStreak }}</strong>
+        <div style="height: 200px; margin-top: 10px">
+          <canvas id="habitsChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Focus Card -->
+    <div
+      class="app-card"
+      style="
+        flex: 1 1 400px;
+        min-width: 300px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        cursor: pointer;
+      "
+    >
+      <div
+        style="
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: #007bff;
+          color: white;
+          border-radius: 50%;
+          width: 26px;
+          height: 26px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 16px;
+          font-weight: bold;
+        "
+      >
+        i
+      </div>
+
+      <h4 style="font-size: 25px; margin-top: 30px">Focus</h4>
+      <hr style="border: 1px solid #ccc" />
+      <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
+        <strong>You focused for {{ totalFocusTime }} hours across {{ pomodoroSessionsCompleted }} pomodoro sessions</strong>
+        <div style="height: 200px; margin-top: 10px">
+          <canvas id="focusChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Background Overlay (click to close) -->
+    <div
+      *ngIf="popupOpen"
+      (click)="closePopup()"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 999;
+        cursor: pointer;
+      "
+    ></div>
+
+    <!-- Popup Modal -->
+    <div
+      *ngIf="popupOpen"
+      style="
+        position: fixed;
+        top: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 400px;
+        background: white;
+        border: 2px solid #007bff;
+        border-radius: 10px;
+        padding: 20px;
+        z-index: 1000;
+        animation: popIn 0.3s ease-in-out;
+      "
+    >
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px">
+        <h4 style="margin: 0">{{ popupTitle }}</h4>
+        <button
+          (click)="closePopup()"
+          style="background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer"
+        >
+          X
+        </button>
+      </div>
+      <div style="font-size: 18px">
+        <div *ngIf="popupContent === 'overview'">
+          <p><strong>Under Development</strong></p>
+        </div>
+
+        <div *ngIf="popupContent === 'tasks'">
+          <p><strong>Completed Tasks:</strong></p>
+          <ul *ngIf="completedTaskTitles.length > 0; else noTasks">
+            <li *ngFor="let title of completedTaskTitles">{{ title }}</li>
+          </ul>
+          <ng-template #noTasks>
+            <p>No tasks available.</p>
+          </ng-template>
+        </div>
+
+        <div *ngIf="popupContent === 'habits'">
+          <p><strong>Habits Completed:</strong> {{ completedHabitNames.length }}</p>
+          <ul *ngIf="completedHabitNames.length > 0; else noHabits">
+            <li *ngFor="let habitName of completedHabitNames">{{ habitName }}</li>
+          </ul>
+
+          <ng-template #noHabits>
+            <p>No habits completed.</p>
+          </ng-template>
+        </div>
+
+        <div *ngIf="popupContent === 'focus'">
+          <p><strong>Pomodoro Sessions:</strong></p>
+          <ul>
+            <li>Session 1: 25 min - Complete</li>
+            <li>Session 2: 25 min - Complete</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- Inline Popup Animation -->
+  <style>
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.9) translateY(-10px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+  </style>
+
+  <!--  &lt;!&ndash; Right Side: Graph &ndash;&gt;-->
+  <!--  <div style="flex: 1; display: flex; justify-content: center">-->
+  <!--    <canvas #chartCanvas style="height: 600px !important; width: 100%"></canvas>-->
+  <!--  </div>-->
 </div>
