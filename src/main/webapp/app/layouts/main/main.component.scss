@@ -26,6 +26,13 @@
   margin-left: 0;
 }
 
+/* less padding when sidebar is expanded on desktop */
+@media (min-width: 769px) {
+  .layout.expanded .main-content {
+    padding-inline: clamp(10px, 3vw, 40px);
+  }
+}
+
 /* sidebar goes over main content on mobile */
 @media (max-width: 768px) {
   .layout.expanded .main-content {
