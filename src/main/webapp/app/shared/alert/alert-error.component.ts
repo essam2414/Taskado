@@ -68,7 +68,10 @@ export class AlertErrorComponent implements OnDestroy {
       }
 
       case 404:
-        this.addErrorAlert('Not found');
+        // Ignore 404s from user-preferences
+        if (!httpErrorResponse.url?.includes('/api/user-preferences/')) {
+          this.addErrorAlert('Not found');
+        }
         break;
 
       default:

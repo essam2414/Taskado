@@ -209,6 +209,7 @@
 .widget-title {
   font-size: var(--font-sm);
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .widget-link {
@@ -435,4 +436,5 @@
   border: 0.5px solid var(--dashboard-accent);
   color: var(--dashboard-accent);
   font-size: var(--font-3xs);
+  white-space: nowrap;
 }

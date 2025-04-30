@@ -200,7 +200,8 @@ li {
   }
 
   .landing-header,
-  .mobile-sidebar {
+  .mobile-sidebar,
+  .sidebar {
     padding-top: calc(20px + env(safe-area-inset-top)) !important;
   }
 }
