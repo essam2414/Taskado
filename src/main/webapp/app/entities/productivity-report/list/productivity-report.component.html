@@ -59,7 +59,6 @@
 
         <!-- Dropdown Menu -->
         <div class="dropdown-menu" [ngClass]="{ show: isDropdownOpen }">
-          <button class="dropdown-item" [routerLink]="['/productivity-report/new']" (click)="isDropdownOpen = false">Update</button>
           <button class="dropdown-item delete" (click)="confirmDelete(); isDropdownOpen = false">
             <span>Delete</span> <fa-icon icon="trash-alt"></fa-icon>
           </button>
@@ -135,7 +134,7 @@
         <div style="position: relative; height: 200px; margin-top: 8px">
           <canvas id="efficiencyGauge"></canvas>
         </div>
-        <strong>Suggestion: Drink some milk?</strong>
+        <strong>Suggestion: {{ suggestion }}</strong>
         <strong>Report created at: {{ reportCreatedTime ?? 'Unselected' }}</strong>
       </div>
     </div>
@@ -227,7 +226,7 @@
       <h4 style="font-size: 25px; margin-top: 30px">Habits</h4>
       <hr style="border: 1px solid #ccc" />
       <div style="display: flex; flex-direction: column; gap: 10px; font-size: 18px; margin-top: 10px">
-        <strong>You completed {{ completedHabitNames.length }} Habits and achieved a streak of {{ habitStreak }}</strong>
+        <strong>You completed {{ completedHabitNames.length }} daily Habits and achieved a streak of {{ habitStreak }}</strong>
         <div style="height: 200px; margin-top: 10px">
           <canvas id="habitsChart"></canvas>
         </div>
@@ -325,7 +324,19 @@
       </div>
       <div style="font-size: 18px">
         <div *ngIf="popupContent === 'overview'">
-          <p><strong>Under Development</strong></p>
+          <p>
+            <strong>Your Productivity Score:</strong>
+            <span>{{ efficiencyScore | number: '1.1-1' }}%</span>
+          </p>
+          <p>
+            This score reflects how productive your day was based on completed tasks, habits, and focus sessions. It’s calculated using:
+          </p>
+          <ul style="margin-left: 20px">
+            <li><strong>Tasks Completed</strong> / Total Tasks</li>
+            <li><strong>Habits Completed</strong> / Total Habits</li>
+            <li><strong>Pomodoro Sessions Completed</strong> / Total Pomodoros</li>
+          </ul>
+          <p>The final score is the ratio of all completed items to total planned activities, scaled to a percentage.</p>
         </div>
 
         <div *ngIf="popupContent === 'tasks'">
