@@ -236,6 +236,7 @@
     <!-- Focus Card -->
     <div
       class="app-card"
+      (click)="openPopup('focus')"
       style="
         flex: 1 1 400px;
         min-width: 300px;
@@ -345,7 +346,10 @@
             <li *ngFor="let title of completedTaskTitles">{{ title }}</li>
           </ul>
           <ng-template #noTasks>
-            <p>No tasks available.</p>
+            <p>
+              <em>Task names are only available for newly generated reports.</em><br /><br />
+              <em>Make sure you mark your available tasks as completed.</em>
+            </p>
           </ng-template>
         </div>
 
@@ -356,16 +360,22 @@
           </ul>
 
           <ng-template #noHabits>
-            <p>No habits completed.</p>
+            <p>
+              <em>Habit names are only available for newly generated reports.</em><br /><br />
+              <em>Make sure you mark your daily habits as completed.</em>
+            </p>
           </ng-template>
         </div>
 
         <div *ngIf="popupContent === 'focus'">
-          <p><strong>Pomodoro Sessions:</strong></p>
-          <ul>
-            <li>Session 1: 25 min - Complete</li>
-            <li>Session 2: 25 min - Complete</li>
-          </ul>
+          <p *ngIf="+pomodoroSessionsCompleted > 0">
+            <strong>Average Focus Time per Session:</strong>
+            {{ +totalFocusTime / +pomodoroSessionsCompleted | number: '1.1-1' }} hours
+          </p>
+          <p *ngIf="+pomodoroSessionsCompleted === 0 || !totalFocusTime">
+            <em>Pomodoro analyses is only available for newly generated reports.</em><br /><br />
+            <em>Make sure you have completed pomodoros.</em>
+          </p>
         </div>
       </div>
     </div>
