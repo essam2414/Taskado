@@ -1,4 +1,4 @@
-# teamproject24 template application
+# Taskado
 
 This application was generated using JHipster 8.7.3 for the team project 2024-2025 module at the university of Birmingham.
 
@@ -131,7 +131,7 @@ Modified by Madasar Shah for Team Project 2024 - 2025 as follows:
 These settings can also be found in the file [.yo-rc.json](.yo-rc.json)
 
 - `? Which *type* of application would you like to create? Monolithic application (recommended for simple projects) `
-- `? What is the base name of your application? teamproject24`
+- `? What is the base name of your application? Taskado`
 - `? Do you want to make it reactive with Spring WebFlux? No `
 - `? What is your default Java package name? bham.team `
 - `? Which *type* of authentication would you like to use? JWT authentication (stateless, with a token) `
@@ -291,7 +291,7 @@ update src/main/webapp/app/app.config.ts
 
 ### Packaging as jar
 
-To build the final jar and optimize the teamproject24 application for production, run:
+To build the final jar and optimize the Taskado application for production, run:
 
 ```
 ./mvnw -Pprod clean verify

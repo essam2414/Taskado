@@ -1,0 +1,64 @@
+{
+  "annotations": {
+    "changelogDate": "20250402172251"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "darkMode",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "sidebarColorLight",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "sidebarColorDark",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "accentColor",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "fontSizeLevel",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "dyslexiaMode",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "highContrast",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "reduceMotion",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "dashboardWidgetsJson",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "dashboardTheme",
+      "fieldType": "String"
+    }
+  ],
+  "name": "UserPreferences",
+  "relationships": [
+    {
+      "options": {
+        "id": true,
+        "onDelete": "CASCADE"
+      },
+      "otherEntityField": "login",
+      "otherEntityName": "user",
+      "relationshipName": "user",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one",
+      "relationshipWithBuiltInEntity": true
+    }
+  ],
+  "searchEngine": "no"
+}

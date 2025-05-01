@@ -5,6 +5,12 @@ import SharedModule from 'app/shared/shared.module';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
 
+import { UserPreferencesService } from 'app/entities/user-preferences/service/user-preferences.service';
+import { IUserPreferences } from 'app/entities/user-preferences/user-preferences.model';
+
+import { dashboardWidgets, Widget } from 'app/dashboard/widgets/widgets.component';
+import { ActivatedRoute } from '@angular/router';
+
 const initialAccount: Account = {} as Account;
 
 @Component({
@@ -16,24 +22,21 @@ const initialAccount: Account = {} as Account;
 })
 export default class SettingsComponent implements OnInit {
   user: Account | null = null;
+  preferences: IUserPreferences | null = null;
   success = signal(false);
-  darkMode = false;
 
-  activeTab = 'account';
-  tabsOpen = false;
-  tabs = [
-    { value: 'account', label: 'Account', icon: 'user' },
-    { value: 'appearance', label: 'Appearance', icon: 'palette' },
-    { value: 'accessibility', label: 'Accessibility', icon: 'eye' },
-  ];
+  darkMode = false;
+  selectedSidebarColorLight = '#fdf1f6';
+  selectedSidebarColorDark = '#1d1d1d';
+  selectedAccentColor = '#564df2';
 
   themeColors: string[] = [];
   darkModePalette: string[] = this.getThemeColors(true);
   lightModePalette: string[] = this.getThemeColors(false);
 
-  selectedSidebarColorLight = this.getStoredSidebarColor(false);
-  selectedSidebarColorDark = this.getStoredSidebarColor(true);
-  selectedSidebarColor = this.darkMode ? this.selectedSidebarColorDark : this.selectedSidebarColorLight;
+  selectedSidebarColor = '';
+  customSidebarHexInput = '';
+  customAccentHexInput = '';
 
   accentColors: string[] = [
     getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim(),
@@ -46,19 +49,36 @@ export default class SettingsComponent implements OnInit {
     '#e43f6f', // Pink
     '#be3e82', // Violet
   ];
-  selectedAccentColor = this.accentColors[0];
-
-  customSidebarHexInput = '';
-  customAccentHexInput = '';
 
   fontSizeLevel = 2;
-  fontScaleOptions = [0.7, 0.85, 1, 1.15, 1.3];
   dyslexiaMode = false;
   highContrast = false;
   reduceMotion = false;
 
+  activeTab = 'account';
+  tabsOpen = false;
+  tabs = [
+    { value: 'account', label: 'Account', icon: 'user' },
+    { value: 'appearance', label: 'Appearance', icon: 'palette' },
+    { value: 'accessibility', label: 'Accessibility', icon: 'eye' },
+    { value: 'dashboard', label: 'Dashboard', icon: 'desktop' },
+  ];
+
   previewUrl: string | null = null;
   selectedFile: File | null = null;
+
+  dashboardThemes = [
+    { id: 'Default', bg: this.getDashboardThemeBackground('Default') },
+    { id: 'Midnight', bg: this.getDashboardThemeBackground('Midnight') },
+    { id: 'Amethyst', bg: this.getDashboardThemeBackground('Amethyst') },
+    { id: 'Blush', bg: this.getDashboardThemeBackground('Blush') },
+    { id: 'Apricot', bg: this.getDashboardThemeBackground('Apricot') },
+    { id: 'Mist', bg: this.getDashboardThemeBackground('Mist') },
+    { id: 'Sage', bg: this.getDashboardThemeBackground('Sage') },
+    { id: 'Bloom', bg: this.getDashboardThemeBackground('Bloom') },
+  ];
+  selectedDashboardTheme = 'Default';
+  widgets: Widget[] = [];
 
   settingsForm = new FormGroup({
     firstName: new FormControl(initialAccount.firstName, {
@@ -82,37 +102,216 @@ export default class SettingsComponent implements OnInit {
   });
 
   private readonly accountService = inject(AccountService);
+  private readonly userPreferencesService = inject(UserPreferencesService);
+  private readonly route = inject(ActivatedRoute);
 
   ngOnInit(): void {
-    this.loadFontSize();
-    this.loadDyslexiaFont();
-    this.loadHighContrast();
-    this.loadReduceMotion();
-
-    this.darkMode = localStorage.getItem('darkMode') === 'true';
-    const highContrast = localStorage.getItem('highContrast') === 'true';
-
-    document.documentElement.setAttribute('data-theme', highContrast ? 'high-contrast' : this.darkMode ? 'dark' : 'light');
-
-    this.themeColors = this.darkMode ? this.darkModePalette : this.lightModePalette;
-    this.selectedSidebarColorLight = this.getStoredSidebarColor(false);
-    this.selectedSidebarColorDark = this.getStoredSidebarColor(true);
-
-    this.selectedSidebarColor = this.getStoredSidebarColor(this.darkMode);
-
-    this.applySidebarColor();
-
-    this.selectedAccentColor =
-      localStorage.getItem('accentColor') ?? getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
-    this.updateAccentColor();
+    this.route.queryParams.subscribe(params => {
+      const tab = params['tab'];
+      if (tab && this.tabs.some(t => t.value === tab)) {
+        this.activeTab = tab;
+      }
+    });
 
     this.accountService.identity().subscribe(account => {
       if (account) {
         this.user = account;
         this.settingsForm.patchValue(account);
+
+        const prefs = this.userPreferencesService.currentPreferences;
+        if (prefs) {
+          this.preferences = prefs;
+          this.applyPreferences(prefs);
+
+          this.selectedDashboardTheme = prefs.dashboardTheme ?? 'Default';
+          this.widgets = this.userPreferencesService.widgets;
+        } else {
+          console.warn('[Settings] Preferences not loaded yet.');
+        }
       }
     });
   }
+
+  applyPreferences(prefs: IUserPreferences): void {
+    this.darkMode = prefs.darkMode ?? false;
+    this.highContrast = prefs.highContrast ?? false;
+    this.dyslexiaMode = prefs.dyslexiaMode ?? false;
+    this.reduceMotion = prefs.reduceMotion ?? false;
+    this.fontSizeLevel = prefs.fontSizeLevel ?? 2;
+    this.selectedAccentColor = prefs.accentColor ?? '#564df2';
+    this.selectedSidebarColorLight = prefs.sidebarColorLight ?? '#fdf1f6';
+    this.selectedSidebarColorDark = prefs.sidebarColorDark ?? '#1d1d1d';
+
+    this.selectedSidebarColor = this.darkMode ? this.selectedSidebarColorDark : this.selectedSidebarColorLight;
+    this.themeColors = this.darkMode ? this.darkModePalette : this.lightModePalette;
+
+    this.userPreferencesService.applyPreferencesToDOM(prefs);
+  }
+
+  updateUserPreference(update: Partial<IUserPreferences>): void {
+    if (!this.preferences?.id) return;
+
+    const updatedPrefs = { ...this.preferences, ...update };
+
+    this.userPreferencesService.update(updatedPrefs).subscribe({
+      next: res => {
+        this.preferences = res.body ?? updatedPrefs;
+        this.applyPreferences(this.preferences);
+      },
+    });
+  }
+
+  // appearance settings
+
+  toggleDarkMode(): void {
+    this.darkMode = !this.darkMode;
+    this.updateUserPreference({ darkMode: this.darkMode });
+
+    this.selectedSidebarColor = this.darkMode ? this.selectedSidebarColorDark : this.selectedSidebarColorLight;
+    this.themeColors = this.darkMode ? this.darkModePalette : this.lightModePalette;
+  }
+
+  updateAccentColor(): void {
+    this.updateUserPreference({ accentColor: this.selectedAccentColor });
+  }
+
+  setSidebarColor(color: string): void {
+    if (this.darkMode) {
+      this.selectedSidebarColorDark = color;
+      this.updateUserPreference({ sidebarColorDark: color });
+    } else {
+      this.selectedSidebarColorLight = color;
+      this.updateUserPreference({ sidebarColorLight: color });
+    }
+
+    this.selectedSidebarColor = color;
+  }
+
+  isAppearanceDefault(): boolean {
+    const defaultSidebarColor = (
+      this.darkMode
+        ? getComputedStyle(document.documentElement).getPropertyValue('--default-sidebar-color-dark')
+        : getComputedStyle(document.documentElement).getPropertyValue('--default-sidebar-color')
+    ).trim();
+    const defaultAccentColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+
+    return this.selectedSidebarColor === defaultSidebarColor && this.selectedAccentColor === defaultAccentColor;
+  }
+
+  // accessability settings
+
+  toggleHighContrast(): void {
+    this.highContrast = !this.highContrast;
+    this.updateUserPreference({ highContrast: this.highContrast });
+  }
+
+  toggleDyslexiaFont(): void {
+    this.dyslexiaMode = !this.dyslexiaMode;
+    this.updateUserPreference({ dyslexiaMode: this.dyslexiaMode });
+  }
+
+  toggleReduceMotion(): void {
+    this.reduceMotion = !this.reduceMotion;
+    this.updateUserPreference({ reduceMotion: this.reduceMotion });
+  }
+
+  updateFontSize(): void {
+    this.updateUserPreference({ fontSizeLevel: this.fontSizeLevel });
+  }
+
+  isAccessibilityDefault(): boolean {
+    return !this.highContrast && !this.dyslexiaMode && !this.reduceMotion && this.fontSizeLevel === 2;
+  }
+
+  // dashboard settings
+
+  toggleWidget(widget: Widget): void {
+    widget.enabled = !widget.enabled;
+
+    const visibleWidgets = this.widgets.filter(w => w.enabled);
+    const widgetsJson = JSON.stringify(visibleWidgets.map(w => w.id));
+
+    this.updateUserPreference({ dashboardWidgetsJson: widgetsJson });
+  }
+
+  setDashboardTheme(theme: string): void {
+    this.selectedDashboardTheme = theme;
+    this.updateUserPreference({ dashboardTheme: theme });
+    this.userPreferencesService.applyDashboardTheme(theme);
+  }
+
+  getDashboardThemeBackground(themeId: string): string {
+    const fakeDiv = document.createElement('div');
+    fakeDiv.setAttribute('data-dashboard-theme', themeId);
+    document.body.appendChild(fakeDiv);
+
+    const bg = getComputedStyle(fakeDiv).getPropertyValue('--dashboard-bg').trim();
+
+    document.body.removeChild(fakeDiv);
+
+    return bg;
+  }
+
+  isDashboardDefault(): boolean {
+    const allWidgetsEnabled = this.widgets.every(w => w.enabled);
+    return this.selectedDashboardTheme === 'Default' && allWidgetsEnabled;
+  }
+
+  // reset functions
+
+  resetAppearance(): void {
+    const defaultSidebarColor = (
+      this.darkMode
+        ? getComputedStyle(document.documentElement).getPropertyValue('--default-sidebar-color-dark')
+        : getComputedStyle(document.documentElement).getPropertyValue('--default-sidebar-color')
+    ).trim();
+
+    const defaultAccentColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
+
+    this.selectedSidebarColor = defaultSidebarColor;
+    this.selectedAccentColor = defaultAccentColor;
+
+    this.updateUserPreference({
+      sidebarColorDark: this.darkMode ? defaultSidebarColor : this.preferences?.sidebarColorDark,
+      sidebarColorLight: !this.darkMode ? defaultSidebarColor : this.preferences?.sidebarColorLight,
+      accentColor: defaultAccentColor,
+    });
+  }
+
+  resetAccessibility(): void {
+    const defaultAccessibilityPrefs = {
+      highContrast: false,
+      dyslexiaMode: false,
+      reduceMotion: false,
+      fontSizeLevel: 2,
+    };
+
+    this.updateUserPreference(defaultAccessibilityPrefs);
+    this.userPreferencesService.resetDOMToDefaultTheme();
+
+    this.darkMode = false;
+    this.highContrast = false;
+    this.dyslexiaMode = false;
+    this.reduceMotion = false;
+    this.fontSizeLevel = 2;
+  }
+
+  resetDashboard(): void {
+    const defaultTheme = 'Default';
+    this.selectedDashboardTheme = defaultTheme;
+    this.userPreferencesService.applyDashboardTheme(defaultTheme);
+
+    this.widgets.forEach(widget => {
+      widget.enabled = true;
+    });
+
+    this.updateUserPreference({
+      dashboardTheme: defaultTheme,
+      dashboardWidgetsJson: JSON.stringify(this.widgets.map(widget => widget.id)),
+    });
+  }
+
+  // account settings
 
   getProfilePictureUrl(): string {
     const login = this.settingsForm.value.login;
@@ -126,7 +325,7 @@ export default class SettingsComponent implements OnInit {
   }
 
   getAvatarUrl(seed: string): string {
-    return `https://api.dicebear.com/7.x/micah/svg?seed=${encodeURIComponent(seed)}`;
+    return `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(seed)}`;
   }
 
   removeProfilePicture(): void {
@@ -188,8 +387,8 @@ export default class SettingsComponent implements OnInit {
     const account = this.settingsForm.getRawValue();
     if (this.selectedFile) {
       this.uploadProfilePicture(this.selectedFile).then(imageUrl => {
-        account.imageUrl = imageUrl; // Update image URL
-        this.settingsForm.patchValue({ imageUrl }); // update form immediately
+        account.imageUrl = imageUrl;
+        this.settingsForm.patchValue({ imageUrl });
         this.submitAccountUpdate(account);
       });
     } else {
@@ -213,82 +412,6 @@ export default class SettingsComponent implements OnInit {
     this.tabsOpen = !this.tabsOpen;
   }
 
-  toggleDarkMode(): void {
-    this.darkMode = !this.darkMode;
-    document.documentElement.setAttribute('data-theme', this.darkMode ? 'dark' : 'light');
-    localStorage.setItem('darkMode', this.darkMode.toString());
-
-    this.themeColors = this.darkMode ? this.darkModePalette : this.lightModePalette;
-
-    this.selectedSidebarColor = this.darkMode ? this.getStoredSidebarColor(true) : this.getStoredSidebarColor(false);
-
-    this.applySidebarColor();
-  }
-
-  setSidebarColor(color: string): void {
-    if (this.darkMode) {
-      this.selectedSidebarColorDark = color;
-      localStorage.setItem('sidebarColorDark', color);
-    } else {
-      this.selectedSidebarColorLight = color;
-      localStorage.setItem('sidebarColorLight', color);
-    }
-    this.selectedSidebarColor = color;
-    this.applySidebarColor();
-  }
-
-  updateAccentColor(): void {
-    document.documentElement.style.setProperty('--accent-color', this.selectedAccentColor);
-    localStorage.setItem('accentColor', this.selectedAccentColor);
-  }
-
-  applySidebarColor(): void {
-    document.documentElement.style.setProperty('--sidebar-color', this.selectedSidebarColor);
-
-    let textColor = '#FFFFFF';
-    let hoverColor = '#444444';
-
-    if (!this.highContrast) {
-      const rgb = this.hexToRgb(this.selectedSidebarColor);
-      if (rgb) {
-        const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
-        textColor = brightness > 128 ? '#2C2C38' : '#FFFFFF';
-
-        hoverColor =
-          brightness > 128
-            ? `rgba(${rgb.r - 20}, ${rgb.g - 20}, ${rgb.b - 20}, 0.3)`
-            : `rgba(${rgb.r + 20}, ${rgb.g + 20}, ${rgb.b + 20}, 0.3)`;
-      }
-    }
-
-    document.documentElement.style.setProperty('--sidebar-text-color', textColor);
-    document.documentElement.style.setProperty('--navmenu-text', textColor);
-    document.documentElement.style.setProperty('--navmenu-hover-text', textColor);
-    document.documentElement.style.setProperty('--sidebar-hover-bg', hoverColor);
-  }
-
-  resetColors(): void {
-    const defaultColor = this.darkMode
-      ? getComputedStyle(document.documentElement).getPropertyValue('--default-sidebar-color-dark').trim()
-      : getComputedStyle(document.documentElement).getPropertyValue('--default-sidebar-color').trim();
-    this.setSidebarColor(defaultColor);
-
-    this.selectedAccentColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim();
-    this.updateAccentColor();
-  }
-
-  getStoredSidebarColor(isDarkMode: boolean): string {
-    if (this.highContrast) {
-      return localStorage.getItem('sidebarColorHighContrast') ?? '#000000'; // Black sidebar in high contrast
-    }
-
-    return isDarkMode
-      ? (localStorage.getItem('sidebarColorDark') ??
-          getComputedStyle(document.documentElement).getPropertyValue('--default-sidebar-color-dark').trim())
-      : (localStorage.getItem('sidebarColorLight') ??
-          getComputedStyle(document.documentElement).getPropertyValue('--default-sidebar-color').trim());
-  }
-
   onCustomHexChange(type: 'sidebar' | 'accent'): void {
     if (type === 'sidebar' && /^[A-Fa-f0-9]*$/.test(this.customSidebarHexInput)) {
       this.selectedSidebarColor = `#${this.customSidebarHexInput}`;
@@ -309,74 +432,6 @@ export default class SettingsComponent implements OnInit {
     return { r, g, b };
   }
 
-  updateFontSize(): void {
-    const newScale = this.fontScaleOptions[this.fontSizeLevel];
-    document.documentElement.style.setProperty('--font-scale', newScale.toString());
-    localStorage.setItem('fontSizeLevel', this.fontSizeLevel.toString());
-  }
-
-  loadFontSize(): void {
-    const storedLevel = localStorage.getItem('fontSizeLevel');
-    if (storedLevel !== null) {
-      this.fontSizeLevel = parseInt(storedLevel, 10);
-      this.updateFontSize();
-    }
-  }
-
-  toggleDyslexiaFont(): void {
-    this.dyslexiaMode = !this.dyslexiaMode;
-    document.documentElement.classList.toggle('dyslexia-mode', this.dyslexiaMode);
-    localStorage.setItem('dyslexiaMode', this.dyslexiaMode.toString());
-  }
-
-  loadDyslexiaFont(): void {
-    const storedDyslexiaMode = localStorage.getItem('dyslexiaMode');
-    this.dyslexiaMode = storedDyslexiaMode === 'true';
-
-    if (this.dyslexiaMode) {
-      document.documentElement.classList.add('dyslexia-mode');
-    }
-  }
-
-  toggleHighContrast(): void {
-    this.highContrast = !this.highContrast;
-
-    if (this.highContrast) {
-      document.documentElement.setAttribute('data-theme', 'high-contrast');
-      localStorage.setItem('highContrast', 'true');
-
-      this.selectedSidebarColor = '#000000';
-    } else {
-      document.documentElement.setAttribute('data-theme', this.darkMode ? 'dark' : 'light');
-      localStorage.removeItem('highContrast');
-
-      this.selectedSidebarColor = this.darkMode ? this.getStoredSidebarColor(true) : this.getStoredSidebarColor(false);
-    }
-
-    this.applySidebarColor();
-  }
-
-  loadHighContrast(): void {
-    const storedSetting = localStorage.getItem('highContrast');
-    if (storedSetting === 'true') {
-      this.highContrast = true;
-      document.documentElement.setAttribute('data-theme', 'high-contrast');
-    }
-  }
-
-  toggleReduceMotion(): void {
-    this.reduceMotion = !this.reduceMotion;
-    document.documentElement.classList.toggle('reduce-motion', this.reduceMotion);
-    localStorage.setItem('reduceMotion', this.reduceMotion.toString());
-  }
-
-  loadReduceMotion(): void {
-    this.reduceMotion = localStorage.getItem('reduceMotion') === 'true';
-    if (this.reduceMotion) {
-      document.documentElement.classList.add('reduce-motion');
-    }
-  }
-
   protected submitAccountUpdate(account: Account): void {
     this.accountService.save(account).subscribe(() => {
       this.success.set(true);
@@ -394,7 +449,7 @@ export default class SettingsComponent implements OnInit {
   protected async uploadProfilePicture(file: File): Promise<string> {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('upload_preset', 'taskado_preset'); // your unsigned preset
+    formData.append('upload_preset', 'taskado_preset');
 
     const cloudName = 'dzxjmjjnt'; // Cloudinary cloud name
 
@@ -408,6 +463,6 @@ export default class SettingsComponent implements OnInit {
     }
 
     const data: { secure_url: string } = await response.json();
-    return data.secure_url; // this is the public image URL
+    return data.secure_url;
   }
 }

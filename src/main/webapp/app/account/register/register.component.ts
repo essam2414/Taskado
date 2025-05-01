@@ -14,7 +14,6 @@ import { HeaderComponent } from 'app/layouts/header/header.component';
   selector: 'jhi-register',
   imports: [SharedModule, RouterModule, FormsModule, ReactiveFormsModule, PasswordStrengthBarComponent, HeaderComponent],
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss'],
 })
 export default class RegisterComponent implements AfterViewInit {
   login = viewChild.required<ElementRef>('login');

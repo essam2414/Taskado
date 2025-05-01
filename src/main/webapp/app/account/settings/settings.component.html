@@ -12,25 +12,23 @@
       </div>
 
       <!-- Dropdown filters for mobile -->
-      <div class="mobile-only entity-filters-dropdown dropdown dropdown-select" [class.open]="tabsOpen">
-        <button class="dropdown-btn" (click)="toggleTabs()">
+      <div class="mobile-only dropdown dropdown-select" [class.open]="tabsOpen">
+        <div class="dropdown-btn" [class.open]="tabsOpen" (click)="toggleTabs()">
           <span><fa-icon class="filter-icon" [icon]="activeTabIcon"></fa-icon> {{ activeTabLabel }}</span>
           <fa-icon [icon]="'chevron-down'"></fa-icon>
-        </button>
-
-        <div class="dropdown-menu">
-          <button
-            *ngFor="let tab of tabs"
-            class="dropdown-item"
-            [class.active]="activeTab === tab.value"
-            (click)="setActiveTab(tab.value); toggleTabs()"
-          >
-            <fa-icon [icon]="tab.icon"></fa-icon> {{ tab.label }}
-          </button>
         </div>
+
+        <ul class="dropdown-menu">
+          <li *ngFor="let tab of tabs" [class.active]="activeTab === tab.value" (click)="setActiveTab(tab.value); toggleTabs()">
+            <fa-icon class="select-icon" [icon]="tab.icon"></fa-icon> {{ tab.label }}
+          </li>
+        </ul>
       </div>
     </div>
   </div>
+
+  <jhi-alert-error></jhi-alert-error>
+  <jhi-alert></jhi-alert>
 
   <div class="settings-container">
     <div class="settings-content">
@@ -60,19 +58,19 @@
             </div>
 
             <div class="form-user">
-              <div class="auth-input-group">
-                <span class="setting-label" for="firstName">First Name</span>
+              <div class="form-group">
+                <label class="form-label" for="firstName">First Name</label>
                 <input type="text" class="form-control" id="firstName" formControlName="firstName" />
               </div>
 
-              <div class="auth-input-group">
-                <span class="setting-label" for="lastName">Last Name</span>
+              <div class="form-group">
+                <label class="form-label" for="lastName">Last Name</label>
                 <input type="text" class="form-control" id="lastName" formControlName="lastName" />
               </div>
             </div>
 
-            <div class="auth-input-group">
-              <span class="setting-label" for="email">Email</span>
+            <div class="form-group">
+              <label class="form-label" for="email">Email</label>
               <input type="email" class="form-control" id="email" formControlName="email" />
             </div>
 
@@ -114,13 +112,16 @@
               <span>Custom</span>
               <div class="hex-input-container">
                 <span>#</span>
+                <label for="customSidebarColor" class="visually-hidden">Custom sidebar color (hex code)</label>
                 <input
+                  id="customSidebarColor"
                   type="text"
                   [(ngModel)]="customSidebarHexInput"
                   (input)="onCustomHexChange('sidebar')"
                   maxlength="6"
                   pattern="[A-Fa-f0-9]*"
                   class="color-hex-input"
+                  aria-label="Custom sidebar color hex code"
                 />
               </div>
             </div>
@@ -156,7 +157,9 @@
               <span>Custom</span>
               <div class="hex-input-container">
                 <span>#</span>
+                <label for="customAccentColor" class="visually-hidden">Custom accent color (hex code)</label>
                 <input
+                  id="customAccentColor"
                   type="text"
                   [(ngModel)]="customAccentHexInput"
                   (input)="onCustomHexChange('accent')"
@@ -176,7 +179,13 @@
           </div>
 
           <label class="toggle-switch">
-            <input type="checkbox" [checked]="darkMode" (change)="toggleDarkMode()" [disabled]="highContrast" />
+            <input
+              type="checkbox"
+              [checked]="darkMode"
+              (change)="toggleDarkMode()"
+              [disabled]="highContrast"
+              aria-label="Toggle dark mode"
+            />
             <span class="slider"></span>
           </label>
 
@@ -186,7 +195,7 @@
         </div>
 
         <!-- Reset Button -->
-        <button class="reset-btn" (click)="resetColors()">Reset to default</button>
+        <button class="reset-btn" (click)="resetAppearance()" [disabled]="isAppearanceDefault()">Reset to default</button>
       </div>
 
       <!-- Accessibility Settings -->
@@ -203,7 +212,20 @@
             <span class="font-size-label">A</span>
 
             <div class="font-size-controls">
-              <input type="range" min="0" max="4" [(ngModel)]="fontSizeLevel" (input)="updateFontSize()" class="font-size-slider" />
+              <label for="fontSizeSlider" class="visually-hidden">Adjust font size</label>
+              <input
+                id="fontSizeSlider"
+                type="range"
+                min="0"
+                max="4"
+                [(ngModel)]="fontSizeLevel"
+                (input)="updateFontSize()"
+                class="font-size-slider"
+                aria-valuemin="0"
+                aria-valuemax="4"
+                [attr.aria-valuenow]="fontSizeLevel"
+                aria-label="Font size level"
+              />
 
               <div class="font-size-steps">
                 <span
@@ -224,7 +246,7 @@
           </div>
 
           <label class="toggle-switch">
-            <input type="checkbox" [checked]="dyslexiaMode" (change)="toggleDyslexiaFont()" />
+            <input type="checkbox" [checked]="dyslexiaMode" (change)="toggleDyslexiaFont()" aria-label="Toggle dyslexic font mode" />
             <span class="slider"></span>
           </label>
         </div>
@@ -236,7 +258,7 @@
           </div>
 
           <label class="toggle-switch">
-            <input type="checkbox" [checked]="highContrast" (change)="toggleHighContrast()" />
+            <input type="checkbox" [checked]="highContrast" (change)="toggleHighContrast()" aria-label="Toggle high contrast mode" />
             <span class="slider"></span>
           </label>
         </div>
@@ -248,10 +270,59 @@
           </div>
 
           <label class="toggle-switch">
-            <input type="checkbox" [checked]="reduceMotion" (change)="toggleReduceMotion()" />
+            <input type="checkbox" [checked]="reduceMotion" (change)="toggleReduceMotion()" aria-label="Toggle reduce motion" />
             <span class="slider"></span>
           </label>
         </div>
+
+        <!-- Reset Button -->
+        <button class="reset-btn" (click)="resetAccessibility()" [disabled]="isAccessibilityDefault()">Reset to default</button>
+      </div>
+
+      <div *ngIf="activeTab === 'dashboard'">
+        <h3 class="settings-title">Dashboard</h3>
+
+        <div class="setting-item">
+          <div>
+            <span class="setting-label">Widgets</span>
+            <p class="setting-desc">Choose which widgets you want to show on your dashboard</p>
+          </div>
+
+          <div class="widget-list">
+            <div class="widget-item" [class.enabled]="widget.enabled" *ngFor="let widget of widgets" (click)="toggleWidget(widget)">
+              <span>{{ widget.title }}</span>
+              <label class="toggle-switch" (click)="$event.stopPropagation()">
+                <input type="checkbox" [checked]="widget.enabled" (change)="toggleWidget(widget)" aria-label="Toggle widget" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="setting-item">
+          <div>
+            <span class="setting-label">Theme</span>
+            <p class="setting-desc">Choose a theme to change the look and feel of your dashboard</p>
+          </div>
+
+          <div class="theme-options">
+            <button
+              *ngFor="let theme of dashboardThemes"
+              class="theme-option"
+              [class.active]="selectedDashboardTheme === theme.id"
+              [ngStyle]="{
+                background: theme.bg,
+                'background-size': theme.bg.includes('url') ? '120px' : 'cover',
+              }"
+              (click)="setDashboardTheme(theme.id)"
+            >
+              <span class="theme-name">{{ theme.id }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Reset Button -->
+        <button class="reset-btn" (click)="resetDashboard()" [disabled]="isDashboardDefault()">Reset to default</button>
       </div>
     </div>
   </div>

@@ -10,7 +10,7 @@ import { ProfileService } from 'app/layouts/profiles/profile.service';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 import SharedModule from 'app/shared/shared.module';
-import { Account } from 'app/core/auth/account.model';
+import { UserPreferencesService } from 'app/entities/user-preferences/service/user-preferences.service';
 
 @Component({
   selector: 'jhi-sidebar',
@@ -88,6 +88,7 @@ export class SidebarComponent implements OnInit {
   private readonly loginService = inject(LoginService);
   private readonly profileService = inject(ProfileService);
   private readonly router = inject(Router);
+  private readonly userPreferencesService = inject(UserPreferencesService);
 
   ngOnInit(): void {
     this.profileService.getProfileInfo().subscribe(profileInfo => {
@@ -128,6 +129,7 @@ export class SidebarComponent implements OnInit {
 
   logout(): void {
     this.loginService.logout();
+    this.userPreferencesService.resetDOMToDefaultTheme(); // Resets UI to default
     this.router.navigate(['']);
   }
 
@@ -143,6 +145,6 @@ export class SidebarComponent implements OnInit {
     return this.getAvatarUrl(login);
   }
   getAvatarUrl(seed: string): string {
-    return `https://api.dicebear.com/7.x/micah/svg?seed=${encodeURIComponent(seed)}`;
+    return `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(seed)}`;
   }
 }

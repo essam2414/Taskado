@@ -1,3 +1,6 @@
+/* eslint-disable prettier/prettier */
+// src/main/webapp/app/entities/habit/update/habit-form.service.ts
+
 import { Injectable } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
@@ -5,29 +8,22 @@ import dayjs from 'dayjs/esm';
 import { DATE_TIME_FORMAT } from 'app/config/input.constants';
 import { IHabit, NewHabit } from '../habit.model';
 
-/**
- * A partial Type with required key is used as form input.
- */
+/** Utility type for edit vs new forms */
 type PartialWithRequiredKeyOf<T extends { id: unknown }> = Partial<Omit<T, 'id'>> & { id: T['id'] };
 
-/**
- * Type for createFormGroup and resetForm argument.
- * It accepts IHabit for edit and NewHabitFormGroupInput for create.
- */
+/** Input type for createHabitFormGroup */
 type HabitFormGroupInput = IHabit | PartialWithRequiredKeyOf<NewHabit>;
 
-/**
- * Type that converts some properties for forms.
- */
+/** Convert Dayjs to string for forms */
 type FormValueOf<T extends IHabit | NewHabit> = Omit<T, 'startDate'> & {
   startDate?: string | null;
 };
 
 type HabitFormRawValue = FormValueOf<IHabit>;
-
 type NewHabitFormRawValue = FormValueOf<NewHabit>;
 
-type HabitFormDefaults = Pick<NewHabit, 'id' | 'startDate'>;
+/** Fields that get defaults when creating a new form */
+type HabitFormDefaults = Pick<NewHabit, 'id' | 'startDate' | 'repeatType'>;
 
 type HabitFormGroupContent = {
   id: FormControl<HabitFormRawValue['id'] | NewHabit['id']>;
@@ -49,74 +45,65 @@ export type HabitFormGroup = FormGroup<HabitFormGroupContent>;
 @Injectable({ providedIn: 'root' })
 export class HabitFormService {
   createHabitFormGroup(habit: HabitFormGroupInput = { id: null }): HabitFormGroup {
-    const habitRawValue = this.convertHabitToHabitRawValue({
+    const rawValue = this.convertHabitToFormValue({
       ...this.getFormDefaults(),
       ...habit,
     });
+
     return new FormGroup<HabitFormGroupContent>({
-      id: new FormControl(
-        { value: habitRawValue.id, disabled: true },
-        {
-          nonNullable: true,
-          validators: [Validators.required],
-        },
-      ),
-      name: new FormControl(habitRawValue.name, {
-        validators: [Validators.required],
-      }),
-      startDate: new FormControl(habitRawValue.startDate, {
-        validators: [Validators.required],
-      }),
-      streak: new FormControl(habitRawValue.streak),
-      completionRate: new FormControl(habitRawValue.completionRate),
-      repeatType: new FormControl(habitRawValue.repeatType, {
-        validators: [Validators.required],
-      }),
-      repeatInterval: new FormControl(habitRawValue.repeatInterval),
-      repeatDays: new FormControl(habitRawValue.repeatDays),
-      repeatTimes: new FormControl(habitRawValue.repeatTimes),
-      completedDates: new FormControl(habitRawValue.completedDates),
-      category: new FormControl(habitRawValue.category),
-      user: new FormControl(habitRawValue.user),
+      id: new FormControl({ value: rawValue.id, disabled: true }, { nonNullable: true, validators: [Validators.required] }),
+      name: new FormControl(rawValue.name, { validators: [Validators.required] }),
+      startDate: new FormControl(rawValue.startDate, { validators: [Validators.required] }),
+      streak: new FormControl(rawValue.streak),
+      completionRate: new FormControl(rawValue.completionRate),
+
+      // defaulted to 'DAILY' so never null
+      repeatType: new FormControl(rawValue.repeatType),
+      repeatInterval: new FormControl(rawValue.repeatInterval),
+      repeatDays: new FormControl(rawValue.repeatDays),
+      repeatTimes: new FormControl(rawValue.repeatTimes),
+      completedDates: new FormControl(rawValue.completedDates),
+      category: new FormControl(rawValue.category),
+      user: new FormControl(rawValue.user),
     });
   }
 
   getHabit(form: HabitFormGroup): IHabit | NewHabit {
-    return this.convertHabitRawValueToHabit(form.getRawValue() as HabitFormRawValue | NewHabitFormRawValue);
+    const raw = form.getRawValue() as HabitFormRawValue & NewHabitFormRawValue;
+    return this.convertFormValueToHabit(raw);
   }
 
   resetForm(form: HabitFormGroup, habit: HabitFormGroupInput): void {
-    const habitRawValue = this.convertHabitToHabitRawValue({ ...this.getFormDefaults(), ...habit });
-    form.reset(
-      {
-        ...habitRawValue,
-        id: { value: habitRawValue.id, disabled: true },
-      } as any /* cast to workaround https://github.com/angular/angular/issues/46458 */,
-    );
+    const rawValue = this.convertHabitToFormValue({
+      ...this.getFormDefaults(),
+      ...habit,
+    });
+    form.reset({
+      ...rawValue,
+      id: { value: rawValue.id, disabled: true },
+    } as any);
   }
 
   private getFormDefaults(): HabitFormDefaults {
-    const currentTime = dayjs();
-
     return {
       id: null,
-      startDate: currentTime,
+      startDate: dayjs(),
+      repeatType: 'DAILY',
     };
   }
 
-  private convertHabitRawValueToHabit(rawHabit: HabitFormRawValue | NewHabitFormRawValue): IHabit | NewHabit {
+  private convertFormValueToHabit(raw: HabitFormRawValue | NewHabitFormRawValue): IHabit | NewHabit {
     return {
-      ...rawHabit,
-      startDate: dayjs(rawHabit.startDate, DATE_TIME_FORMAT),
+      ...raw,
+      startDate: raw.startDate ? dayjs(raw.startDate, DATE_TIME_FORMAT) : undefined,
     };
   }
 
-  private convertHabitToHabitRawValue(
-    habit: IHabit | (Partial<NewHabit> & HabitFormDefaults),
-  ): HabitFormRawValue | PartialWithRequiredKeyOf<NewHabitFormRawValue> {
+  private convertHabitToFormValue(habit: IHabit | (Partial<NewHabit> & HabitFormDefaults)): HabitFormRawValue | NewHabitFormRawValue {
     return {
       ...habit,
       startDate: habit.startDate ? habit.startDate.format(DATE_TIME_FORMAT) : undefined,
+      repeatType: habit.repeatType ?? 'DAILY',
     };
   }
 }

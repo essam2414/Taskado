@@ -1,7 +1,10 @@
+import { IUser } from 'app/entities/user/user.model';
+
 export interface ICategory {
   id: number;
   name?: string | null;
   color?: string | null;
+  user?: Pick<IUser, 'id'> | null;
 }
 
 export const CATEGORY_COLORS = [

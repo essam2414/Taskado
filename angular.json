@@ -32,7 +32,9 @@
             "assets": [
               "src/main/webapp/content",
               "src/main/webapp/favicon.ico",
-              "src/main/webapp/manifest.webapp",
+              "src/main/webapp/apple-touch-icon.png",
+              "src/main/webapp/favicon-96x96.png",
+              "src/main/webapp/manifest.webmanifest",
               "src/main/webapp/robots.txt"
             ],
             "styles": ["src/main/webapp/content/scss/vendor.scss", "src/main/webapp/content/scss/global.scss"],
@@ -57,8 +59,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "3kb",
-                  "maximumError": "6kb"
+                  "maximumWarning": "15kb",
+                  "maximumError": "20kb"
                 }
               ]
             },

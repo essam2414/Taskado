@@ -1,7 +1,10 @@
 package bham.team.web.rest;
 
 import bham.team.domain.Section;
+import bham.team.domain.User;
 import bham.team.repository.SectionRepository;
+import bham.team.repository.UserRepository;
+import bham.team.security.SecurityUtils;
 import bham.team.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -36,8 +39,11 @@ public class SectionResource {
 
     private final SectionRepository sectionRepository;
 
-    public SectionResource(SectionRepository sectionRepository) {
+    private final UserRepository userRepository;
+
+    public SectionResource(SectionRepository sectionRepository, UserRepository userRepository) {
         this.sectionRepository = sectionRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -53,6 +59,11 @@ public class SectionResource {
         if (section.getId() != null) {
             throw new BadRequestAlertException("A new section cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User user = userRepository.findOneByLogin(login).orElseThrow();
+        section.setUser(user);
+
         section = sectionRepository.save(section);
         return ResponseEntity.created(new URI("/api/sections/" + section.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, section.getId().toString()))
@@ -89,6 +100,10 @@ public class SectionResource {
         Section existingSection = sectionRepository
             .findById(id)
             .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingSection.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to modify this section", ENTITY_NAME, "unauthorized");
+        }
 
         // ✅ Preserve the tasks collection to prevent Hibernate from thinking they are deleted
         section.setTasks(existingSection.getTasks());
@@ -127,14 +142,20 @@ public class SectionResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
+        Section existingSection = sectionRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingSection.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to update this section", ENTITY_NAME, "unauthorized");
+        }
+
         Optional<Section> result = sectionRepository
             .findById(section.getId())
-            .map(existingSection -> {
+            .map(sectionToUpdate -> {
                 if (section.getName() != null) {
-                    existingSection.setName(section.getName());
+                    sectionToUpdate.setName(section.getName());
                 }
 
-                return existingSection;
+                return sectionToUpdate;
             })
             .map(sectionRepository::save);
 
@@ -152,7 +173,7 @@ public class SectionResource {
     @GetMapping("")
     public List<Section> getAllSections() {
         LOG.debug("REST request to get all Sections");
-        return sectionRepository.findAll();
+        return sectionRepository.findByUserIsCurrentUser();
     }
 
     /**
@@ -164,7 +185,10 @@ public class SectionResource {
     @GetMapping("/{id}")
     public ResponseEntity<Section> getSection(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Section : {}", id);
-        Optional<Section> section = sectionRepository.findById(id);
+        Optional<Section> section = sectionRepository
+            .findById(id)
+            .filter(s -> s.getUser() != null && s.getUser().getLogin().equals(SecurityUtils.getCurrentUserLogin().orElse("")));
+
         return ResponseUtil.wrapOrNotFound(section);
     }
 
@@ -177,7 +201,14 @@ public class SectionResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSection(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Section : {}", id);
-        sectionRepository.deleteById(id);
+        Section existingSection = sectionRepository
+            .findById(id)
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingSection.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to delete this section", ENTITY_NAME, "unauthorized");
+        }
+        sectionRepository.delete(existingSection);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();

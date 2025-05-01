@@ -1,7 +1,10 @@
 package bham.team.web.rest;
 
 import bham.team.domain.Task;
+import bham.team.domain.User;
 import bham.team.repository.TaskRepository;
+import bham.team.repository.UserRepository;
+import bham.team.security.SecurityUtils;
 import bham.team.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -36,8 +39,11 @@ public class TaskResource {
 
     private final TaskRepository taskRepository;
 
-    public TaskResource(TaskRepository taskRepository) {
+    private final UserRepository userRepository;
+
+    public TaskResource(TaskRepository taskRepository, UserRepository userRepository) {
         this.taskRepository = taskRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -53,6 +59,11 @@ public class TaskResource {
         if (task.getId() != null) {
             throw new BadRequestAlertException("A new task cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User user = userRepository.findOneByLogin(login).orElseThrow();
+        task.setUser(user);
+
         task = taskRepository.save(task);
         return ResponseEntity.created(new URI("/api/tasks/" + task.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, task.getId().toString()))
@@ -82,6 +93,12 @@ public class TaskResource {
 
         if (!taskRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Task existingTask = taskRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingTask.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to update this task", ENTITY_NAME, "unauthorized");
         }
 
         task = taskRepository.save(task);
@@ -118,35 +135,41 @@ public class TaskResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
+        Task existingTask = taskRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingTask.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to update this task", ENTITY_NAME, "unauthorized");
+        }
+
         Optional<Task> result = taskRepository
             .findById(task.getId())
-            .map(existingTask -> {
+            .map(taskToUpdate -> {
                 if (task.getTitle() != null) {
-                    existingTask.setTitle(task.getTitle());
+                    taskToUpdate.setTitle(task.getTitle());
                 }
                 if (task.getDescription() != null) {
-                    existingTask.setDescription(task.getDescription());
+                    taskToUpdate.setDescription(task.getDescription());
                 }
                 if (task.getDueDate() != null) {
-                    existingTask.setDueDate(task.getDueDate());
+                    taskToUpdate.setDueDate(task.getDueDate());
                 }
                 if (task.getPriority() != null) {
-                    existingTask.setPriority(task.getPriority());
+                    taskToUpdate.setPriority(task.getPriority());
                 }
                 if (task.getCompleted() != null) {
-                    existingTask.setCompleted(task.getCompleted());
+                    taskToUpdate.setCompleted(task.getCompleted());
                 }
                 if (task.getCreatedAt() != null) {
-                    existingTask.setCreatedAt(task.getCreatedAt());
+                    taskToUpdate.setCreatedAt(task.getCreatedAt());
                 }
                 if (task.getUpdatedAt() != null) {
-                    existingTask.setUpdatedAt(task.getUpdatedAt());
+                    taskToUpdate.setUpdatedAt(task.getUpdatedAt());
                 }
                 if (task.getOrder() != null) {
-                    existingTask.setOrder(task.getOrder());
+                    taskToUpdate.setOrder(task.getOrder());
                 }
 
-                return existingTask;
+                return taskToUpdate;
             })
             .map(taskRepository::save);
 
@@ -164,7 +187,7 @@ public class TaskResource {
     @GetMapping("")
     public List<Task> getAllTasks() {
         LOG.debug("REST request to get all Tasks");
-        return taskRepository.findAll();
+        return taskRepository.findByUserIsCurrentUser();
     }
 
     /**
@@ -176,7 +199,9 @@ public class TaskResource {
     @GetMapping("/{id}")
     public ResponseEntity<Task> getTask(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Task : {}", id);
-        Optional<Task> task = taskRepository.findById(id);
+        Optional<Task> task = taskRepository
+            .findById(id)
+            .filter(t -> t.getUser() != null && t.getUser().getLogin().equals(SecurityUtils.getCurrentUserLogin().orElse("")));
         return ResponseUtil.wrapOrNotFound(task);
     }
 
@@ -189,7 +214,12 @@ public class TaskResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Task : {}", id);
-        taskRepository.deleteById(id);
+        Task existingTask = taskRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingTask.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to delete this task", ENTITY_NAME, "unauthorized");
+        }
+        taskRepository.delete(existingTask);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();

@@ -1,7 +1,10 @@
 package bham.team.web.rest;
 
 import bham.team.domain.Category;
+import bham.team.domain.User;
 import bham.team.repository.CategoryRepository;
+import bham.team.repository.UserRepository;
+import bham.team.security.SecurityUtils;
 import bham.team.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -36,8 +39,11 @@ public class CategoryResource {
 
     private final CategoryRepository categoryRepository;
 
-    public CategoryResource(CategoryRepository categoryRepository) {
+    private final UserRepository userRepository;
+
+    public CategoryResource(CategoryRepository categoryRepository, UserRepository userRepository) {
         this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -53,6 +59,11 @@ public class CategoryResource {
         if (category.getId() != null) {
             throw new BadRequestAlertException("A new category cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User user = userRepository.findOneByLogin(login).orElseThrow();
+        category.setUser(user);
+
         category = categoryRepository.save(category);
         return ResponseEntity.created(new URI("/api/categories/" + category.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, category.getId().toString()))
@@ -84,6 +95,12 @@ public class CategoryResource {
 
         if (!categoryRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Category existingCategory = categoryRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingCategory.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to update this category", ENTITY_NAME, "unauthorized");
         }
 
         category = categoryRepository.save(category);
@@ -120,17 +137,23 @@ public class CategoryResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
+        Category existingCategory = categoryRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingCategory.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to update this category", ENTITY_NAME, "unauthorized");
+        }
+
         Optional<Category> result = categoryRepository
             .findById(category.getId())
-            .map(existingCategory -> {
+            .map(categoryToUpdate -> {
                 if (category.getName() != null) {
-                    existingCategory.setName(category.getName());
+                    categoryToUpdate.setName(category.getName());
                 }
                 if (category.getColor() != null) {
-                    existingCategory.setColor(category.getColor());
+                    categoryToUpdate.setColor(category.getColor());
                 }
 
-                return existingCategory;
+                return categoryToUpdate;
             })
             .map(categoryRepository::save);
 
@@ -148,7 +171,7 @@ public class CategoryResource {
     @GetMapping("")
     public List<Category> getAllCategories() {
         LOG.debug("REST request to get all Categories");
-        return categoryRepository.findAll();
+        return categoryRepository.findByUserIsCurrentUser();
     }
 
     /**
@@ -160,7 +183,10 @@ public class CategoryResource {
     @GetMapping("/{id}")
     public ResponseEntity<Category> getCategory(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Category : {}", id);
-        Optional<Category> category = categoryRepository.findById(id);
+        Optional<Category> category = categoryRepository
+            .findById(id)
+            .filter(c -> c.getUser() != null && c.getUser().getLogin().equals(SecurityUtils.getCurrentUserLogin().orElse("")));
+
         return ResponseUtil.wrapOrNotFound(category);
     }
 
@@ -173,7 +199,14 @@ public class CategoryResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Category : {}", id);
-        categoryRepository.deleteById(id);
+        Category existingCategory = categoryRepository
+            .findById(id)
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingCategory.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to delete this category", ENTITY_NAME, "unauthorized");
+        }
+        categoryRepository.delete(existingCategory);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();

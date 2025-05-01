@@ -1,0 +1,66 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (userPreferences(); as userPreferencesRef) {
+      <div>
+        <h2 data-cy="userPreferencesDetailsHeading"><span>User Preferences</span></h2>
+
+        <hr />
+
+        <jhi-alert-error></jhi-alert-error>
+
+        <jhi-alert></jhi-alert>
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ userPreferencesRef.id }}</span>
+          </dd>
+          <dt><span>Dark Mode</span></dt>
+          <dd>
+            <span>{{ userPreferencesRef.darkMode }}</span>
+          </dd>
+          <dt><span>Sidebar Color Light</span></dt>
+          <dd>
+            <span>{{ userPreferencesRef.sidebarColorLight }}</span>
+          </dd>
+          <dt><span>Sidebar Color Dark</span></dt>
+          <dd>
+            <span>{{ userPreferencesRef.sidebarColorDark }}</span>
+          </dd>
+          <dt><span>Accent Color</span></dt>
+          <dd>
+            <span>{{ userPreferencesRef.accentColor }}</span>
+          </dd>
+          <dt><span>Font Size Level</span></dt>
+          <dd>
+            <span>{{ userPreferencesRef.fontSizeLevel }}</span>
+          </dd>
+          <dt><span>Dyslexia Mode</span></dt>
+          <dd>
+            <span>{{ userPreferencesRef.dyslexiaMode }}</span>
+          </dd>
+          <dt><span>High Contrast</span></dt>
+          <dd>
+            <span>{{ userPreferencesRef.highContrast }}</span>
+          </dd>
+          <dt><span>Reduce Motion</span></dt>
+          <dd>
+            <span>{{ userPreferencesRef.reduceMotion }}</span>
+          </dd>
+          <dt><span>User</span></dt>
+          <dd>
+            <span>{{ userPreferencesRef.user?.login }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/user-preferences', userPreferencesRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

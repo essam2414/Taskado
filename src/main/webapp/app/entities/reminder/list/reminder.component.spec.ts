@@ -84,7 +84,7 @@ describe('Reminder Management Component', () => {
 
     // THEN
     expect(service.query).toHaveBeenCalled();
-    expect(comp.reminders?.[0]).toEqual(expect.objectContaining({ id: 123 }));
+    expect(comp.reminders[0]).toEqual(expect.objectContaining({ id: 123 }));
   });
 
   describe('trackId', () => {

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal, Injector } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -6,6 +6,10 @@ import { takeUntil } from 'rxjs/operators';
 import SharedModule from 'app/shared/shared.module';
 import { AccountService } from 'app/core/auth/account.service';
 import { Account } from 'app/core/auth/account.model';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { UserPreferencesService } from 'app/entities/user-preferences/service/user-preferences.service';
+
+import { Widget } from './widgets/widgets.component';
 
 @Component({
   standalone: true,
@@ -16,23 +20,41 @@ import { Account } from 'app/core/auth/account.model';
 })
 export default class DashboardComponent implements OnInit, OnDestroy {
   account = signal<Account | null>(null);
-  isGuest = false;
 
   greetingMessage = '';
   currentDate = '';
 
+  visibleWidgets: Widget[] = [];
+
   private readonly destroy$ = new Subject<void>();
   private readonly accountService = inject(AccountService);
   private readonly router = inject(Router);
+  private readonly userPreferencesService = inject(UserPreferencesService);
+  private readonly injector = inject(Injector);
 
   ngOnInit(): void {
     this.accountService
       .getAuthenticationState()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(account => this.account.set(account));
-    this.isGuest = sessionStorage.getItem('guest') === 'true';
+      .subscribe(account => {
+        this.account.set(account);
+        if (account?.login) {
+          this.userPreferencesService.getOrCreateAndApply().then(prefs => {
+            this.visibleWidgets = this.userPreferencesService.visibleWidgets;
+          });
+        }
+      });
+
     this.setGreeting();
     this.setCurrentDate();
+  }
+
+  goToDashboardSettings(): void {
+    this.router.navigate(['/account/settings'], { queryParams: { tab: 'dashboard' } });
+  }
+
+  drop(event: CdkDragDrop<string[]>): void {
+    moveItemInArray(this.visibleWidgets, event.previousIndex, event.currentIndex);
   }
 
   setGreeting(): void {
@@ -64,6 +86,16 @@ export default class DashboardComponent implements OnInit, OnDestroy {
 
   getOrdinalSuffix(day: number): string {
     return ['st', 'nd', 'rd'][(day % 10) - 1] && ![11, 12, 13].includes(day) ? ['st', 'nd', 'rd'][(day % 10) - 1] : 'th';
+  }
+
+  createInjector(widget: Widget): Injector {
+    return Injector.create({
+      providers: [
+        { provide: 'title', useValue: widget.title },
+        { provide: 'link', useValue: widget.link },
+      ],
+      parent: this.injector,
+    });
   }
 
   login(): void {

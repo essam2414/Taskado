@@ -1,0 +1,103 @@
+[data-dashboard-theme='Default'] {
+  --dashboard-bg: var(--bg-color);
+  --widget-bg: var(--card-bg);
+  --dashboard-surface: var(--bg-color);
+  --dashboard-surface-hover: var(--bg-color-secondary);
+  --dashboard-accent: var(--accent-color);
+
+  --dashboard-border: var(--border-color);
+  --dashboard-text-primary: var(--text-primary);
+  --dashboard-text-secondary: var(--text-secondary);
+  --dashboard-text-muted: var(--text-muted);
+}
+
+[data-dashboard-theme='Midnight'] {
+  --dashboard-bg: linear-gradient(to left, #0b0f19, #121826, #1a2238);
+  --widget-bg: #242b35;
+  --dashboard-surface: rgba(42, 52, 64, 0.8);
+  --dashboard-surface-hover: rgba(52, 64, 80, 0.9);
+  --dashboard-accent: #00215c;
+
+  --dashboard-text-primary: #ffffff;
+  --dashboard-text-secondary: #cfcfcf;
+  --dashboard-text-muted: #8a8a8a;
+  --dashboard-border: rgba(255, 255, 255, 0.15);
+}
+
+[data-dashboard-theme='Amethyst'] {
+  --dashboard-bg: linear-gradient(to right, #20002c, #2f0743, #240046);
+  --widget-bg: #2a1d3d;
+  --dashboard-surface: rgba(56, 36, 82, 0.85);
+  --dashboard-surface-hover: rgba(74, 49, 112, 0.9);
+  --dashboard-accent: #3c096c;
+
+  --dashboard-text-primary: #ffffff;
+  --dashboard-text-secondary: #d4c2e5;
+  --dashboard-text-muted: #a68fc2;
+  --dashboard-border: rgba(255, 255, 255, 0.15);
+}
+
+[data-dashboard-theme='Blush'] {
+  --dashboard-bg: linear-gradient(to right, #f9e4e4 0%, #f7d3d3 100%);
+  --widget-bg: #fde9e6;
+  --dashboard-surface: rgba(248, 200, 200, 0.4);
+  --dashboard-surface-hover: rgba(240, 180, 180, 0.6);
+  --dashboard-accent: #f08080;
+
+  --dashboard-text-primary: #3b2b2b;
+  --dashboard-text-secondary: #7a6d6d;
+  --dashboard-text-muted: #b9a8a8;
+  --dashboard-border: rgba(0, 0, 0, 0.1);
+}
+
+[data-dashboard-theme='Apricot'] {
+  --dashboard-bg: linear-gradient(to right, #fce9d6 0%, #f8d9bf 100%);
+  --widget-bg: #f6f2f0;
+  --dashboard-surface: rgba(247, 212, 195, 0.5);
+  --dashboard-surface-hover: rgba(243, 199, 176, 0.6);
+  --dashboard-accent: #9c6644;
+
+  --dashboard-text-primary: #3d2f26;
+  --dashboard-text-secondary: #6f5c50;
+  --dashboard-text-muted: #a08c7d;
+  --dashboard-border: rgba(0, 0, 0, 0.12);
+}
+
+[data-dashboard-theme='Mist'] {
+  --dashboard-bg: linear-gradient(135deg, #dae8fc 0%, #c5d9f1 100%);
+  --widget-bg: #f7faff;
+  --dashboard-surface: rgba(200, 220, 240, 0.5);
+  --dashboard-surface-hover: rgba(190, 210, 235, 0.7);
+  --dashboard-accent: #1a659e;
+
+  --dashboard-text-primary: #27364b;
+  --dashboard-text-secondary: #5b6d7b;
+  --dashboard-text-muted: #9ba9b8;
+  --dashboard-border: rgba(0, 0, 0, 0.1);
+}
+
+[data-dashboard-theme='Sage'] {
+  --dashboard-bg: url(../../images/leaves.webp);
+  --widget-bg: #ddebd1;
+  --dashboard-surface: rgba(208, 223, 196, 0.5);
+  --dashboard-surface-hover: rgba(194, 211, 183, 0.6);
+  --dashboard-accent: #588157;
+
+  --dashboard-text-primary: #2f4035;
+  --dashboard-text-secondary: #5d7165;
+  --dashboard-text-muted: #9cb3a4;
+  --dashboard-border: rgba(0, 0, 0, 0.1);
+}
+
+[data-dashboard-theme='Bloom'] {
+  --dashboard-bg: url(../../images/florals.webp);
+  --widget-bg: #fff9f5;
+  --dashboard-surface: rgba(248, 217, 196, 0.3);
+  --dashboard-surface-hover: rgba(241, 200, 173, 0.6);
+  --dashboard-accent: #eaac8b;
+
+  --dashboard-text-primary: #4a3832;
+  --dashboard-text-secondary: #7d6a65;
+  --dashboard-text-muted: #b4a39d;
+  --dashboard-border: rgba(0, 0, 0, 0.1);
+}

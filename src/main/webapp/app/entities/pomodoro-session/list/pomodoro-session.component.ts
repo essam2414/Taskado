@@ -1,17 +1,22 @@
-import { Component, NgZone, OnDestroy, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
-import { Observable, Subscription, combineLatest, filter, tap, interval } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { Observable, Subscription, interval } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
-import SharedModule from 'app/shared/shared.module';
-import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
-import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
-import { FormsModule } from '@angular/forms';
-import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
 import { IPomodoroSession } from '../pomodoro-session.model';
-import { EntityArrayResponseType, PomodoroSessionService } from '../service/pomodoro-session.service';
+import { PomodoroSessionService, EntityArrayResponseType } from '../service/pomodoro-session.service';
 import { PomodoroSessionDeleteDialogComponent } from '../delete/pomodoro-session-delete-dialog.component';
+
+import SharedModule from 'app/shared/shared.module';
+import { SortByDirective, SortDirective, SortService, sortStateSignal } from 'app/shared/sort';
+import { DurationPipe, FormatMediumDatetimePipe, FormatMediumDatePipe } from 'app/shared/date';
+import { FormsModule } from '@angular/forms';
+import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
 import { NgxDraggableDomModule } from 'ngx-draggable-dom';
+import { tap } from 'rxjs/operators';
+
+// Import your new service for history count
+import { PomodoroService } from '../service/pomodoro.service';
 
 export type PomodoroMode = 'pomodoro' | 'shortBreak' | 'longBreak';
 
@@ -21,7 +26,6 @@ export type PomodoroMode = 'pomodoro' | 'shortBreak' | 'longBreak';
   templateUrl: './pomodoro-session.component.html',
   styleUrls: ['../pomodoro-session.scss'],
   imports: [
-    RouterModule,
     FormsModule,
     SharedModule,
     SortDirective,
@@ -33,14 +37,20 @@ export type PomodoroMode = 'pomodoro' | 'shortBreak' | 'longBreak';
   ],
 })
 export class PomodoroSessionComponent implements OnInit, OnDestroy {
-  subscription: Subscription | null = null;
-  pomodoroSessions?: IPomodoroSession[];
   isLoading = false;
+  subscription: Subscription | null = null;
+  timerSubscription?: Subscription;
 
+  pomodoroSessions?: IPomodoroSession[];
   sortState = sortStateSignal({});
 
-  showSettings = false;
   completedPomodoros = 0;
+  showSettings = false;
+
+  // NEW: history toggle and count
+  showHistory = false;
+  historyCount = 0;
+
   modeDurations: Record<PomodoroMode, number> = {
     pomodoro: 1500,
     shortBreak: 300,
@@ -51,16 +61,14 @@ export class PomodoroSessionComponent implements OnInit, OnDestroy {
   timerRunning = false;
   timeRemaining = this.modeDurations[this.currentMode];
 
-  public readonly router = inject(Router);
-  protected readonly pomodoroSessionService = inject(PomodoroSessionService);
-  protected readonly activatedRoute = inject(ActivatedRoute);
-  protected readonly sortService = inject(SortService);
-  protected modalService = inject(NgbModal);
-  protected ngZone = inject(NgZone);
-
-  private timerSubscription?: Subscription;
-
-  trackId = (item: IPomodoroSession): number => this.pomodoroSessionService.getPomodoroSessionIdentifier(item);
+  constructor(
+    protected pomodoroSessionService: PomodoroSessionService,
+    protected activatedRoute: ActivatedRoute,
+    protected router: Router,
+    protected sortService: SortService,
+    protected modalService: NgbModal,
+    private pomodoroHistoryService: PomodoroService, // <-- inject history service
+  ) {}
 
   ngOnInit(): void {
     this.switchMode(this.currentMode);
@@ -108,13 +116,13 @@ export class PomodoroSessionComponent implements OnInit, OnDestroy {
     this.timeRemaining = this.modeDurations[this.currentMode];
   }
 
-  resetPomodoroCounter(): void {
-    this.completedPomodoros = 0;
-  }
-
   skipSession(): void {
     this.pauseTimer();
     this.autoSwitchMode();
+  }
+
+  resetPomodoroCounter(): void {
+    this.completedPomodoros = 0;
   }
 
   autoSwitchMode(): void {
@@ -140,66 +148,39 @@ export class PomodoroSessionComponent implements OnInit, OnDestroy {
     }
   }
 
+  // NEW: toggle history view and fetch count
+  toggleHistory(): void {
+    this.showHistory = !this.showHistory;
+    if (this.showHistory) {
+      this.pomodoroHistoryService.getCompletedSessionsCount().subscribe({
+        next: (count: number) => (this.historyCount = count),
+        error: () => (this.historyCount = 0),
+      });
+    }
+  }
+
   delete(pomodoroSession: IPomodoroSession): void {
     const modalRef = this.modalService.open(PomodoroSessionDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.pomodoroSession = pomodoroSession;
-    // unsubscribe not needed because closed completes on modal close
-    modalRef.closed
-      .pipe(
-        filter(reason => reason === ITEM_DELETED_EVENT),
-        tap(() => this.load()),
-      )
-      .subscribe();
+    modalRef.closed.subscribe(reason => {
+      if (reason === ITEM_DELETED_EVENT) {
+        this.load();
+      }
+    });
   }
 
   load(): void {
     this.queryBackend().subscribe({
-      next: (res: EntityArrayResponseType) => {
-        this.onResponseSuccess(res);
-      },
+      next: (res: EntityArrayResponseType) => this.onResponseSuccess(res),
     });
-  }
-
-  navigateToWithComponentValues(event: SortState): void {
-    this.handleNavigation(event);
-  }
-
-  protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
-    this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]));
-  }
-
-  protected onResponseSuccess(response: EntityArrayResponseType): void {
-    const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
-    this.pomodoroSessions = this.refineData(dataFromBody);
-  }
-
-  protected refineData(data: IPomodoroSession[]): IPomodoroSession[] {
-    const { predicate, order } = this.sortState();
-    return predicate && order ? data.sort(this.sortService.startSort({ predicate, order })) : data;
-  }
-
-  protected fillComponentAttributesFromResponseBody(data: IPomodoroSession[] | null): IPomodoroSession[] {
-    return data ?? [];
   }
 
   protected queryBackend(): Observable<EntityArrayResponseType> {
     this.isLoading = true;
-    const queryObject: any = {
-      sort: this.sortService.buildSortParam(this.sortState()),
-    };
-    return this.pomodoroSessionService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
+    return this.pomodoroSessionService.query().pipe(tap(() => (this.isLoading = false)));
   }
 
-  protected handleNavigation(sortState: SortState): void {
-    const queryParamsObj = {
-      sort: this.sortService.buildSortParam(sortState),
-    };
-
-    this.ngZone.run(() => {
-      this.router.navigate(['./'], {
-        relativeTo: this.activatedRoute,
-        queryParams: queryParamsObj,
-      });
-    });
+  protected onResponseSuccess(response: EntityArrayResponseType): void {
+    this.pomodoroSessions = response.body ?? [];
   }
 }

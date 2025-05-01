@@ -7,8 +7,8 @@
     <artifactId>teamproject-24</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Teamproject 24</name>
-    <description>Description for Teamproject 24</description>
+    <name>Taskado</name>
+    <description>Taskado - Team Productivity App</description>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
