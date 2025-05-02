@@ -377,11 +377,10 @@ class HabitResourceIT {
 
         partialUpdatedHabit
             .name(UPDATED_NAME)
-            .streak(UPDATED_STREAK)
             .completionRate(UPDATED_COMPLETION_RATE)
-            .repeatInterval(UPDATED_REPEAT_INTERVAL)
-            .completedDates(UPDATED_COMPLETED_DATES);
-      
+            .repeatType(UPDATED_REPEAT_TYPE)
+            .repeatDays(UPDATED_REPEAT_DAYS);
+
         restHabitMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedHabit.getId())

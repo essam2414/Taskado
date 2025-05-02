@@ -17,6 +17,7 @@ import { UserService } from 'app/entities/user/service/user.service';
 import { HabitService } from '../service/habit.service';
 import { IHabit } from '../habit.model';
 import { HabitFormGroup, HabitFormService } from './habit-form.service';
+import dayjs from 'dayjs';
 
 @Component({
   standalone: true,
@@ -38,6 +39,14 @@ export class HabitUpdateComponent implements OnInit {
   addCategoryOpen = false;
   newCategoryName = '';
   newCategoryColor = this.getRandomColor();
+
+  habitDropdownOpen = false;
+  activeRepeatType = 'daily';
+  currentWeekStart: dayjs.Dayjs = dayjs().startOf('week').add(1, 'day');
+
+  selectedWeekDays: string[] = [];
+  customEveryXDays = 1;
+  timesPerDay = 1;
 
   protected dataUtils = inject(DataUtils);
   protected eventManager = inject(EventManager);
@@ -67,6 +76,32 @@ export class HabitUpdateComponent implements OnInit {
 
   toggleCategoryDropdown(): void {
     this.categoryDropdownOpen = !this.categoryDropdownOpen;
+  }
+
+  setRepeatType(selectedRepeatType: string): void {
+    this.activeRepeatType = selectedRepeatType;
+    this.editForm.controls['repeatType'].setValue(this.activeRepeatType);
+  }
+
+  toggleWeekDay(day: string): void {
+    const index = this.selectedWeekDays.indexOf(day);
+    if (index > -1) {
+      this.selectedWeekDays.splice(index, 1);
+    } else {
+      this.selectedWeekDays.push(day);
+    }
+  }
+
+  getCurrentWeekDates(): string[] {
+    const dates: string[] = [];
+    for (let i = 0; i < 7; i++) {
+      dates.push(this.currentWeekStart.add(i, 'day').format('YYYY-MM-DD'));
+    }
+    return dates;
+  }
+
+  toggleHabitDropdown(): void {
+    this.habitDropdownOpen = !this.habitDropdownOpen;
   }
 
   selectCategory(category: ICategory | null): void {
@@ -209,6 +244,7 @@ export class HabitUpdateComponent implements OnInit {
   save(): void {
     this.isSaving = true;
     const habit = this.habitFormService.getHabit(this.editForm);
+
     if (habit.id !== null) {
       this.subscribeToSaveResponse(this.habitService.update(habit));
     } else {
@@ -239,11 +275,17 @@ export class HabitUpdateComponent implements OnInit {
     this.habit = habit;
     this.habitFormService.resetForm(this.editForm, habit);
 
+    if (!habit.repeatType) {
+      this.editForm.controls['repeatType'].setValue('daily');
+      this.activeRepeatType = 'daily';
+    } else {
+      this.activeRepeatType = habit.repeatType;
+    }
+
     this.categoriesSharedCollection = this.categoryService.addCategoryToCollectionIfMissing<ICategory>(
       this.categoriesSharedCollection,
       habit.category,
     );
-    this.usersSharedCollection = this.userService.addUserToCollectionIfMissing<IUser>(this.usersSharedCollection, habit.user);
   }
 
   protected loadRelationshipsOptions(): void {
@@ -256,11 +298,5 @@ export class HabitUpdateComponent implements OnInit {
         ),
       )
       .subscribe((categories: ICategory[]) => (this.categoriesSharedCollection = categories));
-
-    this.userService
-      .query()
-      .pipe(map((res: HttpResponse<IUser[]>) => res.body ?? []))
-      .pipe(map((users: IUser[]) => this.userService.addUserToCollectionIfMissing<IUser>(users, this.habit?.user)))
-      .subscribe((users: IUser[]) => (this.usersSharedCollection = users));
   }
 }

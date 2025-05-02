@@ -6,12 +6,6 @@
       <div>
         <jhi-alert-error></jhi-alert-error>
 
-        <!-- ID field (if editing an existing habit) -->
-        <div *ngIf="editForm.controls.id.value !== null" class="mb-3">
-          <label class="form-label" for="field_id">ID</label>
-          <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" readonly />
-        </div>
-
         <!-- Name field -->
         <div class="mb-3" *ngIf="editForm.get('name') as nameRef">
           <label class="form-label" for="field_name">Name</label>
@@ -19,6 +13,68 @@
           <div *ngIf="nameRef.invalid && (nameRef.dirty || nameRef.touched)">
             <div *ngIf="nameRef.errors?.required">
               <small class="form-text text-danger">This field is required.</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_repeat_type">Repeat Type</label>
+
+          <div class="dropdown dropdown-select habit-dropdown" [class.open]="habitDropdownOpen">
+            <div class="dropdown-btn" [class.open]="habitDropdownOpen" (click)="toggleHabitDropdown()">
+              <span> {{ activeRepeatType }} </span>
+              <fa-icon [icon]="'chevron-down'"></fa-icon>
+            </div>
+
+            <div class="habit-repeat-menu" *ngIf="habitDropdownOpen">
+              <div class="repeat-type-tabs">
+                <button type="button" class="btn-filter" [class.active]="activeRepeatType === 'daily'" (click)="setRepeatType('daily')">
+                  Daily
+                </button>
+                <button type="button" class="btn-filter" [class.active]="activeRepeatType === 'weekly'" (click)="setRepeatType('weekly')">
+                  Weekly
+                </button>
+                <button type="button" class="btn-filter" [class.active]="activeRepeatType === 'custom'" (click)="setRepeatType('custom')">
+                  Custom
+                </button>
+              </div>
+
+              <div *ngIf="activeRepeatType === 'daily'">
+                <label class="repeat-label">Times per day:</label>
+                <select [(ngModel)]="timesPerDay" [ngModelOptions]="{ standalone: true }" class="form-select">
+                  <option *ngFor="let n of [1, 2, 3, 4]" [value]="n">{{ n }} time{{ n > 1 ? 's' : '' }} per day</option>
+                </select>
+              </div>
+
+              <div *ngIf="activeRepeatType === 'weekly'">
+                <label class="repeat-label">Select days:</label>
+
+                <div class="select-days">
+                  <button
+                    *ngFor="let day of getCurrentWeekDates()"
+                    type="button"
+                    class="btn-filter"
+                    [class.active]="selectedWeekDays.includes(day)"
+                    (click)="toggleWeekDay(day)"
+                  >
+                    {{ day | date: 'EEE' }}
+                  </button>
+                </div>
+              </div>
+
+              <div *ngIf="activeRepeatType === 'custom'">
+                <label class="repeat-label">Repeat every:</label>
+                <div class="custom-repeat">
+                  <input
+                    type="number"
+                    [(ngModel)]="customEveryXDays"
+                    [ngModelOptions]="{ standalone: true }"
+                    min="1"
+                    class="form-control"
+                  />
+                  <span>day(s)</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
