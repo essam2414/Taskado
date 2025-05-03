@@ -14,23 +14,27 @@
     }
 
     .app-card {
-      border: 1px solid #ddd;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 20px;
       box-sizing: border-box;
-      background-color: #f8f9fa;
+      background-color: var(--card-bg);
+      color: var(--text-primary);
       display: flex;
       flex-direction: column;
       position: relative;
       cursor: pointer;
       width: 100%;
+      transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
     }
 
     .info-icon {
       position: absolute;
       top: 10px;
       right: 10px;
-      background: #007bff;
+      background: var(--accent-color);
       color: white;
       border-radius: 50%;
       width: 26px;
@@ -65,10 +69,11 @@
       transform: translate(-50%, -50%);
       width: 90%;
       max-width: 400px;
-      max-height: 80vh; /* Prevents it from overflowing on short screens */
-      overflow-y: auto; /* Enables scrolling inside if content overflows */
-      background: white;
-      border: 2px solid #007bff;
+      max-height: 80vh;
+      overflow-y: auto;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      border: 2px solid var(--accent-color);
       border-radius: 10px;
       padding: 20px;
       z-index: 1000;
@@ -156,7 +161,11 @@
         <span>Generate Report</span>
       </button>
 
-      <button class="btn-add jh-create-entity create-task" (click)="confirmDelete()" style="background-color: #dc3545; color: white">
+      <button
+        class="btn-add jh-create-entity create-task"
+        (click)="confirmDelete()"
+        style="background-color: var(--danger-color); color: white"
+      >
         <fa-icon icon="trash-alt"></fa-icon>
         <span>Delete</span>
       </button>
@@ -171,10 +180,7 @@
     <span>{{ successMessage }}</span>
   </div>
 
-  <hr style="margin-top: 10px; margin-bottom: 20px; border: 1px solid #ccc" />
-
-  <!--  <jhi-alert-error></jhi-alert-error>-->
-  <!--  <jhi-alert></jhi-alert>-->
+  <hr style="margin-top: 10px; margin-bottom: 20px; border: 1px solid var(--border-color)" />
 
   @if (productivityReports?.length === 0) {
     <div class="alert alert-warning" id="no-result">
@@ -203,9 +209,9 @@
     <div class="app-card" (click)="openPopup('tasks')">
       <div class="info-icon">i</div>
       <h4>Tasks</h4>
-      <strong style="font-size: 18px; text-align: center; margin-top: 10px"
-        >You completed {{ tasksCompleted }} tasks out of the available {{ tasksPlanned }}</strong
-      >
+      <strong style="font-size: 18px; text-align: center; margin-top: 10px">
+        You completed {{ tasksCompleted }} tasks out of the available {{ tasksPlanned }}
+      </strong>
       <hr />
       <div class="app-card-content">
         <div style="height: 200px; width: 150%; display: flex; justify-content: center; align-items: center">
@@ -262,67 +268,63 @@
       <h4 style="margin: 0">{{ popupTitle }}</h4>
       <button
         (click)="closePopup()"
-        style="background-color: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer"
+        style="background-color: var(--danger-color); color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer"
       >
         X
       </button>
     </div>
     <div style="font-size: 18px">
-      <!-- Same popup content -->
-      <div style="font-size: 18px">
-        <div *ngIf="popupContent === 'overview'">
+      <div *ngIf="popupContent === 'overview'">
+        <p>
+          <strong>Your Productivity Score:</strong> <span>{{ efficiencyScore | number: '1.1-1' }}%</span>
+        </p>
+        <p>This score reflects how productive your day was based on completed tasks, habits, and focus sessions. It’s calculated using:</p>
+        <ul style="margin-left: 20px">
+          <li><strong>Tasks Completed</strong> / Total Tasks</li>
+          <li><strong>Habits Completed</strong> / Total Habits</li>
+          <li><strong>Pomodoro Sessions Completed</strong> / Total Pomodoros</li>
+        </ul>
+        <p>The final score is the ratio of all completed items to total planned activities, scaled to a percentage.</p>
+      </div>
+
+      <div *ngIf="popupContent === 'tasks'">
+        <p><strong>Completed Tasks:</strong></p>
+        <ul *ngIf="completedTaskTitles.length > 0; else noTasks">
+          <li *ngFor="let title of completedTaskTitles">{{ title }}</li>
+        </ul>
+        <ng-template #noTasks>
           <p>
-            <strong>Your Productivity Score:</strong>
-            <span>{{ efficiencyScore | number: '1.1-1' }}%</span>
+            <em>Task names are only available for newly generated reports.</em><br /><br /><em
+              >Make sure you mark your available tasks as completed.</em
+            >
           </p>
+        </ng-template>
+      </div>
+
+      <div *ngIf="popupContent === 'habits'">
+        <p><strong>Habits Completed:</strong> {{ completedHabitNames.length }}</p>
+        <ul *ngIf="completedHabitNames.length > 0; else noHabits">
+          <li *ngFor="let habitName of completedHabitNames">{{ habitName }}</li>
+        </ul>
+        <ng-template #noHabits>
           <p>
-            This score reflects how productive your day was based on completed tasks, habits, and focus sessions. It’s calculated using:
+            <em>Habit names are only available for newly generated reports.</em><br /><br /><em
+              >Make sure you mark your daily habits as completed.</em
+            >
           </p>
-          <ul style="margin-left: 20px">
-            <li><strong>Tasks Completed</strong> / Total Tasks</li>
-            <li><strong>Habits Completed</strong> / Total Habits</li>
-            <li><strong>Pomodoro Sessions Completed</strong> / Total Pomodoros</li>
-          </ul>
-          <p>The final score is the ratio of all completed items to total planned activities, scaled to a percentage.</p>
-        </div>
+        </ng-template>
+      </div>
 
-        <div *ngIf="popupContent === 'tasks'">
-          <p><strong>Completed Tasks:</strong></p>
-          <ul *ngIf="completedTaskTitles.length > 0; else noTasks">
-            <li *ngFor="let title of completedTaskTitles">{{ title }}</li>
-          </ul>
-          <ng-template #noTasks>
-            <p>
-              <em>Task names are only available for newly generated reports.</em><br /><br />
-              <em>Make sure you mark your available tasks as completed.</em>
-            </p>
-          </ng-template>
-        </div>
-
-        <div *ngIf="popupContent === 'habits'">
-          <p><strong>Habits Completed:</strong> {{ completedHabitNames.length }}</p>
-          <ul *ngIf="completedHabitNames.length > 0; else noHabits">
-            <li *ngFor="let habitName of completedHabitNames">{{ habitName }}</li>
-          </ul>
-
-          <ng-template #noHabits>
-            <p>
-              <em>Habit names are only available for newly generated reports.</em><br /><br />
-              <em>Make sure you mark your daily habits as completed.</em>
-            </p>
-          </ng-template>
-        </div>
-
-        <div *ngIf="popupContent === 'focus'">
-          <p *ngIf="+pomodoroSessionsCompleted > 0">
-            <strong>Average Focus Time per Session:</strong>
-            {{ +totalFocusTime / +pomodoroSessionsCompleted | number: '1.1-1' }} hours
-          </p>
-          <p *ngIf="+pomodoroSessionsCompleted === 0 || !totalFocusTime">
-            <em>Pomodoro analyses is only available for newly generated reports.</em><br /><br />
-            <em>Make sure you have completed pomodoros.</em>
-          </p>
-        </div>
+      <div *ngIf="popupContent === 'focus'">
+        <p *ngIf="+pomodoroSessionsCompleted > 0">
+          <strong>Average Focus Time per Session:</strong>
+          {{ +totalFocusTime / +pomodoroSessionsCompleted | number: '1.1-1' }} hours
+        </p>
+        <p *ngIf="+pomodoroSessionsCompleted === 0 || !totalFocusTime">
+          <em>Pomodoro analyses is only available for newly generated reports.</em><br /><br /><em
+            >Make sure you have completed pomodoros.</em
+          >
+        </p>
       </div>
     </div>
   </div>
