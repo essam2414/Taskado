@@ -7,12 +7,6 @@
       grid-template-columns: repeat(2, 1fr);
     }
 
-    @media (max-width: 768px) {
-      .cards-container {
-        grid-template-columns: 1fr;
-      }
-    }
-
     .app-card {
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -87,17 +81,69 @@
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       max-width: 100%;
+      padding: 8px 0;
     }
 
     .header-button-group::-webkit-scrollbar {
       display: none;
     }
 
+    /* Mobile Styles */
     @media (max-width: 768px) {
+      .cards-container {
+        grid-template-columns: 1fr;
+        padding: 0 12px;
+      }
+
+      .app-card {
+        padding: 16px;
+      }
+
+      .app-card h4 {
+        font-size: 20px;
+      }
+
+      .app-card-content {
+        font-size: 16px;
+      }
+
+      canvas {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 160px;
+      }
+
       .header-button-group {
-        justify-content: flex-start;
-        margin-top: 10px;
-        width: 100%;
+        gap: 8px;
+      }
+
+      .header-button-group button span {
+        display: none; /* hide text in buttons */
+      }
+
+      #reportDate span {
+        display: inline !important; /* keep date label visible */
+      }
+
+      #reportDate {
+        padding: 8px 12px !important;
+        font-size: 14px !important;
+        height: 40px !important;
+        min-width: fit-content;
+      }
+
+      .popup-modal {
+        padding: 16px;
+        font-size: 16px;
+      }
+
+      .popup-modal h4 {
+        font-size: 18px;
+      }
+
+      .popup-modal button {
+        font-size: 14px;
+        padding: 6px 10px;
       }
     }
 
