@@ -1,10 +1,16 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
+<div>
+  <div>
     <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
       <h2 id="jhi-habit-heading" data-cy="HabitCreateUpdateHeading">Create or edit a Habit</h2>
 
       <div>
         <jhi-alert-error></jhi-alert-error>
+
+        @if (validationErrorMessage) {
+          <div class="alert alert-danger">
+            {{ validationErrorMessage }}
+          </div>
+        }
 
         <!-- Name field -->
         <div class="mb-3" *ngIf="editForm.get('name') as nameRef">
@@ -18,11 +24,11 @@
         </div>
 
         <div class="mb-3">
-          <label class="form-label" for="field_repeat_type">Repeat Type</label>
+          <label class="form-label" for="field_repeat_type">Repeat Frequency</label>
 
           <div class="dropdown dropdown-select habit-dropdown" [class.open]="habitDropdownOpen">
             <div class="dropdown-btn" [class.open]="habitDropdownOpen" (click)="toggleHabitDropdown()">
-              <span> {{ activeRepeatType }} </span>
+              <span> {{ repeatSummary }} </span>
               <fa-icon [icon]="'chevron-down'"></fa-icon>
             </div>
 
@@ -40,10 +46,11 @@
               </div>
 
               <div *ngIf="activeRepeatType === 'daily'">
-                <label class="repeat-label">Times per day:</label>
-                <select [(ngModel)]="timesPerDay" [ngModelOptions]="{ standalone: true }" class="form-select">
-                  <option *ngFor="let n of [1, 2, 3, 4]" [value]="n">{{ n }} time{{ n > 1 ? 's' : '' }} per day</option>
-                </select>
+                <label class="repeat-label">How many times a day?</label>
+                <div class="custom-repeat">
+                  <input type="number" [(ngModel)]="timesPerDay" [ngModelOptions]="{ standalone: true }" min="1" class="form-control" />
+                  <span>time(s) per day</span>
+                </div>
               </div>
 
               <div *ngIf="activeRepeatType === 'weekly'">
@@ -51,13 +58,13 @@
 
                 <div class="select-days">
                   <button
-                    *ngFor="let day of getCurrentWeekDates()"
+                    *ngFor="let day of daysOfWeek"
                     type="button"
                     class="btn-filter"
                     [class.active]="selectedWeekDays.includes(day)"
                     (click)="toggleWeekDay(day)"
                   >
-                    {{ day | date: 'EEE' }}
+                    {{ day }}
                   </button>
                 </div>
               </div>

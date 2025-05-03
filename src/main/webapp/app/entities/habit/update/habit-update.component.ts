@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, inject, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -43,10 +43,11 @@ export class HabitUpdateComponent implements OnInit {
   habitDropdownOpen = false;
   activeRepeatType = 'daily';
   currentWeekStart: dayjs.Dayjs = dayjs().startOf('week').add(1, 'day');
-
+  daysOfWeek: string[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   selectedWeekDays: string[] = [];
   customEveryXDays = 1;
   timesPerDay = 1;
+  validationErrorMessage: string | null = null;
 
   protected dataUtils = inject(DataUtils);
   protected eventManager = inject(EventManager);
@@ -64,23 +65,81 @@ export class HabitUpdateComponent implements OnInit {
   compareUser = (o1: IUser | null, o2: IUser | null): boolean => this.userService.compareUser(o1, o2);
 
   ngOnInit(): void {
+    this.loadCategories();
+
     this.activatedRoute.data.subscribe(({ habit }) => {
       this.habit = habit;
       if (habit) {
         this.updateForm(habit);
+      } else {
+        this.editForm.controls['repeatType'].setValue('daily');
+        this.editForm.controls['repeatTimes'].setValue('1');
+        this.editForm.controls['repeatDays'].setValue(null);
+        this.editForm.controls['repeatInterval'].setValue(null);
       }
 
       this.loadRelationshipsOptions();
     });
   }
 
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const clickedInsideDropdown = target.closest('.dropdown-select');
+
+    if (!clickedInsideDropdown) {
+      this.closeAllDropdowns();
+    }
+  }
+
+  closeAllDropdowns(): void {
+    this.categoryDropdownOpen = false;
+    this.habitDropdownOpen = false;
+  }
+
+  get repeatSummary(): string {
+    if (this.activeRepeatType === 'daily') {
+      if (this.timesPerDay === 1) {
+        return 'Repeat every day';
+      } else {
+        return `Repeat ${this.timesPerDay} times a day`;
+      }
+    }
+
+    if (this.activeRepeatType === 'weekly') {
+      if (this.selectedWeekDays.length === 7) {
+        return 'Repeat every day';
+      }
+      if (this.selectedWeekDays.length === 6) {
+        const missingDay = this.daysOfWeek.find(day => !this.selectedWeekDays.includes(day));
+        return `Repeat every day except ${missingDay}`;
+      }
+      if (this.selectedWeekDays.length > 0) {
+        return `Repeat every ${this.selectedWeekDays.join(', ')}`;
+      }
+      return 'Repeat on selected days';
+    }
+
+    if (this.activeRepeatType === 'custom') {
+      return `Repeat every ${this.customEveryXDays} day${this.customEveryXDays > 1 ? 's' : ''}`;
+    }
+
+    return 'Repeat';
+  }
+
   toggleCategoryDropdown(): void {
-    this.categoryDropdownOpen = !this.categoryDropdownOpen;
+    const wasOpen = this.categoryDropdownOpen;
+    this.closeAllDropdowns();
+    this.categoryDropdownOpen = !wasOpen;
   }
 
   setRepeatType(selectedRepeatType: string): void {
     this.activeRepeatType = selectedRepeatType;
     this.editForm.controls['repeatType'].setValue(this.activeRepeatType);
+
+    if (selectedRepeatType === 'weekly' && this.selectedWeekDays.length === 0) {
+      this.selectedWeekDays = [...this.daysOfWeek];
+    }
   }
 
   toggleWeekDay(day: string): void {
@@ -101,7 +160,9 @@ export class HabitUpdateComponent implements OnInit {
   }
 
   toggleHabitDropdown(): void {
-    this.habitDropdownOpen = !this.habitDropdownOpen;
+    const wasOpen = this.habitDropdownOpen;
+    this.closeAllDropdowns();
+    this.habitDropdownOpen = !wasOpen;
   }
 
   selectCategory(category: ICategory | null): void {
@@ -242,7 +303,15 @@ export class HabitUpdateComponent implements OnInit {
   }
 
   save(): void {
+    if (!this.validateRepeatSettings()) {
+      return;
+    }
+
     this.isSaving = true;
+
+    // Set repeat settings into form
+    this.applyRepeatSettings();
+
     const habit = this.habitFormService.getHabit(this.editForm);
 
     if (habit.id !== null) {
@@ -250,6 +319,56 @@ export class HabitUpdateComponent implements OnInit {
     } else {
       this.subscribeToSaveResponse(this.habitService.create(habit));
     }
+  }
+
+  protected applyRepeatSettings(): void {
+    if (this.activeRepeatType === 'daily') {
+      this.editForm.controls['repeatType'].setValue('daily');
+      this.editForm.controls['repeatTimes'].setValue(String(this.timesPerDay));
+      this.editForm.controls['repeatDays'].setValue(null);
+      this.editForm.controls['repeatInterval'].setValue(null);
+    } else if (this.activeRepeatType === 'weekly') {
+      this.editForm.controls['repeatType'].setValue('weekly');
+      this.editForm.controls['repeatTimes'].setValue('1');
+      this.editForm.controls['repeatDays'].setValue(this.selectedWeekDays.join(','));
+      this.editForm.controls['repeatInterval'].setValue(null);
+    } else if (this.activeRepeatType === 'custom') {
+      this.editForm.controls['repeatType'].setValue('custom');
+      this.editForm.controls['repeatTimes'].setValue('1');
+      this.editForm.controls['repeatDays'].setValue(null);
+      this.editForm.controls['repeatInterval'].setValue(this.customEveryXDays);
+    }
+  }
+
+  protected validateRepeatSettings(): boolean {
+    this.validationErrorMessage = null; // Clear old errors first
+
+    if (this.activeRepeatType === 'daily') {
+      if (this.timesPerDay < 1) {
+        this.showValidationError('Times per day must be at least 1.');
+        return false;
+      }
+    } else if (this.activeRepeatType === 'weekly') {
+      if (this.selectedWeekDays.length === 0) {
+        this.showValidationError('You must select at least one day for weekly habits.');
+        return false;
+      }
+    } else if (this.activeRepeatType === 'custom') {
+      if (this.customEveryXDays < 1) {
+        this.showValidationError('Repeat every X days must be at least 1.');
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  protected showValidationError(message: string): void {
+    this.validationErrorMessage = message;
+
+    setTimeout(() => {
+      this.validationErrorMessage = null;
+    }, 3000); // disappear after 3 seconds
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IHabit>>): void {
@@ -275,11 +394,23 @@ export class HabitUpdateComponent implements OnInit {
     this.habit = habit;
     this.habitFormService.resetForm(this.editForm, habit);
 
-    if (!habit.repeatType) {
-      this.editForm.controls['repeatType'].setValue('daily');
-      this.activeRepeatType = 'daily';
+    this.activeRepeatType = habit.repeatType ?? 'daily';
+    this.editForm.controls['repeatType'].setValue(this.activeRepeatType);
+
+    if (habit.repeatType === 'daily') {
+      this.timesPerDay = +(habit.repeatTimes ?? 1);
+    } else if (habit.repeatType === 'weekly' && habit.repeatDays) {
+      this.selectedWeekDays = habit.repeatDays.split(',');
+    } else if (habit.repeatType === 'custom') {
+      this.customEveryXDays = +(habit.repeatInterval ?? 1);
+    }
+
+    this.applyRepeatSettings();
+
+    if (habit.category) {
+      this.selectedCategory = habit.category;
     } else {
-      this.activeRepeatType = habit.repeatType;
+      this.selectedCategory = null;
     }
 
     this.categoriesSharedCollection = this.categoryService.addCategoryToCollectionIfMissing<ICategory>(

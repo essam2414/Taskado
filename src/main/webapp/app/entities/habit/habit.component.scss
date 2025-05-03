@@ -1,8 +1,32 @@
 .habit-row {
   display: grid;
-  grid-template-columns: 2fr repeat(7, 1fr) 1fr;
+  grid-template-columns: 3fr repeat(7, 1fr) 2fr;
   align-items: center;
   background: #ffffff;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(7, 1fr);
+    width: 100%;
+
+    .habit-name {
+      grid-column: 1 / -1;
+      margin-bottom: 12px;
+    }
+
+    .habit-end {
+      grid-column: 1 / -1;
+      margin-top: 12px;
+    }
+
+    .mark-all-btn {
+      margin-top: 4px;
+    }
+  }
+}
+
+.habit-end {
+  display: flex;
+  justify-content: space-between;
 }
 
 .habit-week {
@@ -14,6 +38,12 @@
   .today {
     font-weight: 500;
     color: var(--text-primary);
+  }
+
+  @media (max-width: 768px) {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    width: 100%;
   }
 }
 
@@ -40,19 +70,40 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
 
-  .btn {
-    padding: 0;
-    font-size: var(--font-xs);
-    color: var(--text-muted);
-    font-weight: 200;
-    opacity: 0.6;
-    transition: all 0.3s ease;
+.habit-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 
-    &:hover {
-      color: var(--text-primary);
-      opacity: 1;
-    }
+  font-weight: 400;
+  font-size: var(--font-md);
+  margin-bottom: 0;
+
+  .task-tag {
+    font-size: var(--font-2xs);
+  }
+}
+
+.habit-desc {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  font-weight: 200;
+  margin-top: 2px;
+}
+
+.mark-all-btn {
+  padding: 0;
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  font-weight: 200;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: var(--text-primary);
+    opacity: 1;
   }
 }
 
@@ -277,8 +328,10 @@
 }
 
 .select-days {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+
   gap: 4px;
 }
 
@@ -380,17 +433,11 @@
   gap: 20px;
 }
 
-.habit-title {
-  font-weight: 400;
-  font-size: var(--font-md);
-  margin-bottom: 0;
-}
-
 .habit-day-ring {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(--bg-color, #e6e6e6);
+  background: var(--bg-color-secondary, #e6e6e6);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -415,16 +462,8 @@
   }
 
   &.empty {
-    &:hover {
-      background: var(--bg-color-secondary) !important;
-
-      .habit-button {
-        color: var(--bg-color-secondary) !important;
-      }
-    }
-
     .habit-button {
-      color: var(--bg-color) !important;
+      color: var(--bg-color-secondary) !important;
     }
   }
 }

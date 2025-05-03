@@ -146,7 +146,17 @@
             </div>
           </div>
 
-          <h4 class="habit-title">{{ habit.name }}</h4>
+          <div class="habit-name">
+            <h4 class="habit-title">
+              {{ habit.name }}
+              @if (habit.category) {
+                <div class="task-tag task-category" [ngStyle]="getCategoryStyle(habit.category)">
+                  {{ habit.category.name }}
+                </div>
+              }
+            </h4>
+            <span class="habit-desc">{{ getHabitListSummary(habit) }}</span>
+          </div>
         </div>
 
         <div class="habit-right">
@@ -183,21 +193,26 @@
       <div *ngFor="let day of getCurrentWeekDates()" class="habit-day" [class.today]="isToday(day)">
         {{ day | date: 'EEE' }}
       </div>
-      <div class="habit-streak"></div>
     </div>
 
     <div class="entity-list">
       <div *ngFor="let habit of habits; trackBy: trackByHabitId" class="app-card habit-row" (click)="editHabit(habit)">
         <div class="habit-name" (click)="$event.stopPropagation()">
-          <h4 class="habit-title">{{ habit.name }}</h4>
-          <button class="btn" (click)="markAllForHabit(habit); $event.stopPropagation()">
-            {{ isWeekCompleted(habit) ? 'Unmark All' : 'Mark All' }}
-          </button>
+          <h4 class="habit-title">
+            {{ habit.name }}
+            @if (habit.category) {
+              <div class="task-tag task-category" [ngStyle]="getCategoryStyle(habit.category)">
+                {{ habit.category.name }}
+              </div>
+            }
+          </h4>
+          <span class="habit-desc">{{ getHabitListSummary(habit) }}</span>
         </div>
 
         <!-- 7 Days Checkboxes -->
         <div *ngFor="let day of getCurrentWeekDates()" class="habit-day">
           <input
+            *ngIf="shouldHabitAppearOnDate(habit, day)"
             type="checkbox"
             class="custom-checkbox"
             [checked]="isDateCompleted(habit, day)"
@@ -207,14 +222,21 @@
           />
         </div>
 
-        <!-- Streak -->
-        <div class="habit-streak">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path
-              d="M11.24 24a2.262 2.262 0 0 1-.948-.212 2.18 2.18 0 0 1-1.2-2.622L10.653 16H6.975A3 3 0 0 1 4.1 12.131l3.024-10A2.983 2.983 0 0 1 10 0h3.693a2.6 2.6 0 0 1 2.433 3.511L14.443 8H17a3 3 0 0 1 2.483 4.684l-6.4 10.3A2.2 2.2 0 0 1 11.24 24Z"
-            />
-          </svg>
-          {{ habit.streak }}
+        <div class="habit-end">
+          <button class="btn mark-all-btn" (click)="markAllForHabit(habit); $event.stopPropagation()">
+            <fa-icon icon="check"></fa-icon>
+            {{ isWeekCompleted(habit) ? 'Unmark All' : 'Mark All' }}
+          </button>
+
+          <!-- Streak -->
+          <div class="habit-streak">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path
+                d="M11.24 24a2.262 2.262 0 0 1-.948-.212 2.18 2.18 0 0 1-1.2-2.622L10.653 16H6.975A3 3 0 0 1 4.1 12.131l3.024-10A2.983 2.983 0 0 1 10 0h3.693a2.6 2.6 0 0 1 2.433 3.511L14.443 8H17a3 3 0 0 1 2.483 4.684l-6.4 10.3A2.2 2.2 0 0 1 11.24 24Z"
+              />
+            </svg>
+            {{ habit.streak }}
+          </div>
         </div>
       </div>
     </div>

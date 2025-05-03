@@ -12,6 +12,8 @@ import { IHabit } from '../habit.model';
 import { EntityArrayResponseType, HabitService } from '../service/habit.service';
 import { HabitDeleteDialogComponent } from '../delete/habit-delete-dialog.component';
 import dayjs from 'dayjs';
+import { ICategory } from 'app/entities/category/category.model';
+import { CategoryService } from 'app/entities/category/service/category.service';
 
 @Component({
   standalone: true,
@@ -23,6 +25,7 @@ import dayjs from 'dayjs';
 export class HabitComponent implements OnInit {
   subscription: Subscription | null = null;
   habits?: IHabit[];
+  categories: ICategory[] = [];
   isLoading = false;
   dayjs = dayjs;
 
@@ -52,6 +55,7 @@ export class HabitComponent implements OnInit {
   protected dataUtils = inject(DataUtils);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
+  protected categoryService = inject(CategoryService);
 
   trackId = (item: IHabit): number => this.habitService.getHabitIdentifier(item);
 
@@ -84,15 +88,70 @@ export class HabitComponent implements OnInit {
   }
 
   load(): void {
-    this.queryBackend().subscribe({
-      next: (res: EntityArrayResponseType) => {
-        this.onResponseSuccess(res);
-      },
+    combineLatest([this.queryBackend(), this.categoryService.query()]).subscribe(([habitRes, categoryRes]) => {
+      const dataFromBody = this.fillComponentAttributesFromResponseBody(habitRes.body);
+      this.habits = this.refineData(dataFromBody);
+
+      this.categories = categoryRes.body ?? [];
+
+      // Replace habit.category with full category object
+      for (const habit of this.habits) {
+        if (!habit.completedDates) {
+          habit.completedDates = JSON.stringify([]);
+        }
+        try {
+          habit.streak = this.calculateHabitStreak(habit);
+        } catch (e) {
+          habit.streak = 0;
+        }
+
+        if (habit.category?.id) {
+          const matched = this.categories.find(cat => cat.id === habit.category?.id);
+          if (matched) {
+            habit.category = matched;
+          }
+        }
+      }
+
+      this.calculateProgress();
     });
   }
 
-  navigateToWithComponentValues(event: SortState): void {
-    this.handleNavigation(event);
+  getHabitListSummary(habit: IHabit): string {
+    if (!habit.repeatType) return '';
+
+    if (habit.repeatType === 'daily') {
+      const times = +(habit.repeatTimes ?? 1);
+      return times === 1 ? 'Everyday' : `${times}× per day`;
+    }
+
+    if (habit.repeatType === 'weekly') {
+      if (!habit.repeatDays) return '';
+
+      const days = habit.repeatDays.split(',');
+      const sortedDays = this.sortDays(days);
+
+      if (sortedDays.length === 7) {
+        return 'Everyday';
+      }
+      if (sortedDays.length === 6) {
+        const missingDay = this.daysOfWeek.find(d => !sortedDays.includes(d));
+        return `Everyday except ${missingDay}`;
+      }
+      return `Every ${sortedDays.join(', ')}`;
+    }
+
+    if (habit.repeatType === 'custom') {
+      const interval = +(habit.repeatInterval ?? 1);
+      return `Every ${interval} day${interval > 1 ? 's' : ''}`;
+    }
+
+    return '';
+  }
+
+  sortDays(days: string[]): string[] {
+    const order = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    return days.sort((a, b) => order.indexOf(a) - order.indexOf(b));
   }
 
   scrollDays(direction: 'left' | 'right'): void {
@@ -126,7 +185,7 @@ export class HabitComponent implements OnInit {
       percentage = Math.min((progress / total) * 100, 100);
     }
 
-    return `conic-gradient(var(--accent-color, #4f46e5) ${percentage * 3.6}deg, var(--bg-color, #e6e6e6) 0deg)`;
+    return `conic-gradient(var(--accent-color, #4f46e5) ${percentage * 3.6}deg, var(--bg-color-secondary, #e6e6e6) 0deg)`;
   }
 
   getHabitProgress(habit: IHabit): number {
@@ -170,43 +229,38 @@ export class HabitComponent implements OnInit {
     });
   }
 
-  getHabitsForDay(): IHabit[] {
-    const filteredHabits: IHabit[] = [];
-
-    this.habits?.forEach(habit => {
-      if (!habit.repeatType || !habit.startDate) return;
-
-      const startDate = habit.startDate.startOf('day');
-      if (this.selectedDay.isBefore(startDate)) return;
-
-      if (habit.repeatType === 'daily') {
-        filteredHabits.push(habit);
-      } else if (habit.repeatType === 'weekly' && habit.repeatDays) {
-        const targetWeekDay = this.selectedDay.format('ddd');
-        const repeatDays = habit.repeatDays.split(',');
-
-        if (repeatDays.includes(targetWeekDay)) {
-          filteredHabits.push(habit);
-        }
-      } else if (habit.repeatType === 'custom' && habit.repeatInterval) {
-        const diffDays = this.selectedDay.diff(startDate, 'day');
-        if (diffDays % habit.repeatInterval === 0) {
-          filteredHabits.push(habit);
-        }
-      }
-    });
-
-    return filteredHabits;
-  }
-
   calculateHabitStreak(habit: IHabit): number {
+    if (!habit.startDate) return 0;
+
     const completions = this.getCompletedDates(habit);
     let streak = 0;
-    let currentDate = dayjs().startOf('day'); // today
+    let currentDate = dayjs().startOf('day');
 
-    while (completions.includes(currentDate.format('YYYY-MM-DD'))) {
-      streak++;
-      currentDate = currentDate.subtract(1, 'day');
+    const repeatType = habit.repeatType ?? 'daily';
+    const repeatDays = habit.repeatDays?.split(',') ?? [];
+
+    for (;;) {
+      const isScheduled =
+        repeatType === 'daily' ||
+        (repeatType === 'weekly' && repeatDays.includes(currentDate.format('ddd'))) ||
+        (repeatType === 'custom' &&
+          habit.repeatInterval != null &&
+          currentDate.diff(habit.startDate.startOf('day'), 'day') % habit.repeatInterval === 0);
+
+      if (!isScheduled) {
+        currentDate = currentDate.subtract(1, 'day');
+        continue;
+      }
+
+      const completionsToday = completions.filter(d => d === currentDate.format('YYYY-MM-DD')).length;
+      const target = +(habit.repeatTimes ?? 1);
+
+      if (completionsToday >= target) {
+        streak++;
+        currentDate = currentDate.subtract(1, 'day');
+      } else {
+        break;
+      }
     }
 
     return streak;
@@ -386,11 +440,39 @@ export class HabitComponent implements OnInit {
     return `conic-gradient(var(--accent-color, #4f46e5) ${percentage * 3.6}deg, var(--bg-color, #e6e6e6) 0deg)`;
   }
 
+  getHabitsForDay(): IHabit[] {
+    const filteredHabits: IHabit[] = [];
+
+    this.habits?.forEach(habit => {
+      if (!habit.repeatType || !habit.startDate) return;
+
+      const startDate = habit.startDate.startOf('day');
+      const targetDate = this.selectedDay.startOf('day');
+
+      if (habit.repeatType === 'daily') {
+        filteredHabits.push(habit);
+      } else if (habit.repeatType === 'weekly' && habit.repeatDays) {
+        const targetWeekDay = this.selectedDay.format('ddd');
+        const repeatDays = habit.repeatDays.split(',');
+
+        if (repeatDays.includes(targetWeekDay)) {
+          filteredHabits.push(habit);
+        }
+      } else if (habit.repeatType === 'custom' && habit.repeatInterval) {
+        const diffDays = targetDate.diff(startDate, 'day');
+        if (diffDays % habit.repeatInterval === 0) {
+          filteredHabits.push(habit);
+        }
+      }
+    });
+
+    return filteredHabits;
+  }
+
   shouldHabitAppearToday(habit: IHabit): boolean {
     if (!habit.repeatType || !habit.startDate) return false;
 
     const startDate = habit.startDate.startOf('day');
-    if (this.selectedDay.isBefore(startDate)) return false;
 
     if (habit.repeatType === 'daily') {
       return true;
@@ -411,8 +493,6 @@ export class HabitComponent implements OnInit {
 
     const startDate = habit.startDate.startOf('day');
     const targetDate = dayjs(date);
-
-    if (targetDate.isBefore(startDate)) return false;
 
     if (habit.repeatType === 'daily') {
       return true;
@@ -437,25 +517,39 @@ export class HabitComponent implements OnInit {
     this.weeklyProgressPercentage = 0;
   }
 
-  protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
-    this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]));
+  getCategoryStyle(category: ICategory | null): Record<string, string> {
+    if (!category?.color) return {};
+    return {
+      color: category.color,
+      'background-color': this.getCategoryBackground(category.color) ?? '',
+    };
   }
 
-  protected onResponseSuccess(response: EntityArrayResponseType): void {
-    const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
-    dataFromBody.forEach(habit => {
-      if (!habit.completedDates) {
-        habit.completedDates = JSON.stringify([]);
-      }
-      try {
-        const completions: string[] = JSON.parse(habit.completedDates);
-        habit.streak = this.calculateHabitStreak(habit);
-      } catch (e) {
-        habit.streak = 0;
-      }
-    });
-    this.habits = this.refineData(dataFromBody);
-    this.calculateProgress();
+  getCategoryBackground(color: string | null | undefined): string | null {
+    if (!color) return null;
+    const div = document.createElement('div');
+    div.style.color = color;
+    document.body.appendChild(div);
+    const computedColor = getComputedStyle(div).color;
+    document.body.removeChild(div);
+    const match = computedColor.match(/rgba?\((\d+), (\d+), (\d+)/);
+    if (!match) return null;
+    const [_, r, g, b] = match;
+    return `rgba(${r}, ${g}, ${b}, 0.18)`;
+  }
+
+  hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+    if (!/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) return null;
+    let c = hex.substring(1).split('');
+    if (c.length === 3) c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+    const r = parseInt(c[0] + c[1], 16);
+    const g = parseInt(c[2] + c[3], 16);
+    const b = parseInt(c[4] + c[5], 16);
+    return { r, g, b };
+  }
+
+  protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
+    this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]));
   }
 
   protected refineData(data: IHabit[]): IHabit[] {
@@ -473,18 +567,5 @@ export class HabitComponent implements OnInit {
       sort: this.sortService.buildSortParam(this.sortState()),
     };
     return this.habitService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
-  }
-
-  protected handleNavigation(sortState: SortState): void {
-    const queryParamsObj = {
-      sort: this.sortService.buildSortParam(sortState),
-    };
-
-    this.ngZone.run(() => {
-      this.router.navigate(['./'], {
-        relativeTo: this.activatedRoute,
-        queryParams: queryParamsObj,
-      });
-    });
   }
 }
