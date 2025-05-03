@@ -30,13 +30,37 @@ export default class LandingPageComponent implements AfterViewInit, OnInit {
       name: 'Emma Rackham',
       role: 'Paralegal',
       quote:
-        'I suggested adding theme colors, and they made it happen! The dashboard looks amazing - really excited to use Taskado when it launches.',
+        'I suggested adding theme colours, and they made it happen! The dashboard looks amazing - really excited to use Taskado when it launches.',
     },
-    { name: 'Alex', role: 'Designer', quote: 'Dark mode + font size = perfect.' },
-    { name: 'Mina', role: 'Researcher', quote: 'Pomodoro kept me sane writing my thesis.' },
-    { name: 'Zaid', role: 'Worker', quote: 'Everything I need is all in one place.' },
-    { name: 'Noah', role: 'Freelancer', quote: 'Structure and flexibility — just right.' },
-    { name: 'Layla', role: 'Parent', quote: 'Helps me manage school runs and work.' },
+    {
+      name: 'Alex Morgan',
+      role: 'Designer',
+      quote:
+        'A beautifully designed and functional app! I love that I can switch to dark mode and tweak the font size — finally an app that thinks about visual comfort. It just fits my workflow perfectly.',
+    },
+    {
+      name: 'Mina Ahmed',
+      role: 'Researcher',
+      quote:
+        'I find Pomodoro timers really help me in my revision without burning out or getting distracted. I didn’t expect it to make such a difference.',
+    },
+    {
+      name: 'Zaid Khan',
+      role: 'Operations Assistant',
+      quote:
+        'I used to juggle between three different apps. With Taskado, everything I use daily is all in one place. It saves me hours every week.',
+    },
+    {
+      name: 'Noah Evans',
+      role: 'Freelancer',
+      quote:
+        'I can plan structured sprints or just jot quick notes when ideas hit — it works both ways. It’s rare to find something that is personalised to me.',
+    },
+    {
+      name: 'Layla Mahmood',
+      role: 'Parent',
+      quote: 'Helps me set reminders for school runs and work. Really love the app it is so helpful!',
+    },
   ];
 
   visibleReviews: any[] = [];
