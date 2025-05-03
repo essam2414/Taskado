@@ -1,7 +1,10 @@
 package bham.team.web.rest;
 
 import bham.team.domain.Event;
+import bham.team.domain.User;
 import bham.team.repository.EventRepository;
+import bham.team.repository.UserRepository;
+import bham.team.security.SecurityUtils;
 import bham.team.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -36,15 +39,20 @@ public class EventResource {
 
     private final EventRepository eventRepository;
 
-    public EventResource(EventRepository eventRepository) {
+    private final UserRepository userRepository;
+
+    public EventResource(EventRepository eventRepository, UserRepository userRepository) {
         this.eventRepository = eventRepository;
+        this.userRepository = userRepository;
     }
 
     /**
      * {@code POST  /events} : Create a new event.
      *
      * @param event the event to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new event, or with status {@code 400 (Bad Request)} if the event has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
+     *         body the new event, or with status {@code 400 (Bad Request)} if the
+     *         event has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
@@ -53,6 +61,11 @@ public class EventResource {
         if (event.getId() != null) {
             throw new BadRequestAlertException("A new event cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User user = userRepository.findOneByLogin(login).orElseThrow();
+        event.setUser(user);
+
         event = eventRepository.save(event);
         return ResponseEntity.created(new URI("/api/events/" + event.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, event.getId().toString()))
@@ -62,11 +75,13 @@ public class EventResource {
     /**
      * {@code PUT  /events/:id} : Updates an existing event.
      *
-     * @param id the id of the event to save.
+     * @param id    the id of the event to save.
      * @param event the event to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated event,
-     * or with status {@code 400 (Bad Request)} if the event is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the event couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated event,
+     *         or with status {@code 400 (Bad Request)} if the event is not valid,
+     *         or with status {@code 500 (Internal Server Error)} if the event
+     *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
@@ -91,14 +106,17 @@ public class EventResource {
     }
 
     /**
-     * {@code PATCH  /events/:id} : Partial updates given fields of an existing event, field will ignore if it is null
+     * {@code PATCH  /events/:id} : Partial updates given fields of an existing
+     * event, field will ignore if it is null
      *
-     * @param id the id of the event to save.
+     * @param id    the id of the event to save.
      * @param event the event to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated event,
-     * or with status {@code 400 (Bad Request)} if the event is not valid,
-     * or with status {@code 404 (Not Found)} if the event is not found,
-     * or with status {@code 500 (Internal Server Error)} if the event couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated event,
+     *         or with status {@code 400 (Bad Request)} if the event is not valid,
+     *         or with status {@code 404 (Not Found)} if the event is not found,
+     *         or with status {@code 500 (Internal Server Error)} if the event
+     *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
@@ -156,19 +174,21 @@ public class EventResource {
     /**
      * {@code GET  /events} : get all the events.
      *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of events in body.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
+     *         of events in body.
      */
     @GetMapping("")
     public List<Event> getAllEvents() {
         LOG.debug("REST request to get all Events");
-        return eventRepository.findAll();
+        return eventRepository.findByUserIsCurrentUser();
     }
 
     /**
      * {@code GET  /events/:id} : get the "id" event.
      *
      * @param id the id of the event to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the event, or with status {@code 404 (Not Found)}.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the event, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
     public ResponseEntity<Event> getEvent(@PathVariable("id") Long id) {
