@@ -31,6 +31,7 @@ describe('Habit Form Service', () => {
             completedDates: expect.any(Object),
             category: expect.any(Object),
             user: expect.any(Object),
+            productivityReports: expect.any(Object),
           }),
         );
       });
@@ -52,6 +53,7 @@ describe('Habit Form Service', () => {
             completedDates: expect.any(Object),
             category: expect.any(Object),
             user: expect.any(Object),
+            productivityReports: expect.any(Object),
           }),
         );
       });
