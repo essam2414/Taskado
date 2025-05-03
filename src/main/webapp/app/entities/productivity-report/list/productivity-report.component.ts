@@ -379,8 +379,8 @@ export class ProductivityReportComponent implements OnInit {
       const totalFocusTime = totalFocusMinutes / 60;
       const distractionsCount = 0;
 
-      const totalPlanned = tasksPlanned + habits.length + pomodoros.length;
-      const totalCompleted = tasksCompleted + completedHabitsToday.length + pomodoroSessionsCompleted;
+      const totalPlanned = tasksPlanned + habits.length + (completedPomodorosToday.length > 0 ? pomodoros.length : 0);
+      const totalCompleted = tasksCompleted + completedHabitsToday.length + completedPomodorosToday.length;
       const efficiencyScore = totalPlanned > 0 ? Math.min(100, (totalCompleted / totalPlanned) * 100) : 0;
 
       const newReport: NewProductivityReport = {
