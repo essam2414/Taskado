@@ -1,7 +1,10 @@
 package bham.team.web.rest;
 
 import bham.team.domain.Habit;
+import bham.team.domain.User;
 import bham.team.repository.HabitRepository;
+import bham.team.repository.UserRepository;
+import bham.team.security.SecurityUtils;
 import bham.team.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -36,8 +39,11 @@ public class HabitResource {
 
     private final HabitRepository habitRepository;
 
-    public HabitResource(HabitRepository habitRepository) {
+    private final UserRepository userRepository;
+
+    public HabitResource(HabitRepository habitRepository, UserRepository userRepository) {
         this.habitRepository = habitRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -53,6 +59,11 @@ public class HabitResource {
         if (habit.getId() != null) {
             throw new BadRequestAlertException("A new habit cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User user = userRepository.findOneByLogin(login).orElseThrow();
+        habit.setUser(user);
+
         habit = habitRepository.save(habit);
         return ResponseEntity.created(new URI("/api/habits/" + habit.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, habit.getId().toString()))
@@ -82,6 +93,12 @@ public class HabitResource {
 
         if (!habitRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Habit existingHabit = habitRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (existingHabit.getUser() == null || !existingHabit.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to update this habit", ENTITY_NAME, "unauthorized");
         }
 
         habit = habitRepository.save(habit);
@@ -118,38 +135,44 @@ public class HabitResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
+        Habit existingHabit = habitRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingHabit.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to update this habit", ENTITY_NAME, "unauthorized");
+        }
+
         Optional<Habit> result = habitRepository
             .findById(habit.getId())
-            .map(existingHabit -> {
+            .map(habitToUpdate -> {
                 if (habit.getName() != null) {
-                    existingHabit.setName(habit.getName());
+                    habitToUpdate.setName(habit.getName());
                 }
                 if (habit.getStartDate() != null) {
-                    existingHabit.setStartDate(habit.getStartDate());
+                    habitToUpdate.setStartDate(habit.getStartDate());
                 }
                 if (habit.getStreak() != null) {
-                    existingHabit.setStreak(habit.getStreak());
+                    habitToUpdate.setStreak(habit.getStreak());
                 }
                 if (habit.getCompletionRate() != null) {
-                    existingHabit.setCompletionRate(habit.getCompletionRate());
+                    habitToUpdate.setCompletionRate(habit.getCompletionRate());
                 }
                 if (habit.getRepeatType() != null) {
-                    existingHabit.setRepeatType(habit.getRepeatType());
+                    habitToUpdate.setRepeatType(habit.getRepeatType());
                 }
                 if (habit.getRepeatInterval() != null) {
-                    existingHabit.setRepeatInterval(habit.getRepeatInterval());
+                    habitToUpdate.setRepeatInterval(habit.getRepeatInterval());
                 }
                 if (habit.getRepeatDays() != null) {
-                    existingHabit.setRepeatDays(habit.getRepeatDays());
+                    habitToUpdate.setRepeatDays(habit.getRepeatDays());
                 }
                 if (habit.getRepeatTimes() != null) {
-                    existingHabit.setRepeatTimes(habit.getRepeatTimes());
+                    habitToUpdate.setRepeatTimes(habit.getRepeatTimes());
                 }
                 if (habit.getCompletedDates() != null) {
-                    existingHabit.setCompletedDates(habit.getCompletedDates());
+                    habitToUpdate.setCompletedDates(habit.getCompletedDates());
                 }
 
-                return existingHabit;
+                return habitToUpdate;
             })
             .map(habitRepository::save);
 
@@ -167,7 +190,7 @@ public class HabitResource {
     @GetMapping("")
     public List<Habit> getAllHabits() {
         LOG.debug("REST request to get all Habits");
-        return habitRepository.findAll();
+        return habitRepository.findByUserIsCurrentUser();
     }
 
     /**
@@ -179,7 +202,9 @@ public class HabitResource {
     @GetMapping("/{id}")
     public ResponseEntity<Habit> getHabit(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Habit : {}", id);
-        Optional<Habit> habit = habitRepository.findById(id);
+        Optional<Habit> habit = habitRepository
+            .findById(id)
+            .filter(h -> h.getUser() != null && h.getUser().getLogin().equals(SecurityUtils.getCurrentUserLogin().orElse("")));
         return ResponseUtil.wrapOrNotFound(habit);
     }
 
@@ -192,7 +217,14 @@ public class HabitResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteHabit(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Habit : {}", id);
-        habitRepository.deleteById(id);
+
+        Habit existingHabit = habitRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingHabit.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to delete this habit", ENTITY_NAME, "unauthorized");
+        }
+        habitRepository.delete(existingHabit);
+
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();

@@ -5,7 +5,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
-import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
 import { FormsModule } from '@angular/forms';
 import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
 import { DataUtils } from 'app/core/util/data-util.service';
@@ -13,35 +12,39 @@ import { IHabit } from '../habit.model';
 import { EntityArrayResponseType, HabitService } from '../service/habit.service';
 import { HabitDeleteDialogComponent } from '../delete/habit-delete-dialog.component';
 import dayjs from 'dayjs';
+import { ICategory } from 'app/entities/category/category.model';
+import { CategoryService } from 'app/entities/category/service/category.service';
 
 @Component({
   standalone: true,
   selector: 'jhi-habit',
   templateUrl: './habit.component.html',
   styleUrls: ['../habit.component.scss'],
-  imports: [
-    RouterModule,
-    FormsModule,
-    SharedModule,
-    SortDirective,
-    SortByDirective,
-    DurationPipe,
-    FormatMediumDatetimePipe,
-    FormatMediumDatePipe,
-  ],
+  imports: [RouterModule, FormsModule, SharedModule, SortDirective, SortByDirective],
 })
 export class HabitComponent implements OnInit {
   subscription: Subscription | null = null;
   habits?: IHabit[];
+  categories: ICategory[] = [];
   isLoading = false;
+  dayjs = dayjs;
 
-  progressPercentage = 0;
-
-  // NEW: Whether to hide completed habits
-  showOnlyIncomplete = false;
+  dailyCompleted = 0;
+  dailyTotal = 0;
+  weeklyCompleted = 0;
+  weeklyTotal = 0;
+  dailyProgressPercentage = 0;
+  weeklyProgressPercentage = 0;
 
   currentWeekStart: dayjs.Dayjs = dayjs().startOf('week').add(1, 'day');
   daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  currentView: 'day' | 'week' = 'day';
+
+  visibleDays: string[] = [];
+  visibleWeekStart: dayjs.Dayjs = dayjs().startOf('week').add(1, 'day');
+  todayWeekStart: dayjs.Dayjs = dayjs().startOf('week').add(1, 'day');
+  selectedDay: dayjs.Dayjs = dayjs();
 
   sortState = sortStateSignal({});
 
@@ -52,6 +55,7 @@ export class HabitComponent implements OnInit {
   protected dataUtils = inject(DataUtils);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
+  protected categoryService = inject(CategoryService);
 
   trackId = (item: IHabit): number => this.habitService.getHabitIdentifier(item);
 
@@ -72,14 +76,6 @@ export class HabitComponent implements OnInit {
       .subscribe();
   }
 
-  byteSize(base64String: string): string {
-    return this.dataUtils.byteSize(base64String);
-  }
-
-  openFile(base64String: string, contentType: string | null | undefined): void {
-    return this.dataUtils.openFile(base64String, contentType);
-  }
-
   delete(habit: IHabit): void {
     const modalRef = this.modalService.open(HabitDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.habit = habit;
@@ -92,15 +88,192 @@ export class HabitComponent implements OnInit {
   }
 
   load(): void {
-    this.queryBackend().subscribe({
-      next: (res: EntityArrayResponseType) => {
-        this.onResponseSuccess(res);
-      },
+    combineLatest([this.queryBackend(), this.categoryService.query()]).subscribe(([habitRes, categoryRes]) => {
+      const dataFromBody = this.fillComponentAttributesFromResponseBody(habitRes.body);
+      this.habits = this.refineData(dataFromBody);
+
+      this.categories = categoryRes.body ?? [];
+
+      // Replace habit.category with full category object
+      for (const habit of this.habits) {
+        if (!habit.completedDates) {
+          habit.completedDates = JSON.stringify([]);
+        }
+        try {
+          habit.streak = this.calculateHabitStreak(habit);
+        } catch (e) {
+          habit.streak = 0;
+        }
+
+        if (habit.category?.id) {
+          const matched = this.categories.find(cat => cat.id === habit.category?.id);
+          if (matched) {
+            habit.category = matched;
+          }
+        }
+      }
+
+      this.calculateProgress();
     });
   }
 
-  navigateToWithComponentValues(event: SortState): void {
-    this.handleNavigation(event);
+  getHabitListSummary(habit: IHabit): string {
+    if (!habit.repeatType) return '';
+
+    if (habit.repeatType === 'daily') {
+      const times = +(habit.repeatTimes ?? 1);
+      return times === 1 ? 'Everyday' : `${times}× per day`;
+    }
+
+    if (habit.repeatType === 'weekly') {
+      if (!habit.repeatDays) return '';
+
+      const days = habit.repeatDays.split(',');
+      const sortedDays = this.sortDays(days);
+
+      if (sortedDays.length === 7) {
+        return 'Everyday';
+      }
+      if (sortedDays.length === 6) {
+        const missingDay = this.daysOfWeek.find(d => !sortedDays.includes(d));
+        return `Everyday except ${missingDay}`;
+      }
+      return `Every ${sortedDays.join(', ')}`;
+    }
+
+    if (habit.repeatType === 'custom') {
+      const interval = +(habit.repeatInterval ?? 1);
+      return `Every ${interval} day${interval > 1 ? 's' : ''}`;
+    }
+
+    return '';
+  }
+
+  sortDays(days: string[]): string[] {
+    const order = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    return days.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  }
+
+  scrollDays(direction: 'left' | 'right'): void {
+    this.visibleWeekStart = direction === 'left' ? this.visibleWeekStart.subtract(1, 'day') : this.visibleWeekStart.add(1, 'day');
+  }
+
+  getVisibleDays(): string[] {
+    return Array.from({ length: 7 }, (_, i) => this.visibleWeekStart.add(i, 'day').format('YYYY-MM-DD'));
+  }
+
+  selectDay(date: string): void {
+    this.selectedDay = dayjs(date);
+  }
+
+  isSelectedDay(date: string): boolean {
+    return this.selectedDay.isSame(dayjs(date), 'day');
+  }
+
+  isFutureDate(date: string): boolean {
+    return dayjs(date).isAfter(dayjs(), 'day');
+  }
+
+  getProgressRingStyle(habit: IHabit): string {
+    let percentage = 0;
+
+    if (!habit.repeatTimes || habit.repeatTimes === '1') {
+      percentage = this.isDateCompleted(habit, this.selectedDay.format('YYYY-MM-DD')) ? 100 : 0;
+    } else {
+      const progress = this.getHabitProgress(habit);
+      const total = +habit.repeatTimes;
+      percentage = Math.min((progress / total) * 100, 100);
+    }
+
+    return `conic-gradient(var(--accent-color, #4f46e5) ${percentage * 3.6}deg, var(--bg-color-secondary, #e6e6e6) 0deg)`;
+  }
+
+  getHabitProgress(habit: IHabit): number {
+    const completions = this.getCompletedDates(habit);
+    return completions.filter(date => date === this.selectedDay.format('YYYY-MM-DD')).length;
+  }
+
+  isHabitCompletedToday(habit: IHabit): boolean {
+    if (!habit.repeatTimes || habit.repeatTimes === '1') {
+      return this.isDateCompleted(habit, this.selectedDay.format('YYYY-MM-DD'));
+    } else {
+      return this.getHabitProgress(habit) >= +habit.repeatTimes;
+    }
+  }
+
+  isHabitEmpty(habit: IHabit): boolean {
+    if (!habit.repeatTimes || habit.repeatTimes === '1') {
+      return !this.isDateCompleted(habit, this.selectedDay.format('YYYY-MM-DD'));
+    } else {
+      return this.getHabitProgress(habit) === 0;
+    }
+  }
+
+  handleMultiProgress(habit: IHabit): void {
+    let completions = this.getCompletedDates(habit);
+    const today = this.selectedDay.format('YYYY-MM-DD');
+    const progress = completions.filter(date => date === today).length;
+    const target = +habit.repeatTimes!;
+
+    if (progress >= target) {
+      completions = completions.filter(date => date !== today);
+    } else {
+      completions.push(today);
+    }
+
+    habit.completedDates = JSON.stringify(completions);
+    habit.streak = this.calculateHabitStreak(habit);
+
+    this.habitService.update(habit).subscribe(() => {
+      this.habits = [...(this.habits ?? [])];
+    });
+  }
+
+  calculateHabitStreak(habit: IHabit): number {
+    if (!habit.startDate) return 0;
+
+    const completions = this.getCompletedDates(habit);
+    let streak = 0;
+    let currentDate = dayjs().startOf('day');
+
+    const repeatType = habit.repeatType ?? 'daily';
+    const repeatDays = habit.repeatDays?.split(',') ?? [];
+
+    for (;;) {
+      const isScheduled =
+        repeatType === 'daily' ||
+        (repeatType === 'weekly' && repeatDays.includes(currentDate.format('ddd'))) ||
+        (repeatType === 'custom' &&
+          habit.repeatInterval != null &&
+          currentDate.diff(habit.startDate.startOf('day'), 'day') % habit.repeatInterval === 0);
+
+      if (!isScheduled) {
+        currentDate = currentDate.subtract(1, 'day');
+        continue;
+      }
+
+      const completionsToday = completions.filter(d => d === currentDate.format('YYYY-MM-DD')).length;
+      const target = +(habit.repeatTimes ?? 1);
+
+      if (completionsToday >= target) {
+        streak++;
+        currentDate = currentDate.subtract(1, 'day');
+      } else {
+        break;
+      }
+    }
+
+    return streak;
+  }
+
+  isToday(date: string): boolean {
+    return dayjs(date).isSame(dayjs(), 'day');
+  }
+
+  getCompletedDates(habit: IHabit): string[] {
+    if (!habit.completedDates) return [];
+
+    return JSON.parse(habit.completedDates) as string[];
   }
 
   toggleDayCompleted(habit: IHabit, date: string): void {
@@ -113,46 +286,53 @@ export class HabitComponent implements OnInit {
       }
     }
 
-    if (completions.includes(date)) {
+    const progress = completions.filter(d => d === date).length;
+    const target = habit.repeatTimes ? +habit.repeatTimes : 1;
+
+    if (progress >= target) {
       completions = completions.filter(d => d !== date);
     } else {
-      completions.push(date);
+      const needed = target - progress;
+      for (let i = 0; i < needed; i++) {
+        completions.push(date);
+      }
     }
 
     habit.completedDates = JSON.stringify(completions);
-    habit.streak = completions.length;
+    habit.streak = this.calculateHabitStreak(habit);
+
     this.habitService.update(habit).subscribe(() => {
       this.habits = [...(this.habits ?? [])];
       this.calculateProgress();
     });
   }
 
+  isWeekCompleted(habit: IHabit): boolean {
+    const completions = this.getCompletedDates(habit);
+
+    const pastAndTodayDates = this.getCurrentWeekDates().filter(date => {
+      return !dayjs(date).isAfter(dayjs(), 'day');
+    });
+
+    return pastAndTodayDates.every(date => completions.includes(date));
+  }
+
   markAllForHabit(habit: IHabit): void {
     const weekDates = this.getCurrentWeekDates();
-    let completions: string[] = [];
-    if (habit.completedDates) {
-      try {
-        completions = JSON.parse(habit.completedDates);
-      } catch (e) {
-        completions = [];
-      }
-    }
+    let completions = this.getCompletedDates(habit);
 
-    const allComplete = weekDates.every(d => completions.includes(d));
-    if (allComplete) {
-      // Unmark all
+    if (this.isWeekCompleted(habit)) {
       completions = completions.filter(d => !weekDates.includes(d));
     } else {
-      // Mark all
       for (const day of weekDates) {
-        if (!completions.includes(day)) {
+        if (!completions.includes(day) && !this.isFutureDate(day)) {
           completions.push(day);
         }
       }
     }
 
     habit.completedDates = JSON.stringify(completions);
-    habit.streak = completions.length;
+    habit.streak = this.calculateHabitStreak(habit);
 
     this.habitService.update(habit).subscribe(() => {
       this.habits = [...(this.habits ?? [])];
@@ -164,11 +344,14 @@ export class HabitComponent implements OnInit {
     if (!habit.completedDates) {
       return false;
     }
-    try {
-      const completions: string[] = JSON.parse(habit.completedDates);
+
+    const completions = this.getCompletedDates(habit);
+
+    if (!habit.repeatTimes || habit.repeatTimes === '1') {
       return completions.includes(date);
-    } catch (e) {
-      return false;
+    } else {
+      const completedToday = completions.filter(d => d === date).length;
+      return completedToday >= +habit.repeatTimes;
     }
   }
 
@@ -196,12 +379,17 @@ export class HabitComponent implements OnInit {
 
   calculateProgress(): void {
     if (!this.habits || this.habits.length === 0) {
-      this.progressPercentage = 0;
+      this.resetProgress();
       return;
     }
-    const weekDates = this.getCurrentWeekDates();
-    const totalDays = this.habits.length * weekDates.length;
-    let completedDays = 0;
+
+    const today = this.selectedDay.format('YYYY-MM-DD');
+    const weekDates = this.getDatesForWeek(this.todayWeekStart);
+
+    let dailyCompleted = 0,
+      dailyTotal = 0;
+    let weeklyCompleted = 0,
+      weeklyTotal = 0;
 
     this.habits.forEach(habit => {
       let completions: string[] = [];
@@ -212,65 +400,156 @@ export class HabitComponent implements OnInit {
           completions = [];
         }
       }
+
+      if (this.shouldHabitAppearToday(habit)) {
+        dailyTotal++;
+        const progress = this.getHabitProgress(habit);
+        const target = habit.repeatTimes ? +habit.repeatTimes : 1;
+        if (progress >= target) {
+          dailyCompleted++;
+        }
+      }
+
       weekDates.forEach(date => {
-        if (completions.includes(date)) {
-          completedDays++;
+        if (this.shouldHabitAppearOnDate(habit, date)) {
+          weeklyTotal++;
+          if (completions.includes(date)) {
+            weeklyCompleted++;
+          }
         }
       });
     });
 
-    this.progressPercentage = Math.round((completedDays / totalDays) * 100);
+    this.dailyCompleted = dailyCompleted;
+    this.dailyTotal = dailyTotal;
+    this.weeklyCompleted = weeklyCompleted;
+    this.weeklyTotal = weeklyTotal;
+    this.dailyProgressPercentage = dailyTotal > 0 ? Math.round((dailyCompleted / dailyTotal) * 100) : 0;
+    this.weeklyProgressPercentage = weeklyTotal > 0 ? Math.round((weeklyCompleted / weeklyTotal) * 100) : 0;
   }
 
-  /**
-   * NEW: Return only the habits we want to show (based on showOnlyIncomplete).
-   */
-  filteredHabits(): IHabit[] {
-    if (!this.habits) {
-      return [];
+  getDatesForWeek(startOfWeek: dayjs.Dayjs): string[] {
+    const dates: string[] = [];
+    for (let i = 0; i < 7; i++) {
+      dates.push(startOfWeek.add(i, 'day').format('YYYY-MM-DD'));
     }
-    if (!this.showOnlyIncomplete) {
-      // If not filtering, show them all
-      return this.habits;
-    }
+    return dates;
+  }
 
-    // Show only habits that are NOT fully completed for the current week
-    const weekDates = this.getCurrentWeekDates();
-    return this.habits.filter(habit => {
-      let completions: string[] = [];
-      if (habit.completedDates) {
-        try {
-          completions = JSON.parse(habit.completedDates);
-        } catch (e) {
-          completions = [];
+  getProgressRing(percentage: number): string {
+    return `conic-gradient(var(--accent-color, #4f46e5) ${percentage * 3.6}deg, var(--bg-color, #e6e6e6) 0deg)`;
+  }
+
+  getHabitsForDay(): IHabit[] {
+    const filteredHabits: IHabit[] = [];
+
+    this.habits?.forEach(habit => {
+      if (!habit.repeatType || !habit.startDate) return;
+
+      const startDate = habit.startDate.startOf('day');
+      const targetDate = this.selectedDay.startOf('day');
+
+      if (habit.repeatType === 'daily') {
+        filteredHabits.push(habit);
+      } else if (habit.repeatType === 'weekly' && habit.repeatDays) {
+        const targetWeekDay = this.selectedDay.format('ddd');
+        const repeatDays = habit.repeatDays.split(',');
+
+        if (repeatDays.includes(targetWeekDay)) {
+          filteredHabits.push(habit);
+        }
+      } else if (habit.repeatType === 'custom' && habit.repeatInterval) {
+        const diffDays = targetDate.diff(startDate, 'day');
+        if (diffDays % habit.repeatInterval === 0) {
+          filteredHabits.push(habit);
         }
       }
-      // If every day in the current week is included, it's fully complete
-      const allComplete = weekDates.every(d => completions.includes(d));
-      // Return only habits that are NOT fully complete
-      return !allComplete;
     });
+
+    return filteredHabits;
+  }
+
+  shouldHabitAppearToday(habit: IHabit): boolean {
+    if (!habit.repeatType || !habit.startDate) return false;
+
+    const startDate = habit.startDate.startOf('day');
+
+    if (habit.repeatType === 'daily') {
+      return true;
+    } else if (habit.repeatType === 'weekly' && habit.repeatDays) {
+      const targetWeekDay = this.selectedDay.format('ddd');
+      const repeatDays = habit.repeatDays.split(',');
+      return repeatDays.includes(targetWeekDay);
+    } else if (habit.repeatType === 'custom' && habit.repeatInterval) {
+      const diffDays = this.selectedDay.diff(startDate, 'day');
+      return diffDays % habit.repeatInterval === 0;
+    }
+
+    return false;
+  }
+
+  shouldHabitAppearOnDate(habit: IHabit, date: string): boolean {
+    if (!habit.repeatType || !habit.startDate) return false;
+
+    const startDate = habit.startDate.startOf('day');
+    const targetDate = dayjs(date);
+
+    if (habit.repeatType === 'daily') {
+      return true;
+    } else if (habit.repeatType === 'weekly' && habit.repeatDays) {
+      const targetWeekDay = targetDate.format('ddd');
+      const repeatDays = habit.repeatDays.split(',');
+      return repeatDays.includes(targetWeekDay);
+    } else if (habit.repeatType === 'custom' && habit.repeatInterval) {
+      const diffDays = targetDate.diff(startDate, 'day');
+      return diffDays % habit.repeatInterval === 0;
+    }
+
+    return false;
+  }
+
+  resetProgress(): void {
+    this.dailyCompleted = 0;
+    this.dailyTotal = 0;
+    this.weeklyCompleted = 0;
+    this.weeklyTotal = 0;
+    this.dailyProgressPercentage = 0;
+    this.weeklyProgressPercentage = 0;
+  }
+
+  getCategoryStyle(category: ICategory | null): Record<string, string> {
+    if (!category?.color) return {};
+    return {
+      color: category.color,
+      'background-color': this.getCategoryBackground(category.color) ?? '',
+    };
+  }
+
+  getCategoryBackground(color: string | null | undefined): string | null {
+    if (!color) return null;
+    const div = document.createElement('div');
+    div.style.color = color;
+    document.body.appendChild(div);
+    const computedColor = getComputedStyle(div).color;
+    document.body.removeChild(div);
+    const match = computedColor.match(/rgba?\((\d+), (\d+), (\d+)/);
+    if (!match) return null;
+    const [_, r, g, b] = match;
+    return `rgba(${r}, ${g}, ${b}, 0.18)`;
+  }
+
+  hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+    if (!/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) return null;
+    let c = hex.substring(1).split('');
+    if (c.length === 3) c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+    const r = parseInt(c[0] + c[1], 16);
+    const g = parseInt(c[2] + c[3], 16);
+    const b = parseInt(c[4] + c[5], 16);
+    return { r, g, b };
   }
 
   protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
     this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]));
-  }
-
-  protected onResponseSuccess(response: EntityArrayResponseType): void {
-    const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
-    dataFromBody.forEach(habit => {
-      if (!habit.completedDates) {
-        habit.completedDates = JSON.stringify([]);
-      }
-      try {
-        const completions: string[] = JSON.parse(habit.completedDates);
-        habit.streak = completions.length;
-      } catch (e) {
-        habit.streak = 0;
-      }
-    });
-    this.habits = this.refineData(dataFromBody);
-    this.calculateProgress();
   }
 
   protected refineData(data: IHabit[]): IHabit[] {
@@ -288,18 +567,5 @@ export class HabitComponent implements OnInit {
       sort: this.sortService.buildSortParam(this.sortState()),
     };
     return this.habitService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
-  }
-
-  protected handleNavigation(sortState: SortState): void {
-    const queryParamsObj = {
-      sort: this.sortService.buildSortParam(sortState),
-    };
-
-    this.ngZone.run(() => {
-      this.router.navigate(['./'], {
-        relativeTo: this.activatedRoute,
-        queryParams: queryParamsObj,
-      });
-    });
   }
 }
