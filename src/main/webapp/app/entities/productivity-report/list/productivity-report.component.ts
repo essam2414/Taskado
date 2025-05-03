@@ -97,6 +97,7 @@ export class ProductivityReportComponent implements OnInit {
   completedTaskTitles: (string | null | undefined)[] = [];
   completedHabitNames: (string | null | undefined)[] = [];
   habitStreak: number | string = 'N/A';
+  suggestion = '';
 
   public readonly router = inject(Router);
   protected readonly productivityReportService = inject(ProductivityReportService);
@@ -341,6 +342,8 @@ export class ProductivityReportComponent implements OnInit {
     this.completedHabitNames = this.currentReport.completedHabits?.map(habit => habit.name) ?? [];
     this.habitStreak = this.calculateHabitStreak();
 
+    this.suggestion = this.getSuggestionForScore(this.efficiencyScore);
+
     this.renderTasksChart();
     this.renderHabitsChart();
     this.renderFocusChart();
@@ -558,6 +561,7 @@ export class ProductivityReportComponent implements OnInit {
       this.habitStreak = 'N/A';
       this.completedTaskTitles = [];
       this.completedHabitNames = [];
+      this.suggestion = 'N/A';
       this.renderTasksChart();
       this.renderHabitsChart();
       this.renderFocusChart();
@@ -643,5 +647,21 @@ export class ProductivityReportComponent implements OnInit {
     }
 
     return streak;
+  }
+
+  private getSuggestionForScore(score: number | string): string {
+    const numericScore = typeof score === 'number' ? score : parseFloat(score);
+
+    if (numericScore >= 90) {
+      return '🚀 Fantastic! You’re on fire!';
+    } else if (numericScore >= 75) {
+      return '💪 Keep the momentum going!';
+    } else if (numericScore >= 50) {
+      return '⚖️ Consider focusing a bit more.';
+    } else if (numericScore >= 25) {
+      return '🔄 Try shorter sessions or fewer tasks.';
+    } else {
+      return '🛌 Maybe take a break and reset.';
+    }
   }
 }
