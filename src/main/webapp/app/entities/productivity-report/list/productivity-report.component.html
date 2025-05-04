@@ -363,15 +363,19 @@
       </div>
 
       <div *ngIf="popupContent === 'focus'">
-        <p *ngIf="+pomodoroSessionsCompleted > 0">
-          <strong>Average Focus Time per Session:</strong>
-          {{ +totalFocusTime / +pomodoroSessionsCompleted | number: '1.1-1' }} hours
-        </p>
-        <p *ngIf="+pomodoroSessionsCompleted === 0 || !totalFocusTime">
-          <em>Pomodoro analyses is only available for newly generated reports.</em><br /><br /><em
-            >Make sure you have completed pomodoros.</em
-          >
-        </p>
+        <ng-container *ngIf="currentReport?.pomodoroSessionsCompleted ?? 0 > 0; else noPomodoroData">
+          <p>
+            <strong>Average Focus Time per Session:</strong>
+            {{ +totalFocusTime / +pomodoroSessionsCompleted | number: '1.1-1' }} hours
+          </p>
+        </ng-container>
+
+        <ng-template #noPomodoroData>
+          <p>
+            <em>Pomodoro analyses is only available for newly generated reports.</em><br /><br />
+            <em>Make sure you have completed pomodoros.</em>
+          </p>
+        </ng-template>
       </div>
     </div>
   </div>
