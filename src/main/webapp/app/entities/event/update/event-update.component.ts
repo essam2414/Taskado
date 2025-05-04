@@ -58,6 +58,17 @@ export class EventUpdateComponent implements OnInit {
     }
   }
 
+  deleteEvent(): void {
+    const id = this.editForm.get('id')?.value;
+    if (id) {
+      if (confirm('Are you sure you want to delete this event?')) {
+        this.eventService.delete(id).subscribe(() => {
+          this.previousState(); // Navigate back or refresh
+        });
+      }
+    }
+  }
+
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IEvent>>): void {
     result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
       next: () => this.onSaveSuccess(),
