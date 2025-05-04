@@ -71,7 +71,18 @@ export class PomodoroSessionComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.switchMode(this.currentMode);
+    const saved = localStorage.getItem('pomodoro-timer-state');
+    if (saved) {
+      const { timeRemaining, currentMode, completedPomodoros, timerRunning } = JSON.parse(saved);
+      this.currentMode = currentMode;
+      this.timeRemaining = timeRemaining;
+      this.completedPomodoros = completedPomodoros;
+      if (timerRunning) {
+        this.startTimer(); // Automatically resume if it was running
+      }
+    } else {
+      this.switchMode(this.currentMode);
+    }
   }
 
   ngOnDestroy(): void {
@@ -96,6 +107,7 @@ export class PomodoroSessionComponent implements OnInit, OnDestroy {
       this.timerSubscription = interval(1000).subscribe(() => {
         if (this.timeRemaining > 0) {
           this.timeRemaining--;
+          this.saveTimerState(); // 👈 Save progress
         } else {
           this.pauseTimer();
           this.autoSwitchMode();
@@ -103,7 +115,20 @@ export class PomodoroSessionComponent implements OnInit, OnDestroy {
         }
       });
       this.timerRunning = true;
+      this.saveTimerState(); // 👈 Save immediately when starting
     }
+  }
+  saveTimerState(): void {
+    localStorage.setItem(
+      'pomodoro-timer-state',
+      JSON.stringify({
+        timeRemaining: this.timeRemaining,
+        currentMode: this.currentMode,
+        completedPomodoros: this.completedPomodoros,
+        timestamp: Date.now(), // optional
+        timerRunning: this.timerRunning,
+      }),
+    );
   }
 
   pauseTimer(): void {
@@ -114,6 +139,7 @@ export class PomodoroSessionComponent implements OnInit, OnDestroy {
   resetTimer(): void {
     this.pauseTimer();
     this.timeRemaining = this.modeDurations[this.currentMode];
+    this.saveTimerState();
   }
 
   skipSession(): void {
@@ -123,6 +149,7 @@ export class PomodoroSessionComponent implements OnInit, OnDestroy {
 
   resetPomodoroCounter(): void {
     this.completedPomodoros = 0;
+    this.saveTimerState();
   }
 
   autoSwitchMode(): void {
@@ -149,15 +176,6 @@ export class PomodoroSessionComponent implements OnInit, OnDestroy {
   }
 
   // NEW: toggle history view and fetch count
-  toggleHistory(): void {
-    this.showHistory = !this.showHistory;
-    if (this.showHistory) {
-      this.pomodoroHistoryService.getCompletedSessionsCount().subscribe({
-        next: (count: number) => (this.historyCount = count),
-        error: () => (this.historyCount = 0),
-      });
-    }
-  }
 
   delete(pomodoroSession: IPomodoroSession): void {
     const modalRef = this.modalService.open(PomodoroSessionDeleteDialogComponent, { size: 'lg', backdrop: 'static' });

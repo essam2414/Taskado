@@ -3,6 +3,7 @@ package bham.team.repository;
 import bham.team.domain.PomodoroSession;
 import java.util.List;
 import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -11,6 +12,10 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface PomodoroSessionRepository extends JpaRepository<PomodoroSession, Long> {
-    @Query("select pomodoroSession from PomodoroSession pomodoroSession where pomodoroSession.user.login = ?#{authentication.name}")
+    @Query("select p from PomodoroSession p where p.user.login = ?#{authentication.name}")
     List<PomodoroSession> findByUserIsCurrentUser();
+
+    // Optional: used in controller for custom login-based queries
+    @Query("select p from PomodoroSession p where p.user.login = :login")
+    List<PomodoroSession> findAllByUserLogin(@Param("login") String login);
 }
