@@ -13,4 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface PomodoroSessionRepository extends JpaRepository<PomodoroSession, Long> {
     @Query("select pomodoroSession from PomodoroSession pomodoroSession where pomodoroSession.user.login = ?#{authentication.name}")
     List<PomodoroSession> findByUserIsCurrentUser();
+
+    List<PomodoroSession> findAllByUser(bham.team.domain.User user);
 }

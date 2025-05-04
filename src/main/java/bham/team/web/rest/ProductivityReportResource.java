@@ -1,7 +1,10 @@
 package bham.team.web.rest;
 
 import bham.team.domain.ProductivityReport;
+import bham.team.domain.User;
 import bham.team.repository.ProductivityReportRepository;
+import bham.team.repository.UserRepository;
+import bham.team.security.SecurityUtils;
 import bham.team.service.ProductivityReportService;
 import bham.team.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
@@ -37,12 +40,16 @@ public class ProductivityReportResource {
 
     private final ProductivityReportRepository productivityReportRepository;
 
+    private final UserRepository userRepository;
+
     public ProductivityReportResource(
         ProductivityReportService productivityReportService,
-        ProductivityReportRepository productivityReportRepository
+        ProductivityReportRepository productivityReportRepository,
+        UserRepository userRepository
     ) {
         this.productivityReportService = productivityReportService;
         this.productivityReportRepository = productivityReportRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -56,9 +63,16 @@ public class ProductivityReportResource {
     public ResponseEntity<ProductivityReport> createProductivityReport(@Valid @RequestBody ProductivityReport productivityReport)
         throws URISyntaxException {
         LOG.debug("REST request to save ProductivityReport : {}", productivityReport);
+
         if (productivityReport.getId() != null) {
             throw new BadRequestAlertException("A new productivityReport cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        // 🔐 Get current user
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User user = userRepository.findOneByLogin(login).orElseThrow();
+        productivityReport.setUser(user); // ✅ Assign user to report
+
         productivityReport = productivityReportService.save(productivityReport);
         return ResponseEntity.created(new URI("/api/productivity-reports/" + productivityReport.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, productivityReport.getId().toString()))
@@ -145,7 +159,7 @@ public class ProductivityReportResource {
         @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
     ) {
         LOG.debug("REST request to get all ProductivityReports");
-        return productivityReportService.findAll();
+        return productivityReportRepository.findByUserIsCurrentUser();
     }
 
     /**
@@ -157,7 +171,12 @@ public class ProductivityReportResource {
     @GetMapping("/{id}")
     public ResponseEntity<ProductivityReport> getProductivityReport(@PathVariable("id") Long id) {
         LOG.debug("REST request to get ProductivityReport : {}", id);
-        Optional<ProductivityReport> productivityReport = productivityReportService.findOne(id);
+
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        Optional<ProductivityReport> productivityReport = productivityReportRepository
+            .findById(id)
+            .filter(report -> report.getUser() != null && report.getUser().getLogin().equals(login));
+
         return ResponseUtil.wrapOrNotFound(productivityReport);
     }
 
@@ -170,6 +189,13 @@ public class ProductivityReportResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProductivityReport(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete ProductivityReport : {}", id);
+
+        ProductivityReport report = productivityReportRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!report.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to delete this report", ENTITY_NAME, "unauthorized");
+        }
+
         productivityReportService.delete(id);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
