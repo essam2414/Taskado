@@ -3,27 +3,54 @@
     <div class="calendar-top-left">
       <h2 id="page-heading" data-cy="EventHeading">Calendar</h2>
 
-      <div class="calendar-filters">
-        <button class="btn-filter" [class.active]="viewMode === 'month'" (click)="setView('month')">Month</button>
-        <button class="btn-filter" [class.active]="viewMode === 'week'" (click)="setView('week')">Week</button>
-        <button class="btn-filter" [class.active]="viewMode === 'day'" (click)="setView('day')">Day</button>
+      <div class="desktop-only calendar-filters">
+        <button *ngFor="let view of views" class="btn-filter" [class.active]="activeView === view.value" (click)="setView(view.value)">
+          {{ view.label }}
+        </button>
+      </div>
+
+      <!-- Dropdown filters for mobile -->
+      <div class="mobile-only dropdown dropdown-select" [class.open]="viewsOpen">
+        <div class="dropdown-btn" [class.open]="viewsOpen" (click)="toggleViews()">
+          <span>{{ activeViewLabel }}</span>
+          <fa-icon [icon]="'chevron-down'"></fa-icon>
+        </div>
+
+        <ul class="dropdown-menu">
+          <li *ngFor="let view of views" [class.active]="activeView === view.value" (click)="setView(view.value); toggleViews()">
+            {{ view.label }}
+          </li>
+        </ul>
       </div>
     </div>
 
-    <button id="jh-create-entity" data-cy="entityCreateButton" class="btn-add jh-create-entity create-event" [routerLink]="['/event/new']">
+    <button
+      id="jh-create-entity"
+      data-cy="entityCreateButton"
+      class="btn-add jh-create-entity create-event desktop-only"
+      [routerLink]="['/event/new']"
+    >
       <fa-icon icon="plus"></fa-icon>
       <span>Add event</span>
+    </button>
+
+    <button class="btn-add-icon jh-create-entity create-event mobile-only" [routerLink]="['/event/new']">
+      <fa-icon icon="plus"></fa-icon>
     </button>
   </div>
 
   <!-- Centered Calendar Container -->
-  <div *ngIf="viewMode === 'month'" class="calendar-container">
+  <div *ngIf="activeView === 'month'" class="calendar-container">
     <div class="calendar">
       <!-- Navigation for Previous/Next Month -->
-      <div class="calendar-header calendar-subtitle">
-        <button class="btn-add" (click)="changeMonth(-1)">❮</button>
-        <h3>{{ getFormattedCurrentMonth() }}</h3>
-        <button class="btn-add" (click)="changeMonth(1)">❯</button>
+      <div class="day-header">
+        <button class="btn btn-nav" (click)="changeMonth(-1)">
+          <fa-icon icon="chevron-left"></fa-icon>
+        </button>
+        <h4>{{ getFormattedCurrentMonth() }}</h4>
+        <button class="btn btn-nav" (click)="changeMonth(1)">
+          <fa-icon icon="chevron-right"></fa-icon>
+        </button>
       </div>
 
       <!-- Month View: Default View -->
@@ -56,14 +83,18 @@
   </div>
 
   <!-- Week View -->
-  <div *ngIf="viewMode === 'week'" class="week-view">
-    <div class="week-header">
-      <button class="btn-add" (click)="changeWeek(-1)">❮</button>
-      <h3>
+  <div *ngIf="activeView === 'week'" class="week-view">
+    <div class="day-header">
+      <button class="btn btn-nav" (click)="changeWeek(-1)">
+        <fa-icon icon="chevron-left"></fa-icon>
+      </button>
+      <h4>
         {{ getStartOfWeek(weekStartDate).toDate() | date: 'd' }} -
         {{ weekEndDate?.toDate() | date: 'd MMMM yyyy' }}
-      </h3>
-      <button class="btn-add" (click)="changeWeek(1)">❯</button>
+      </h4>
+      <button class="btn btn-nav" (click)="changeWeek(1)">
+        <fa-icon icon="chevron-right"></fa-icon>
+      </button>
     </div>
 
     <table class="table">
@@ -89,13 +120,17 @@
   </div>
 
   <!-- Day View -->
-  <div *ngIf="viewMode === 'day'" class="day-view-container">
+  <div *ngIf="activeView === 'day'" class="day-view-container">
     <div class="day-view">
       <!-- Navigation Arrows -->
       <div class="day-header">
-        <button class="btn-add" (click)="changeDay(-1)">❮</button>
+        <button class="btn btn-nav" (click)="changeDay(-1)">
+          <fa-icon icon="chevron-left"></fa-icon>
+        </button>
         <h4>{{ selectedDate?.toDate() | date: 'fullDate' }}</h4>
-        <button class="btn-add" (click)="changeDay(1)">❯</button>
+        <button class="btn btn-nav" (click)="changeDay(1)">
+          <fa-icon icon="chevron-right"></fa-icon>
+        </button>
       </div>
 
       <div class="hour-row" *ngFor="let hour of hours">

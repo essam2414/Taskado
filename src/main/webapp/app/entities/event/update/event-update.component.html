@@ -1,17 +1,10 @@
-<div class="d-flex justify-content-center">
-  <div class="col-8">
+<div>
+  <div>
     <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="jhi-event-heading" data-cy="EventCreateUpdateHeading">Create or edit a Event</h2>
+      <h2 id="jhi-event-heading" data-cy="EventCreateUpdateHeading">Create or Edit an Event</h2>
 
       <div>
         <jhi-alert-error></jhi-alert-error>
-
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
 
         @let titleRef = editForm.get('title')!;
         <div class="mb-3">
@@ -124,16 +117,6 @@
         <div class="mb-3">
           <label class="form-label" for="field_reminder">Reminder</label>
           <input type="checkbox" class="form-check" name="reminder" id="field_reminder" data-cy="reminder" formControlName="reminder" />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_user">User</label>
-          <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user" [compareWith]="compareUser">
-            <option [ngValue]="null"></option>
-            @for (userOption of usersSharedCollection; track $index) {
-              <option [ngValue]="userOption">{{ userOption.id }}</option>
-            }
-          </select>
         </div>
       </div>
 
