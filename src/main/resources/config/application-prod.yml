@@ -112,8 +112,8 @@ jhipster:
         token-validity-in-seconds-for-remember-me: 2592000
     content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; img-src 'self' data: https://api.dicebear.com https://res.cloudinary.com; font-src 'self' https://fonts.gstatic.com data:"
   mail: # specific JHipster mail property, for standard properties see MailProperties
-    from: taskadoproject@gmail.com
-    base-url: https://team45.bham.team/ # Modify according to your server's URL
+    from: 'Taskado Team <taskadoproject@gmail.com>'
+    base-url: https://team45.bham.team # Modify according to your server's URL
   logging:
     use-json-format: false # By default, logs are not in Json format
     logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration

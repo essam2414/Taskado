@@ -38,14 +38,16 @@ export default class DashboardComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(account => {
         this.account.set(account);
+
         if (account?.login) {
           this.userPreferencesService.getOrCreateAndApply().then(prefs => {
             this.visibleWidgets = this.userPreferencesService.visibleWidgets;
           });
         }
+
+        this.setGreeting(account);
       });
 
-    this.setGreeting();
     this.setCurrentDate();
   }
 
@@ -57,9 +59,9 @@ export default class DashboardComponent implements OnInit, OnDestroy {
     moveItemInArray(this.visibleWidgets, event.previousIndex, event.currentIndex);
   }
 
-  setGreeting(): void {
+  setGreeting(account: Account | null): void {
     const hour = new Date().getHours();
-    const firstName = this.account()?.firstName ?? 'there'; // Fallback if no name is available
+    const firstName = account?.firstName?.trim() ?? account?.login ?? 'there';
 
     if (hour >= 5 && hour < 12) {
       this.greetingMessage = `Good morning, ${firstName} 👋`;
