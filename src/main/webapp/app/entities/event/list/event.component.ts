@@ -48,7 +48,13 @@ export class EventComponent implements OnInit {
   weekStartDate: Dayjs = dayjs();
   weekEndDate?: Dayjs;
   sortState = sortStateSignal({});
-  viewMode: 'day' | 'week' | 'month' = 'month';
+  viewsOpen = false;
+  activeView = 'month';
+  views = [
+    { label: 'Month', value: 'month' },
+    { label: 'Week', value: 'week' },
+    { label: 'Day', value: 'day' },
+  ];
 
   public readonly router = inject(Router);
   protected readonly eventService = inject(EventService);
@@ -116,13 +122,21 @@ export class EventComponent implements OnInit {
 
   selectDate(day: Dayjs): void {
     this.selectedDate = day;
-    if (this.viewMode === 'month') this.viewMode = 'day';
+    if (this.activeView === 'month') this.activeView = 'day';
   }
 
-  setView(mode: 'day' | 'week' | 'month'): void {
-    this.viewMode = mode;
-    if (mode === 'week') this.renderWeekView();
-    else if (mode === 'day') this.currentDate = dayjs();
+  toggleViews(): void {
+    this.viewsOpen = !this.viewsOpen;
+  }
+
+  setView(selectedView: string): void {
+    this.activeView = selectedView;
+    if (selectedView === 'week') this.renderWeekView();
+    else if (selectedView === 'day') this.currentDate = dayjs();
+  }
+
+  get activeViewLabel(): string {
+    return this.views.find(f => f.value === this.activeView)?.label ?? '';
   }
 
   renderWeekView(): void {

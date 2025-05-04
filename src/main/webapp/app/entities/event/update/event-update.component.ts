@@ -41,8 +41,6 @@ export class EventUpdateComponent implements OnInit {
       if (event) {
         this.updateForm(event);
       }
-
-      this.loadRelationshipsOptions();
     });
   }
 
@@ -57,6 +55,17 @@ export class EventUpdateComponent implements OnInit {
       this.subscribeToSaveResponse(this.eventService.update(event));
     } else {
       this.subscribeToSaveResponse(this.eventService.create(event));
+    }
+  }
+
+  deleteEvent(): void {
+    const id = this.editForm.get('id')?.value;
+    if (id) {
+      if (confirm('Are you sure you want to delete this event?')) {
+        this.eventService.delete(id).subscribe(() => {
+          this.previousState(); // Navigate back or refresh
+        });
+      }
     }
   }
 
@@ -84,13 +93,5 @@ export class EventUpdateComponent implements OnInit {
     this.eventFormService.resetForm(this.editForm, event);
 
     this.usersSharedCollection = this.userService.addUserToCollectionIfMissing<IUser>(this.usersSharedCollection, event.user);
-  }
-
-  protected loadRelationshipsOptions(): void {
-    this.userService
-      .query()
-      .pipe(map((res: HttpResponse<IUser[]>) => res.body ?? []))
-      .pipe(map((users: IUser[]) => this.userService.addUserToCollectionIfMissing<IUser>(users, this.event?.user)))
-      .subscribe((users: IUser[]) => (this.usersSharedCollection = users));
   }
 }
