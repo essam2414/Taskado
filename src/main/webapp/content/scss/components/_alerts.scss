@@ -51,6 +51,11 @@
   background: var(--alert-success-bg) !important;
   color: var(--success-color) !important;
   border-left: 4px solid var(--success-color) !important;
+
+  .alert-link {
+    color: var(--success-color) !important;
+    font-size: var(--font-sm);
+  }
 }
 
 .alert-danger {
