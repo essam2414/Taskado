@@ -118,6 +118,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  align-items: flex-start;
 }
 
 .circle-highlight {
@@ -184,10 +185,12 @@
   gap: 10px;
   width: 100%;
   border-collapse: collapse;
+  color: var(--text-primary);
 }
 
 .week-view th,
 .week-view td {
+  color: var(--text-primary);
   padding: 5px;
   text-align: center;
 }
@@ -196,7 +199,7 @@
   display: flex;
   flex-direction: column;
   padding: 15px;
-  background: #f9f9f9;
+  background-color: var(--body-bg) !important;
   border-radius: 8px;
   border-left: 2px solid var(--accent-color);
 }
