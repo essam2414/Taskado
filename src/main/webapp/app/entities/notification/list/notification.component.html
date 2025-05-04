@@ -4,13 +4,13 @@
       <h2 id="page-heading" data-cy="NotificationHeading">Notifications</h2>
 
       <div class="notification-filters">
-        <button class="btn-filter" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
-          <fa-icon icon="inbox"></fa-icon>
-          All
-        </button>
         <button class="btn-filter" [class.active]="activeFilter === 'unread'" (click)="setFilter('unread')">
           <fa-icon icon="envelope"></fa-icon>
           Unread ({{ getUnreadCount() }})
+        </button>
+        <button class="btn-filter" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
+          <fa-icon icon="inbox"></fa-icon>
+          All
         </button>
       </div>
     </div>
