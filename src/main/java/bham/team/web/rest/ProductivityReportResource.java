@@ -190,7 +190,7 @@ public class ProductivityReportResource {
     public ResponseEntity<Void> deleteProductivityReport(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete ProductivityReport : {}", id);
 
-        ProductivityReport report = productivityReportRepository.findById(id).orElseThrow();
+        ProductivityReport report = productivityReportRepository.findByIdWithUser(id).orElseThrow();
         String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
         if (!report.getUser().getLogin().equals(login)) {
             throw new BadRequestAlertException("You do not have permission to delete this report", ENTITY_NAME, "unauthorized");
