@@ -547,6 +547,8 @@ export class TaskModalComponent implements OnInit {
     this.selectedDueDate = task.dueDate ? dayjs(task.dueDate).format('YYYY-MM-DDTHH:mm') : null;
 
     this.usersSharedCollection = this.userService.addUserToCollectionIfMissing<IUser>(this.usersSharedCollection, task.user);
+
+    this.editForm.markAsDirty();
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<ITask>>): void {

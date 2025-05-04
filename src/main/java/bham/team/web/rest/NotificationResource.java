@@ -1,7 +1,10 @@
 package bham.team.web.rest;
 
 import bham.team.domain.Notification;
+import bham.team.domain.User;
 import bham.team.repository.NotificationRepository;
+import bham.team.repository.UserRepository;
+import bham.team.security.SecurityUtils;
 import bham.team.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -35,40 +38,30 @@ public class NotificationResource {
     private String applicationName;
 
     private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
 
-    public NotificationResource(NotificationRepository notificationRepository) {
+    public NotificationResource(NotificationRepository notificationRepository, UserRepository userRepository) {
         this.notificationRepository = notificationRepository;
+        this.userRepository = userRepository;
     }
 
-    /**
-     * {@code POST  /notifications} : Create a new notification.
-     *
-     * @param notification the notification to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new notification, or with status {@code 400 (Bad Request)} if the notification has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PostMapping("")
     public ResponseEntity<Notification> createNotification(@Valid @RequestBody Notification notification) throws URISyntaxException {
         LOG.debug("REST request to save Notification : {}", notification);
         if (notification.getId() != null) {
             throw new BadRequestAlertException("A new notification cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User user = userRepository.findOneByLogin(login).orElseThrow();
+        notification.setUser(user);
+
         notification = notificationRepository.save(notification);
         return ResponseEntity.created(new URI("/api/notifications/" + notification.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, notification.getId().toString()))
             .body(notification);
     }
 
-    /**
-     * {@code PUT  /notifications/:id} : Updates an existing notification.
-     *
-     * @param id the id of the notification to save.
-     * @param notification the notification to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated notification,
-     * or with status {@code 400 (Bad Request)} if the notification is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the notification couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PutMapping("/{id}")
     public ResponseEntity<Notification> updateNotification(
         @PathVariable(value = "id", required = false) final Long id,
@@ -82,27 +75,19 @@ public class NotificationResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        if (!notificationRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        Notification existingNotification = notificationRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingNotification.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to update this notification", ENTITY_NAME, "unauthorized");
         }
 
+        notification.setUser(existingNotification.getUser()); // preserve user link
         notification = notificationRepository.save(notification);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, notification.getId().toString()))
             .body(notification);
     }
 
-    /**
-     * {@code PATCH  /notifications/:id} : Partial updates given fields of an existing notification, field will ignore if it is null
-     *
-     * @param id the id of the notification to save.
-     * @param notification the notification to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated notification,
-     * or with status {@code 400 (Bad Request)} if the notification is not valid,
-     * or with status {@code 404 (Not Found)} if the notification is not found,
-     * or with status {@code 500 (Internal Server Error)} if the notification couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<Notification> partialUpdateNotification(
         @PathVariable(value = "id", required = false) final Long id,
@@ -116,36 +101,37 @@ public class NotificationResource {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
 
-        if (!notificationRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        Notification existingNotification = notificationRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingNotification.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to update this notification", ENTITY_NAME, "unauthorized");
         }
 
-        Optional<Notification> result = notificationRepository
-            .findById(notification.getId())
-            .map(existingNotification -> {
+        Optional<Notification> result = Optional.of(existingNotification)
+            .map(existing -> {
                 if (notification.getMessage() != null) {
-                    existingNotification.setMessage(notification.getMessage());
+                    existing.setMessage(notification.getMessage());
                 }
                 if (notification.getNotificationType() != null) {
-                    existingNotification.setNotificationType(notification.getNotificationType());
+                    existing.setNotificationType(notification.getNotificationType());
                 }
                 if (notification.getCreatedAt() != null) {
-                    existingNotification.setCreatedAt(notification.getCreatedAt());
+                    existing.setCreatedAt(notification.getCreatedAt());
                 }
                 if (notification.getRead() != null) {
-                    existingNotification.setRead(notification.getRead());
+                    existing.setRead(notification.getRead());
                 }
                 if (notification.getPriority() != null) {
-                    existingNotification.setPriority(notification.getPriority());
+                    existing.setPriority(notification.getPriority());
                 }
                 if (notification.getStatus() != null) {
-                    existingNotification.setStatus(notification.getStatus());
+                    existing.setStatus(notification.getStatus());
                 }
                 if (notification.getSentVia() != null) {
-                    existingNotification.setSentVia(notification.getSentVia());
+                    existing.setSentVia(notification.getSentVia());
                 }
 
-                return existingNotification;
+                return existing;
             })
             .map(notificationRepository::save);
 
@@ -155,40 +141,30 @@ public class NotificationResource {
         );
     }
 
-    /**
-     * {@code GET  /notifications} : get all the notifications.
-     *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of notifications in body.
-     */
     @GetMapping("")
     public List<Notification> getAllNotifications() {
         LOG.debug("REST request to get all Notifications");
-        return notificationRepository.findAll();
+        return notificationRepository.findByUserIsCurrentUser();
     }
 
-    /**
-     * {@code GET  /notifications/:id} : get the "id" notification.
-     *
-     * @param id the id of the notification to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the notification, or with status {@code 404 (Not Found)}.
-     */
     @GetMapping("/{id}")
     public ResponseEntity<Notification> getNotification(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Notification : {}", id);
-        Optional<Notification> notification = notificationRepository.findById(id);
+        Optional<Notification> notification = notificationRepository
+            .findById(id)
+            .filter(n -> n.getUser() != null && n.getUser().getLogin().equals(SecurityUtils.getCurrentUserLogin().orElse("")));
         return ResponseUtil.wrapOrNotFound(notification);
     }
 
-    /**
-     * {@code DELETE  /notifications/:id} : delete the "id" notification.
-     *
-     * @param id the id of the notification to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNotification(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Notification : {}", id);
-        notificationRepository.deleteById(id);
+        Notification existingNotification = notificationRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingNotification.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to delete this notification", ENTITY_NAME, "unauthorized");
+        }
+        notificationRepository.delete(existingNotification);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();
