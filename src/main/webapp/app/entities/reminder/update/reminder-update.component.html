@@ -1,17 +1,10 @@
 <div>
   <div>
     <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
-      <h2 id="jhi-reminder-heading" data-cy="ReminderCreateUpdateHeading">Create or edit a Reminder</h2>
+      <h2 id="jhi-reminder-heading" data-cy="ReminderCreateUpdateHeading">Edit a Reminder</h2>
 
       <div>
         <jhi-alert-error></jhi-alert-error>
-
-        @if (editForm.controls.id.value !== null) {
-          <div class="mb-3">
-            <label class="form-label" for="field_id">ID</label>
-            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
-          </div>
-        }
 
         @let titleRef = editForm.get('title')!;
         <div class="mb-3">
@@ -62,64 +55,6 @@
               >
             </div>
           }
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_repeatType">Repeat Type</label>
-          <input
-            type="text"
-            class="form-control"
-            name="repeatType"
-            id="field_repeatType"
-            data-cy="repeatType"
-            formControlName="repeatType"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_repeatInterval">Repeat Interval</label>
-          <input
-            type="number"
-            class="form-control"
-            name="repeatInterval"
-            id="field_repeatInterval"
-            data-cy="repeatInterval"
-            formControlName="repeatInterval"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_linkedEntityType">Linked Entity Type</label>
-          <input
-            type="text"
-            class="form-control"
-            name="linkedEntityType"
-            id="field_linkedEntityType"
-            data-cy="linkedEntityType"
-            formControlName="linkedEntityType"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_linkedEntityId">Linked Entity Id</label>
-          <input
-            type="number"
-            class="form-control"
-            name="linkedEntityId"
-            id="field_linkedEntityId"
-            data-cy="linkedEntityId"
-            formControlName="linkedEntityId"
-          />
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="field_user">User</label>
-          <select class="form-control" id="field_user" data-cy="user" name="user" formControlName="user" [compareWith]="compareUser">
-            <option [ngValue]="null"></option>
-            @for (userOption of usersSharedCollection; track $index) {
-              <option [ngValue]="userOption">{{ userOption.id }}</option>
-            }
-          </select>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 import { Component, NgZone, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
-import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
+import { Observable, Subscription, combineLatest, filter as rxFilter, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
@@ -8,10 +8,11 @@ import { SortByDirective, SortDirective, SortService, type SortState, sortStateS
 import { DurationPipe, FormatMediumDatePipe, FormatMediumDatetimePipe } from 'app/shared/date';
 import { FormsModule } from '@angular/forms';
 import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
-import { IReminder } from '../reminder.model';
+import { IReminder, NewReminder } from '../reminder.model';
 import { EntityArrayResponseType, ReminderService } from '../service/reminder.service';
 import { ReminderDeleteDialogComponent } from '../delete/reminder-delete-dialog.component';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs/esm';
+import type { Dayjs } from 'dayjs/esm';
 
 @Component({
   standalone: true,
@@ -34,18 +35,20 @@ export class ReminderComponent implements OnInit {
   filteredReminders: IReminder[] = [];
   isLoading = false;
   showAddForm = false;
-  newReminder: Partial<IReminder> = {
+
+  minDateTime = dayjs().format('YYYY-MM-DDTHH:mm');
+
+  newReminder: {
+    title: string;
+    description: string | null;
+    reminderDate: string | null;
+  } = {
     title: '',
-    description: '',
+    description: null,
     reminderDate: null,
-    repeatType: '',
-    repeatInterval: undefined,
-    linkedEntityType: '',
-    linkedEntityId: undefined,
   };
 
-  activeFilter: 'search' | 'today' | 'scheduled' | 'all' | 'completed' | 'flagged' = 'all';
-
+  activeFilter: 'all' | 'today' = 'all';
   sortState = sortStateSignal({});
 
   public readonly router = inject(Router);
@@ -55,42 +58,17 @@ export class ReminderComponent implements OnInit {
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
 
-  trackId(index: number, item: IReminder): number {
-    return this.reminderService.getReminderIdentifier(item);
-  }
-
   ngOnInit(): void {
     this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
       .pipe(
         tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
-        tap(() => {
-          this.load();
-        }),
-      )
-      .subscribe();
-  }
-
-  delete(reminder: IReminder): void {
-    const modalRef = this.modalService.open(ReminderDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
-    modalRef.componentInstance.reminder = reminder;
-    modalRef.closed
-      .pipe(
-        filter(reason => reason === ITEM_DELETED_EVENT),
         tap(() => this.load()),
       )
       .subscribe();
   }
 
   load(): void {
-    this.queryBackend().subscribe({
-      next: (res: EntityArrayResponseType) => {
-        this.onResponseSuccess(res);
-      },
-    });
-  }
-
-  parseDate(dateValue: Dayjs | null | undefined): Dayjs | null {
-    return dateValue ?? null;
+    this.queryBackend().subscribe({ next: res => this.onResponseSuccess(res) });
   }
 
   toggleAddForm(): void {
@@ -100,59 +78,68 @@ export class ReminderComponent implements OnInit {
   onAddReminder(): void {
     if (!this.newReminder.title || !this.newReminder.reminderDate) return;
 
-    const newItem: IReminder = {
-      id: Math.floor(Math.random() * 100000),
+    const reminderToCreate: NewReminder = {
+      id: null,
       title: this.newReminder.title,
-      description: this.newReminder.description ?? '',
-      repeatType: this.newReminder.repeatType ?? '',
-      repeatInterval: this.newReminder.repeatInterval,
-      linkedEntityType: this.newReminder.linkedEntityType ?? '',
-      linkedEntityId: this.newReminder.linkedEntityId,
+      description: this.newReminder.description,
+      reminderDate: dayjs(this.newReminder.reminderDate),
+      repeatType: null,
+      repeatInterval: null,
+      linkedEntityType: null,
+      linkedEntityId: null,
     };
 
-    this.reminders.push(newItem);
-    this.filterReminders();
-    this.newReminder = {
-      title: '',
-      description: '',
-      reminderDate: null,
-      repeatType: '',
-      repeatInterval: undefined,
-      linkedEntityType: '',
-      linkedEntityId: undefined,
-    };
-    this.toggleAddForm();
+    this.reminderService.create(reminderToCreate).subscribe({
+      next: () => {
+        this.newReminder = {
+          title: '',
+          description: null,
+          reminderDate: null,
+        };
+        this.toggleAddForm();
+        this.load();
+      },
+      error: err => console.error('❌ Failed to create reminder:', err),
+    });
   }
 
-  setFilter(selectedFilter: typeof this.activeFilter): void {
-    this.activeFilter = selectedFilter;
+  delete(reminder: IReminder): void {
+    const modalRef = this.modalService.open(ReminderDeleteDialogComponent, {
+      size: 'lg',
+      backdrop: 'static',
+    });
+    modalRef.componentInstance.reminder = reminder;
+    modalRef.closed
+      .pipe(
+        rxFilter(reason => reason === ITEM_DELETED_EVENT),
+        tap(() => this.load()),
+      )
+      .subscribe();
+  }
+
+  setFilter(filter: typeof this.activeFilter): void {
+    this.activeFilter = filter;
     this.filterReminders();
+  }
+
+  isToday(reminder: IReminder): boolean {
+    return dayjs(reminder.reminderDate).isSame(dayjs(), 'day');
   }
 
   filterReminders(): void {
     const today = dayjs();
-    this.filteredReminders = this.reminders.filter(r => {
-      const date = dayjs(r.reminderDate);
+    const sorted = [...this.reminders].sort((a, b) => dayjs(a.reminderDate).diff(dayjs(b.reminderDate)));
 
-      if (this.activeFilter === 'all') return true;
-      if (this.activeFilter === 'search') return `${r.title} ${r.description ?? ''}`.toLowerCase().includes('test');
-      if (this.activeFilter === 'today') return date.isSame(today, 'day');
-      if (this.activeFilter === 'scheduled') return date.isAfter(today);
-      return true;
-    });
+    this.filteredReminders = this.activeFilter === 'today' ? sorted.filter(rem => dayjs(rem.reminderDate).isSame(today, 'day')) : sorted;
   }
 
-  navigateToWithComponentValues(event: SortState): void {
-    this.handleNavigation(event);
-  }
-
-  protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
-    this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]));
+  parseDate(value: Dayjs | null | undefined): Dayjs | null {
+    return value ?? null;
   }
 
   protected onResponseSuccess(response: EntityArrayResponseType): void {
-    const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
-    this.reminders = this.refineData(dataFromBody);
+    const data = this.fillComponentAttributesFromResponseBody(response.body);
+    this.reminders = this.refineData(data);
     this.filterReminders();
   }
 
@@ -167,10 +154,12 @@ export class ReminderComponent implements OnInit {
 
   protected queryBackend(): Observable<EntityArrayResponseType> {
     this.isLoading = true;
-    const queryObject: any = {
-      sort: this.sortService.buildSortParam(this.sortState()),
-    };
+    const queryObject = { sort: this.sortService.buildSortParam(this.sortState()) };
     return this.reminderService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
+  }
+
+  protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
+    this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]));
   }
 
   protected handleNavigation(sortState: SortState): void {
