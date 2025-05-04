@@ -36,7 +36,7 @@ export class NotificationComponent implements OnInit {
 
   sortState = sortStateSignal({});
 
-  activeFilter = 'all';
+  activeFilter = 'unread';
   selectedNotification: any = null;
 
   notificationIcons: Record<'REMINDER' | 'DEADLINE' | 'SYSTEM_UPDATE', string> = {
@@ -102,10 +102,15 @@ export class NotificationComponent implements OnInit {
   getFilteredNotifications(): INotification[] {
     if (!this.notifications) return [];
 
-    if (this.activeFilter === 'unread') {
-      return this.notifications.filter(notification => !notification.read);
-    }
-    return this.notifications;
+    const filtered = this.activeFilter === 'unread' ? this.notifications.filter(notification => !notification.read) : this.notifications;
+
+    // Sort unread first, then by createdAt descending
+    return filtered.sort((a, b) => {
+      if (a.read === b.read) {
+        return dayjs(b.createdAt).diff(dayjs(a.createdAt)); // newest first
+      }
+      return a.read ? 1 : -1; // unread first
+    });
   }
 
   getUnreadCount(): number {

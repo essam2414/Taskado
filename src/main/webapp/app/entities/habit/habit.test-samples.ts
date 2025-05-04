@@ -3,39 +3,39 @@ import dayjs from 'dayjs/esm';
 import { IHabit, NewHabit } from './habit.model';
 
 export const sampleWithRequiredData: IHabit = {
-  id: 9321,
-  name: 'weakly burly furthermore',
-  startDate: dayjs('2025-01-31T21:13'),
-  repeatType: 'reboot mantua but',
+  id: 29912,
+  name: 'ha cease',
+  startDate: dayjs('2025-02-01T06:56'),
+  repeatType: 'as resolve',
 };
 
 export const sampleWithPartialData: IHabit = {
-  id: 20527,
-  name: 'equally eyeglasses',
-  startDate: dayjs('2025-01-31T17:23'),
-  streak: 16786,
-  completionRate: 16391.15,
-  repeatType: 'on',
-  repeatDays: 'flat',
+  id: 13174,
+  name: 'declaration to',
+  startDate: dayjs('2025-01-31T14:35'),
+  streak: 26416,
+  repeatType: 'as degenerate decent',
+  repeatDays: 'barring beneath',
+  repeatTimes: 'remorseful',
 };
 
 export const sampleWithFullData: IHabit = {
-  id: 28353,
-  name: 'meh excitable uh-huh',
-  startDate: dayjs('2025-02-01T10:47'),
-  streak: 5925,
-  completionRate: 10331.81,
-  repeatType: 'enormously who',
-  repeatInterval: 23080,
-  repeatDays: 'wherever finally',
-  repeatTimes: 'antique phooey',
+  id: 10882,
+  name: 'quintuple woot meanwhile',
+  startDate: dayjs('2025-02-01T07:09'),
+  streak: 30883,
+  completionRate: 28271.63,
+  repeatType: 'boo ah outsource',
+  repeatInterval: 20586,
+  repeatDays: 'upon',
+  repeatTimes: 'psst downshift accomplished',
   completedDates: '../fake-data/blob/hipster.txt',
 };
 
 export const sampleWithNewData: NewHabit = {
-  name: 'next duh inside',
-  startDate: dayjs('2025-02-01T03:55'),
-  repeatType: 'handy',
+  name: 'nectarine',
+  startDate: dayjs('2025-01-31T14:35'),
+  repeatType: 'pfft',
   id: null,
 };
 

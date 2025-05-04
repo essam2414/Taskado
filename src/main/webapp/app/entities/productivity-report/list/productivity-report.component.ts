@@ -337,15 +337,55 @@ export class ProductivityReportComponent implements OnInit {
 
     this.timestamp = this.currentReport.timestamp ? dayjs(this.currentReport.timestamp).locale('en').format('D MMM YYYY') : 'Unselected';
 
-    this.completedTaskTitles = this.currentReport.completedTasks?.map(task => task.title) ?? [];
+    if (this.currentReport.timestamp) {
+      const reportDate = dayjs(this.currentReport.timestamp);
 
-    this.completedHabitNames = this.currentReport.completedHabits?.map(habit => habit.name) ?? [];
-    this.habitStreak = this.calculateHabitStreak();
+      // 🔁 Re-fetch all tasks to find those completed on the report date
+      this.taskService.query().subscribe({
+        next: res => {
+          const allTasks = res.body ?? [];
+          const completedTasks = allTasks.filter(task => {
+            return task.completed && task.updatedAt && dayjs(task.updatedAt).isSame(reportDate, 'day');
+          });
+          this.completedTaskTitles = completedTasks.map(t => t.title ?? 'Unnamed Task');
+          this.renderTasksChart();
+        },
+        error: err => {
+          console.error('⚠️ Failed to fetch tasks for report navigation:', err);
+          this.completedTaskTitles = [];
+          this.renderTasksChart();
+        },
+      });
+
+      // 🧠 Also re-fetch habits as you already do:
+      this.habitService.query().subscribe({
+        next: res => {
+          const allHabits = res.body ?? [];
+          const completedHabits = allHabits.filter(habit => {
+            if (!habit.completedDates) return false;
+            try {
+              const parsedDates: string[] = JSON.parse(habit.completedDates);
+              return parsedDates.some(dateStr => dayjs(dateStr).isSame(reportDate, 'day'));
+            } catch {
+              return false;
+            }
+          });
+
+          this.completedHabitNames = completedHabits.map(h => h.name ?? 'Unnamed Habit');
+          this.habitStreak = this.calculateHabitStreak();
+          this.renderHabitsChart();
+        },
+        error: err => {
+          console.error('⚠️ Failed to fetch habits for report navigation:', err);
+          this.completedHabitNames = [];
+          this.habitStreak = 0;
+          this.renderHabitsChart();
+        },
+      });
+    }
 
     this.suggestion = this.getSuggestionForScore(this.efficiencyScore);
 
-    this.renderTasksChart();
-    this.renderHabitsChart();
     this.renderFocusChart();
     this.renderEfficiencyGauge();
   }
@@ -379,8 +419,8 @@ export class ProductivityReportComponent implements OnInit {
       const totalFocusTime = totalFocusMinutes / 60;
       const distractionsCount = 0;
 
-      const totalPlanned = tasksPlanned + habits.length + pomodoros.length;
-      const totalCompleted = tasksCompleted + completedHabitsToday.length + pomodoroSessionsCompleted;
+      const totalPlanned = tasksPlanned + habits.length + (completedPomodorosToday.length > 0 ? pomodoros.length : 0);
+      const totalCompleted = tasksCompleted + completedHabitsToday.length + completedPomodorosToday.length;
       const efficiencyScore = totalPlanned > 0 ? Math.min(100, (totalCompleted / totalPlanned) * 100) : 0;
 
       const newReport: NewProductivityReport = {
