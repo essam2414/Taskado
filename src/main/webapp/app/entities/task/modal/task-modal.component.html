@@ -514,6 +514,26 @@
             </div>
           </div>
 
+          <div *ngIf="showRemindMe()" class="remind-me mb-3">
+            <label for="remindMe">
+              <input type="checkbox" name="remindMe" id="remindMe" [checked]="remindMe" (change)="toggleRemindMe()" />
+              <span>Remind me</span>
+            </label>
+
+            <div *ngIf="remindMe" class="dropdown dropdown-select" [class.open]="reminderDropdownOpen">
+              <div class="dropdown-btn" (click)="toggleReminderDropdown()">
+                <span>{{ selectedReminderTimeLabel }}</span>
+                <fa-icon icon="chevron-down"></fa-icon>
+              </div>
+
+              <ul class="dropdown-menu" *ngIf="reminderDropdownOpen">
+                <li *ngFor="let time of reminderTimes" (click)="selectReminderTime(time.value)">
+                  <span>{{ time.label }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
           <div class="mb-3">
             <label class="form-label" for="field_priority">Priority</label>
 
