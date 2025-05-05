@@ -42,7 +42,8 @@ export class HabitComponent implements OnInit {
   currentView: 'day' | 'week' = 'day';
 
   visibleDays: string[] = [];
-  visibleWeekStart: dayjs.Dayjs = dayjs().startOf('week').add(1, 'day');
+  visibleWeekStart: dayjs.Dayjs =
+    dayjs().day() === 0 ? dayjs().subtract(1, 'day').startOf('week').add(1, 'day') : dayjs().startOf('week').add(1, 'day');
   todayWeekStart: dayjs.Dayjs = dayjs().startOf('week').add(1, 'day');
   selectedDay: dayjs.Dayjs = dayjs();
 
