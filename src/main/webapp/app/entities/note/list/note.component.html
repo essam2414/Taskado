@@ -15,7 +15,7 @@
     <div *ngFor="let note of filteredNotes" class="app-card" (click)="editNote(note)">
       <div>
         <h5 class="mb-1">{{ note.title }}</h5>
-        <p class="mb-1">{{ note.content }}</p>
+        <p class="mb-1" [innerHTML]="note.content"></p>
       </div>
     </div>
 

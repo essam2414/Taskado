@@ -1,7 +1,11 @@
 package bham.team.web.rest;
 
 import bham.team.domain.Note;
+import bham.team.domain.Task;
+import bham.team.domain.User;
 import bham.team.repository.NoteRepository;
+import bham.team.repository.UserRepository;
+import bham.team.security.SecurityUtils;
 import bham.team.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -36,8 +40,11 @@ public class NoteResource {
 
     private final NoteRepository noteRepository;
 
-    public NoteResource(NoteRepository noteRepository) {
+    private final UserRepository userRepository;
+
+    public NoteResource(NoteRepository noteRepository, UserRepository userRepository) {
         this.noteRepository = noteRepository;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -53,6 +60,11 @@ public class NoteResource {
         if (note.getId() != null) {
             throw new BadRequestAlertException("A new note cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User user = userRepository.findOneByLogin(login).orElseThrow();
+        note.setUser(user);
+
         note = noteRepository.save(note);
         return ResponseEntity.created(new URI("/api/notes/" + note.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, note.getId().toString()))
@@ -82,6 +94,12 @@ public class NoteResource {
 
         if (!noteRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+        }
+
+        Note existingNote = noteRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingNote.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to update this note", ENTITY_NAME, "unauthorized");
         }
 
         note = noteRepository.save(note);
@@ -118,23 +136,29 @@ public class NoteResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
+        Note existingNote = noteRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingNote.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to update this note", ENTITY_NAME, "unauthorized");
+        }
+
         Optional<Note> result = noteRepository
             .findById(note.getId())
-            .map(existingNote -> {
+            .map(noteToUpdate -> {
                 if (note.getTitle() != null) {
-                    existingNote.setTitle(note.getTitle());
+                    noteToUpdate.setTitle(note.getTitle());
                 }
                 if (note.getContent() != null) {
-                    existingNote.setContent(note.getContent());
+                    noteToUpdate.setContent(note.getContent());
                 }
                 if (note.getCreatedAt() != null) {
-                    existingNote.setCreatedAt(note.getCreatedAt());
+                    noteToUpdate.setCreatedAt(note.getCreatedAt());
                 }
                 if (note.getUpdatedAt() != null) {
-                    existingNote.setUpdatedAt(note.getUpdatedAt());
+                    noteToUpdate.setUpdatedAt(note.getUpdatedAt());
                 }
 
-                return existingNote;
+                return noteToUpdate;
             })
             .map(noteRepository::save);
 
@@ -152,7 +176,7 @@ public class NoteResource {
     @GetMapping("")
     public List<Note> getAllNotes() {
         LOG.debug("REST request to get all Notes");
-        return noteRepository.findAll();
+        return noteRepository.findByUserIsCurrentUser();
     }
 
     /**
@@ -164,7 +188,9 @@ public class NoteResource {
     @GetMapping("/{id}")
     public ResponseEntity<Note> getNote(@PathVariable("id") Long id) {
         LOG.debug("REST request to get Note : {}", id);
-        Optional<Note> note = noteRepository.findById(id);
+        Optional<Note> note = noteRepository
+            .findById(id)
+            .filter(n -> n.getUser() != null && n.getUser().getLogin().equals(SecurityUtils.getCurrentUserLogin().orElse("")));
         return ResponseUtil.wrapOrNotFound(note);
     }
 
@@ -177,7 +203,14 @@ public class NoteResource {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteNote(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Note : {}", id);
-        noteRepository.deleteById(id);
+
+        Note existingNote = noteRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingNote.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to delete this note", ENTITY_NAME, "unauthorized");
+        }
+        noteRepository.delete(existingNote);
+
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();
