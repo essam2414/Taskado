@@ -338,14 +338,21 @@ export class ProductivityReportComponent implements OnInit {
     this.timestamp = this.currentReport.timestamp ? dayjs(this.currentReport.timestamp).locale('en').format('D MMM YYYY') : 'Unselected';
 
     if (this.currentReport.timestamp) {
-      const reportDate = dayjs(this.currentReport.timestamp);
+      const reportTimestamp = dayjs(this.currentReport.timestamp);
+      const reportDate = reportTimestamp.format('YYYY-MM-DD');
+      const startOfDay = reportTimestamp.startOf('day');
 
-      // 🔁 Re-fetch all tasks to find those completed on the report date
+      // 🔁 Fetch tasks completed from start of report day until the report timestamp
       this.taskService.query().subscribe({
         next: res => {
           const allTasks = res.body ?? [];
           const completedTasks = allTasks.filter(task => {
-            return task.completed && task.updatedAt && dayjs(task.updatedAt).isSame(reportDate, 'day');
+            return (
+              task.completed &&
+              task.updatedAt &&
+              dayjs(task.updatedAt).isAfter(startOfDay.subtract(1, 'millisecond')) &&
+              dayjs(task.updatedAt).isBefore(reportTimestamp.add(1, 'millisecond'))
+            );
           });
           this.completedTaskTitles = completedTasks.map(t => t.title ?? 'Unnamed Task');
           this.renderTasksChart();
@@ -357,7 +364,7 @@ export class ProductivityReportComponent implements OnInit {
         },
       });
 
-      // 🧠 Also re-fetch habits as you already do:
+      // 🧠 Fetch habits completed within the same report window
       this.habitService.query().subscribe({
         next: res => {
           const allHabits = res.body ?? [];
@@ -365,7 +372,11 @@ export class ProductivityReportComponent implements OnInit {
             if (!habit.completedDates) return false;
             try {
               const parsedDates: string[] = JSON.parse(habit.completedDates);
-              return parsedDates.some(dateStr => dayjs(dateStr).isSame(reportDate, 'day'));
+              return parsedDates.some(dateStr => {
+                const completedDate = dayjs(dateStr, 'YYYY-MM-DD');
+                // Include habits where completion date is same as report date
+                return completedDate.isSame(reportTimestamp, 'day');
+              });
             } catch {
               return false;
             }
