@@ -54,6 +54,9 @@ public class Task implements Serializable {
     @Column(name = "jhi_order")
     private Integer order;
 
+    @Column(name = "reminder_id")
+    private Long reminderId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Category category;
 
@@ -190,6 +193,19 @@ public class Task implements Serializable {
 
     public void setOrder(Integer order) {
         this.order = order;
+    }
+
+    public Long getReminderId() {
+        return this.reminderId;
+    }
+
+    public Task reminderId(Long reminderId) {
+        this.setReminderId(reminderId);
+        return this;
+    }
+
+    public void setReminderId(Long reminderId) {
+        this.reminderId = reminderId;
     }
 
     public Category getCategory() {

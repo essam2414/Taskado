@@ -20,6 +20,7 @@ export interface ITask {
   user?: Pick<IUser, 'id'> | null;
   section?: ISection | null;
   productivityReports?: IProductivityReport[] | null;
+  reminderId?: number | null;
 }
 
 export type NewTask = Omit<ITask, 'id'> & { id: null };

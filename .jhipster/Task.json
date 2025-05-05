@@ -37,6 +37,10 @@
     {
       "fieldName": "order",
       "fieldType": "Integer"
+    },
+    {
+      "fieldName": "reminderId",
+      "fieldType": "Long"
     }
   ],
   "name": "Task",
