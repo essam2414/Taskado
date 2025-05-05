@@ -13,4 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface HabitRepository extends JpaRepository<Habit, Long> {
     @Query("select habit from Habit habit where habit.user.login = ?#{authentication.name}")
     List<Habit> findByUserIsCurrentUser();
+
+    List<Habit> findAllByUser(bham.team.domain.User user);
 }

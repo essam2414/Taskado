@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, Renderer2 } from '@angular/core';
+import { Component, OnInit, inject, Renderer2, OnDestroy } from '@angular/core';
 import { Router, RouterOutlet, RouterModule, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -19,7 +19,7 @@ import { interval } from 'rxjs';
   imports: [RouterOutlet, SidebarComponent, FooterComponent, PageRibbonComponent, CommonModule, RouterModule, HeaderComponent],
   styleUrls: ['./main.component.scss'],
 })
-export default class MainComponent implements OnInit {
+export default class MainComponent implements OnInit, OnDestroy {
   account = inject(AccountService).trackCurrentAccount();
   guestTimeLeft: string | null = null;
   currentRouteIsLandingPage = false;

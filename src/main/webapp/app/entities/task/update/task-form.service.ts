@@ -46,6 +46,7 @@ type TaskFormGroupContent = {
   user: FormControl<TaskFormRawValue['user']>;
   section: FormControl<TaskFormRawValue['section']>;
   productivityReports: FormControl<TaskFormRawValue['productivityReports']>;
+  reminderId: FormControl<TaskFormRawValue['reminderId']>;
 };
 
 export type TaskFormGroup = FormGroup<TaskFormGroupContent>;
@@ -80,6 +81,7 @@ export class TaskFormService {
       user: new FormControl(taskRawValue.user),
       section: new FormControl(taskRawValue.section),
       productivityReports: new FormControl(taskRawValue.productivityReports ?? []),
+      reminderId: new FormControl(taskRawValue.reminderId),
     });
   }
 
@@ -113,6 +115,7 @@ export class TaskFormService {
   private convertTaskRawValueToTask(rawTask: TaskFormRawValue | NewTaskFormRawValue): ITask | NewTask {
     return {
       ...rawTask,
+      reminderId: rawTask.reminderId,
       dueDate: dayjs(rawTask.dueDate, DATE_TIME_FORMAT),
       createdAt: dayjs(rawTask.createdAt, DATE_TIME_FORMAT),
       updatedAt: dayjs(rawTask.updatedAt, DATE_TIME_FORMAT),
@@ -124,6 +127,7 @@ export class TaskFormService {
   ): TaskFormRawValue | PartialWithRequiredKeyOf<NewTaskFormRawValue> {
     return {
       ...task,
+      reminderId: task.reminderId,
       dueDate: task.dueDate ? task.dueDate.format(DATE_TIME_FORMAT) : undefined,
       createdAt: task.createdAt ? task.createdAt.format(DATE_TIME_FORMAT) : undefined,
       updatedAt: task.updatedAt ? task.updatedAt.format(DATE_TIME_FORMAT) : undefined,

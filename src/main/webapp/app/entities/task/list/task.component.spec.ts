@@ -84,7 +84,7 @@ describe('Task Management Component', () => {
 
     // THEN
     expect(service.query).toHaveBeenCalled();
-    expect(comp.tasks?.[0]).toEqual(expect.objectContaining({ id: 123 }));
+    expect(comp.tasks[0]).toEqual(expect.objectContaining({ id: 123 }));
   });
 
   describe('trackId', () => {

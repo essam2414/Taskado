@@ -1,3 +1,50 @@
+@media (max-width: 768px) {
+  .event-badges {
+    display: none !important;
+  }
+
+  .calendar-grid {
+    gap: 12px !important;
+  }
+
+  .calendar-day {
+    min-height: 0 !important;
+    aspect-ratio: 1 / 1;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    border: 0.5px solid var(--border-color);
+  }
+
+  .date-number {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1rem;
+  }
+
+  .circle-highlight {
+    width: 100% !important;
+    height: 100% !important;
+    border: 1px solid var(--accent-color);
+    background: none !important;
+    color: var(--text-primary) !important;
+  }
+}
+
+.nav-btn {
+  color: var(--text-muted);
+  padding: 0;
+
+  &:hover {
+    color: var(--text-secondary);
+  }
+}
+
 .calendar-container {
   display: flex;
   grid-template-columns: repeat(7, 1fr);
@@ -47,9 +94,19 @@
   justify-content: flex-start;
 
   border-radius: 5px;
-  font-size: clamp(12px, 2vw, 18px);
+  font-size: var(--font-sm);
   cursor: pointer;
   padding: 4px;
+
+  &.disabled {
+    pointer-events: none;
+    background: transparent;
+    border: none;
+  }
+}
+
+.date-number {
+  color: var(--text-muted);
 }
 
 .calendar-day button {
@@ -86,11 +143,6 @@
   justify-content: center;
 }
 
-.day-header {
-  font-weight: bold;
-  text-align: left;
-}
-
 .calendar-dates {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -118,26 +170,28 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  align-items: flex-start;
 }
 
 .circle-highlight {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  aspect-ratio: 1;
+  width: 2em;
+  height: 2em;
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
-  background-color: var(--accent-color);
+  background: var(--accent-color);
+  font-weight: 400;
   color: white;
-  font-weight: bold;
 }
 
 .event-badge {
-  background: var(--accent-color);
-  color: white;
-  padding: 4px;
+  background: color-mix(in srgb, var(--accent-color) 20%, transparent);
+  color: var(--accent-color);
+  padding: 2px 6px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: var(--font-2xs);
   margin-top: 4px;
   text-align: center;
   white-space: nowrap;
@@ -184,10 +238,12 @@
   gap: 10px;
   width: 100%;
   border-collapse: collapse;
+  color: var(--text-primary);
 }
 
 .week-view th,
 .week-view td {
+  color: var(--text-primary);
   padding: 5px;
   text-align: center;
 }
@@ -196,7 +252,7 @@
   display: flex;
   flex-direction: column;
   padding: 15px;
-  background: #f9f9f9;
+  background-color: var(--body-bg) !important;
   border-radius: 8px;
   border-left: 2px solid var(--accent-color);
 }
@@ -209,9 +265,14 @@
 
 .day-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
   gap: 10px;
+  margin-bottom: 20px;
+
+  h4 {
+    margin: 0;
+  }
 }
 
 .hour-row {

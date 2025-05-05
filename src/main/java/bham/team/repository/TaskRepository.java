@@ -13,4 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface TaskRepository extends JpaRepository<Task, Long> {
     @Query("select task from Task task where task.user.login = ?#{authentication.name}")
     List<Task> findByUserIsCurrentUser();
+
+    List<Task> findAllByUser(bham.team.domain.User user);
 }

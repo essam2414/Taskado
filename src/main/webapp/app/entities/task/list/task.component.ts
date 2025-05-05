@@ -23,6 +23,7 @@ import { AlertService } from 'app/core/util/alert.service';
 import { ICategory } from 'app/entities/category/category.model';
 import { CategoryService } from 'app/entities/category/service/category.service';
 import { Priority } from 'app/entities/enumerations/priority.model';
+import { ReminderService } from 'app/entities/reminder/service/reminder.service';
 
 type AllowedPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' | null;
 
@@ -95,6 +96,7 @@ export class TaskComponent implements OnInit {
   protected modalService = inject(NgbModal);
   protected sectionService = inject(SectionService);
   protected ngZone = inject(NgZone);
+  protected reminderService = inject(ReminderService);
   private readonly alertService = inject(AlertService);
 
   trackId = (item: ITask): number => this.taskService.getTaskIdentifier(item);
@@ -139,32 +141,6 @@ export class TaskComponent implements OnInit {
         this.refreshTaskLayout();
       },
     );
-  }
-
-  loadSections(): void {
-    this.sectionService.query().subscribe({
-      next: (res: HttpResponse<ISection[]>) => {
-        this.sections = res.body ?? [];
-      },
-    });
-  }
-
-  loadCategories(): void {
-    this.categoryService.query().subscribe({
-      next: (res: HttpResponse<ICategory[]>) => {
-        this.categories = res.body ?? [];
-        this.categoriesSharedCollection = res.body ?? [];
-
-        for (const task of this.tasks) {
-          if (task.category?.id) {
-            const matched = this.categories.find(cat => cat.id === task.category?.id);
-            if (matched) {
-              task.category = matched;
-            }
-          }
-        }
-      },
-    });
   }
 
   buildFiltersMap(): void {
@@ -398,12 +374,23 @@ export class TaskComponent implements OnInit {
   delete(task: ITask): void {
     const modalRef = this.modalService.open(TaskDeleteDialogComponent, { centered: true, size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.task = task;
-    modalRef.closed
-      .pipe(
-        filter(reason => reason === ITEM_DELETED_EVENT),
-        tap(() => this.load()),
-      )
-      .subscribe();
+
+    modalRef.closed.pipe(filter(reason => reason === ITEM_DELETED_EVENT)).subscribe(() => {
+      // delete reminder if set
+      if (task.reminderId) {
+        this.reminderService.delete(task.reminderId).subscribe({
+          next: () => {
+            this.load();
+          },
+          error: err => {
+            console.error('❌ Failed to delete reminder', err);
+            this.load();
+          },
+        });
+      } else {
+        this.load();
+      }
+    });
   }
 
   /* ─────────────────────────────*

@@ -82,6 +82,22 @@ export class HabitUpdateComponent implements OnInit {
     });
   }
 
+  deleteHabit(): void {
+    const id = this.editForm.get('id')?.value as number;
+    if (id) {
+      this.isSaving = true;
+      this.habitService
+        .delete(id)
+        .pipe(finalize(() => (this.isSaving = false)))
+        .subscribe({
+          next: () => this.previousState(),
+          error: () => {
+            this.isSaving = false;
+          },
+        });
+    }
+  }
+
   @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent): void {
     const target = event.target as HTMLElement;

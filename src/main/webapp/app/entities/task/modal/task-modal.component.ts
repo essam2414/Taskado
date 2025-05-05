@@ -22,6 +22,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import dayjs from 'dayjs';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { NewReminder } from 'app/entities/reminder/reminder.model';
+import { ReminderService } from 'app/entities/reminder/service/reminder.service';
 
 type AllowedPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' | null;
 
@@ -66,6 +68,16 @@ export class TaskModalComponent implements OnInit {
   newCategoryName = '';
   newCategoryColor = this.getRandomColor();
 
+  remindMe = false;
+  reminderDropdownOpen = false;
+  selectedReminderTime = 5;
+  reminderTimes = [
+    { label: '5 minutes before', value: 5 },
+    { label: '30 minutes before', value: 30 },
+    { label: '1 hour before', value: 60 },
+    { label: '1 day before', value: 1440 },
+  ];
+
   categoriesSharedCollection: ICategory[] = [];
   usersSharedCollection: IUser[] = [];
 
@@ -77,6 +89,7 @@ export class TaskModalComponent implements OnInit {
   protected userService = inject(UserService);
   protected activatedRoute = inject(ActivatedRoute);
   protected modalService = inject(NgbModal);
+  protected reminderService = inject(ReminderService);
 
   constructor(public activeModal: NgbActiveModal) {}
 
@@ -100,11 +113,16 @@ export class TaskModalComponent implements OnInit {
 
   save(): void {
     this.isSaving = true;
-    const task = this.taskFormService.getTask(this.editForm);
-    if (task.id !== null) {
-      this.subscribeToSaveResponse(this.taskService.update(task));
+    const formTask = this.taskFormService.getTask(this.editForm);
+
+    if (this.task) {
+      formTask.reminderId = this.task.reminderId;
+    }
+
+    if (formTask.id !== null) {
+      this.subscribeToSaveResponse(this.taskService.update(formTask));
     } else {
-      this.subscribeToSaveResponse(this.taskService.create(task));
+      this.subscribeToSaveResponse(this.taskService.create(formTask));
     }
   }
 
@@ -128,6 +146,35 @@ export class TaskModalComponent implements OnInit {
     combineLatest(updates).subscribe(() => {
       this.loadSubtasks();
     });
+  }
+
+  // reminder methods
+  toggleRemindMe(): void {
+    this.remindMe = !this.remindMe;
+  }
+
+  toggleReminderDropdown(): void {
+    const wasOpen = this.reminderDropdownOpen;
+    this.closeAllDropdowns();
+    this.reminderDropdownOpen = !wasOpen;
+  }
+
+  selectReminderTime(time: number): void {
+    this.selectedReminderTime = time;
+    this.reminderDropdownOpen = false;
+  }
+
+  get selectedReminderTimeLabel(): string {
+    return this.reminderTimes.find(t => t.value === this.selectedReminderTime)?.label ?? '';
+  }
+
+  showRemindMe(): boolean {
+    const now = dayjs();
+    const due = this.selectedDueDate ? dayjs(this.selectedDueDate) : this.task?.dueDate ? dayjs(this.task.dueDate) : null;
+
+    if (!due) return false;
+
+    return due.diff(now, 'minute') >= 5;
   }
 
   // subtask methods
@@ -220,7 +267,6 @@ export class TaskModalComponent implements OnInit {
     this.selectedSubtaskPriority = null;
     this.selectedSubtaskCategory = null;
 
-    // ✅ Clear the form completely with null id
     this.taskFormService.resetForm(this.subtaskForm, {
       id: null,
       parentTask: { id: this.task!.id },
@@ -236,6 +282,7 @@ export class TaskModalComponent implements OnInit {
       createdAt: undefined,
       updatedAt: undefined,
       order: 0,
+      reminderId: null,
     });
 
     setTimeout(() => this.subtaskTitleInputRef.nativeElement.focus());
@@ -467,14 +514,12 @@ export class TaskModalComponent implements OnInit {
   }
 
   deleteCategory(category: ICategory, event: Event): void {
-    event.stopPropagation(); // ✅ So it doesn’t trigger selectCategory()
-
+    event.stopPropagation();
     if (!category.id) return;
 
     this.categoryService.delete(category.id).subscribe(() => {
       this.categoriesSharedCollection = this.categoriesSharedCollection.filter(c => c.id !== category.id);
 
-      // Clear it from the selected form if it was selected
       if (this.editForm.controls['category'].value?.id === category.id) {
         this.editForm.controls['category'].setValue(null);
         this.selectedCategory = null;
@@ -546,7 +591,15 @@ export class TaskModalComponent implements OnInit {
     this.selectedCategory = task.category ?? null;
     this.selectedDueDate = task.dueDate ? dayjs(task.dueDate).format('YYYY-MM-DDTHH:mm') : null;
 
+    this.remindMe = task.reminderId != null;
+
     this.usersSharedCollection = this.userService.addUserToCollectionIfMissing<IUser>(this.usersSharedCollection, task.user);
+
+    if (task.reminderId) {
+      this.loadReminder(task.reminderId, task.dueDate);
+    }
+
+    this.editForm.markAsDirty();
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<ITask>>): void {
@@ -561,8 +614,12 @@ export class TaskModalComponent implements OnInit {
   }
 
   protected onSaveSuccess(task: ITask): void {
+    this.task = task;
     this.fillCategory(task);
-    this.activeModal.close(task);
+
+    this.handleReminder().then(() => {
+      this.activeModal.close(task);
+    });
   }
 
   protected onSaveError(): void {
@@ -578,5 +635,121 @@ export class TaskModalComponent implements OnInit {
       const full = this.categoriesSharedCollection.find(c => c.id === task.category?.id);
       if (full) task.category = full;
     }
+  }
+
+  private loadReminder(reminderId: number, taskDueDate: dayjs.Dayjs | null | undefined): void {
+    this.reminderService.find(reminderId).subscribe({
+      next: res => {
+        const reminder = res.body;
+        if (reminder?.reminderDate && taskDueDate) {
+          const minutesBefore = dayjs(taskDueDate).diff(dayjs(reminder.reminderDate), 'minute');
+          const validOptions = this.reminderTimes.map(t => t.value);
+          if (validOptions.includes(minutesBefore)) {
+            this.selectedReminderTime = minutesBefore;
+          } else {
+            this.selectedReminderTime = 5;
+          }
+        }
+      },
+      error: err => {
+        console.error('❌ Failed to load reminder:', err);
+        this.selectedReminderTime = 5;
+      },
+    });
+  }
+
+  private async handleReminder(): Promise<void> {
+    if (!this.task) {
+      return;
+    }
+
+    if (this.remindMe) {
+      if (this.task.reminderId !== null) {
+        await this.updateReminder(this.task);
+      } else {
+        await this.createReminder(this.task);
+      }
+    } else {
+      if (this.task.reminderId !== null) {
+        await this.deleteReminder(this.task);
+      }
+    }
+  }
+
+  private createReminder(task: ITask): Promise<void> {
+    if (!task.dueDate) return Promise.resolve();
+
+    const reminderTime = task.dueDate.subtract(this.selectedReminderTime, 'minutes');
+
+    const newReminder: NewReminder = {
+      id: null,
+      title: task.title,
+      description: task.description,
+      reminderDate: reminderTime,
+      repeatType: null,
+      linkedEntityType: 'task',
+      linkedEntityId: task.id,
+    };
+
+    return new Promise((resolve, reject) => {
+      this.reminderService.create(newReminder).subscribe({
+        next: res => {
+          if (res.body?.id != null) {
+            task.reminderId = res.body.id;
+            this.taskService.update(task).subscribe({
+              next: () => resolve(),
+              error: err => reject(new Error(JSON.stringify(err))),
+            });
+          } else {
+            resolve();
+          }
+        },
+        error: err => reject(new Error(JSON.stringify(err))),
+      });
+    });
+  }
+
+  private updateReminder(task: ITask): Promise<void> {
+    if (!task.dueDate || !task.reminderId) return Promise.resolve();
+
+    const reminderTime = task.dueDate.subtract(this.selectedReminderTime, 'minutes');
+
+    return new Promise((resolve, reject) => {
+      this.reminderService.find(task.reminderId!).subscribe({
+        next: res => {
+          const reminder = res.body;
+          if (!reminder) {
+            resolve();
+            return;
+          }
+
+          if (reminder.reminderDate?.isSame(reminderTime)) {
+            resolve();
+            return;
+          }
+
+          reminder.reminderDate = reminderTime;
+          this.reminderService.update(reminder).subscribe({
+            next: () => resolve(),
+            error: err => reject(new Error(JSON.stringify(err))),
+          });
+        },
+        error: err => reject(new Error(JSON.stringify(err))),
+      });
+    });
+  }
+
+  private deleteReminder(task: ITask): Promise<void> {
+    if (!task.reminderId) return Promise.resolve();
+
+    return new Promise((resolve, reject) => {
+      this.reminderService.delete(task.reminderId!).subscribe({
+        next() {
+          task.reminderId = null;
+          resolve();
+        },
+        error: err => reject(new Error(JSON.stringify(err))),
+      });
+    });
   }
 }

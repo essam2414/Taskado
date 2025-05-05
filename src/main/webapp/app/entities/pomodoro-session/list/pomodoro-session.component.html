@@ -44,6 +44,16 @@
       <button class="btn btn-outline-danger mx-2" (click)="skipSession()">Skip</button>
     </div>
 
+    <!-- Show History Button -->
+    <button class="btn btn-info mx-auto d-block mb-4" (click)="toggleHistory()">
+      {{ showHistory ? 'Hide' : 'Show' }} Pomodoro History
+    </button>
+
+    <!-- History Display -->
+    <div *ngIf="showHistory" class="mb-4">
+      <p class="fw-bold">Total Completed Sessions (DB): {{ historyCount }}</p>
+    </div>
+
     <button class="btn btn-secondary mx-auto d-block mb-4" (click)="showSettings = !showSettings">⚙️ <strong>Settings</strong></button>
 
     <div *ngIf="showSettings" class="modal fade show d-block" tabindex="-1">

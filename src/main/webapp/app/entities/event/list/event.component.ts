@@ -10,14 +10,9 @@ import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigati
 import { IEvent } from '../event.model';
 import { EntityArrayResponseType, EventService } from '../service/event.service';
 import { EventDeleteDialogComponent } from '../delete/event-delete-dialog.component';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs/esm';
 import { CommonModule } from '@angular/common';
-
-// for frontend to display events in calendar
-interface CalendarEvent {
-  date: string;
-  title: string;
-}
+import { CdkDrag, CdkDragDrop, CdkDropList, CdkDropListGroup, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
 @Component({
   standalone: true,
@@ -34,24 +29,32 @@ interface CalendarEvent {
     DurationPipe,
     FormatMediumDatetimePipe,
     FormatMediumDatePipe,
+    CdkDrag,
+    CdkDropList,
+    CdkDropListGroup,
   ],
 })
-export class EventComponent implements OnInit, OnDestroy {
-  selectedDate: Date | null = null;
-  currentDate = new Date();
+export class EventComponent implements OnInit {
+  selectedDate: Dayjs | null = null;
+  currentDate = dayjs();
   daysInMonth = 0;
   firstDay = 0;
-  calendarDays: (number | null)[] = [];
+  calendarDays: (Dayjs | null)[] = [];
   subscription: Subscription | null = null;
-  events?: IEvent[] = []; //
+  events: IEvent[] = [];
   isLoading = false;
-  weekDays: { date: Date; events: CalendarEvent[] }[] = [];
+  weekDays: { date: Dayjs; events: IEvent[] }[] = [];
   hours = Array.from({ length: 24 }, (_, i) => i);
-  weekStartDate: Date = new Date();
-  weekEndDate?: Date;
+  weekStartDate: Dayjs = dayjs();
+  weekEndDate?: Dayjs;
   sortState = sortStateSignal({});
-
-  viewMode: 'day' | 'week' | 'month' = 'month'; // default month view
+  viewsOpen = false;
+  activeView = 'month';
+  views = [
+    { label: 'Month', value: 'month' },
+    { label: 'Week', value: 'week' },
+    { label: 'Day', value: 'day' },
+  ];
 
   public readonly router = inject(Router);
   protected readonly eventService = inject(EventService);
@@ -62,32 +65,20 @@ export class EventComponent implements OnInit, OnDestroy {
 
   trackId = (item: IEvent): number => this.eventService.getEventIdentifier(item);
 
-  // generate the calendar for the next month
   renderCalendar(): void {
-    const year = this.currentDate.getFullYear();
-    const month = this.currentDate.getMonth();
+    const year = this.currentDate.year();
+    const month = this.currentDate.month();
 
-    this.daysInMonth = new Date(year, month + 1, 0).getDate();
-    this.firstDay = new Date(year, month, 1).getDay();
+    this.daysInMonth = this.currentDate.daysInMonth();
+    this.firstDay = dayjs(`${year}-${month + 1}-01`).day();
 
-    // creates an array where the first few elements are empty (padding for first day)
-    // then fills in the numbers 1 to `daysInMonth`
     this.calendarDays = [];
-
-    // fill with empty days at the start of the month
-    for (let i = 0; i < this.firstDay; i++) {
-      this.calendarDays.push(null); // Empty spots before 1st day of the month
-    }
-
-    // fill with actual day numbers (1 to 31 or less)
-    for (let i = 1; i <= this.daysInMonth; i++) {
-      this.calendarDays.push(i);
-    }
+    for (let i = 0; i < this.firstDay; i++) this.calendarDays.push(null);
+    for (let i = 1; i <= this.daysInMonth; i++) this.calendarDays.push(dayjs(`${year}-${month + 1}-${i}`));
   }
 
-  // function to change the month
   changeMonth(step: number): void {
-    this.currentDate = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + step, 1);
+    this.currentDate = this.currentDate.add(step, 'month');
     this.renderCalendar();
   }
 
@@ -96,48 +87,21 @@ export class EventComponent implements OnInit, OnDestroy {
       .pipe(
         tap(([queryParams, data]) => {
           this.fillComponentAttributeFromRoute(queryParams, data);
-
-          // Check for 'date' query parameter and set it as selected date if available
-          if (queryParams.has('date')) {
-            this.selectedDate = new Date(queryParams.get('date')!); // Set selected date from query params
-          } else {
-            this.selectedDate = new Date(); // Default to today's date
-          }
-
-          if (!this.events || this.events.length === 0) {
-            this.load();
-          }
+          const dateParam = queryParams.get('date');
+          this.selectedDate = dateParam ? dayjs(dateParam) : dayjs();
+          this.load();
         }),
       )
       .subscribe();
 
-    // when switching to day view the date from selected day is used in the add event
-    this.activatedRoute.queryParamMap.subscribe(params => {
-      const dateParam = params.get('date');
-      this.selectedDate = dateParam ? new Date(dateParam) : new Date(); // Use selected date or default to today
-    });
-
     this.initializeWeekView();
-    this.renderCalendar(); // Render the calendar after initializing
-    this.loadEvents(); // events show up on calendar
-    window.addEventListener('resize', this.adjustCalendarSize);
-    this.adjustCalendarSize();
-  }
-
-  adjustCalendarSize = (): void => {
-    const calendarContainer = document.querySelector('.calendar-container') as HTMLElement;
-    const screenWidth = window.innerWidth;
-    calendarContainer.style.gridTemplateColumns = screenWidth < 768 ? 'repeat(3, 1fr)' : 'repeat(7, 1fr)'; // Adjust layout based on screen size
-  };
-
-  ngOnDestroy(): void {
-    window.removeEventListener('resize', this.adjustCalendarSize);
+    this.renderCalendar();
+    this.load();
   }
 
   delete(event: IEvent): void {
     const modalRef = this.modalService.open(EventDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.event = event;
-    // unsubscribe not needed because closed completes on modal close
     modalRef.closed
       .pipe(
         filter(reason => reason === ITEM_DELETED_EVENT),
@@ -148,9 +112,7 @@ export class EventComponent implements OnInit, OnDestroy {
 
   load(): void {
     this.queryBackend().subscribe({
-      next: (res: EntityArrayResponseType) => {
-        this.onResponseSuccess(res);
-      },
+      next: res => this.onResponseSuccess(res),
     });
   }
 
@@ -158,131 +120,108 @@ export class EventComponent implements OnInit, OnDestroy {
     this.handleNavigation(event);
   }
 
-  // add selected date functionality
-  // when a user clicks on a date in the calendar a create form is opened
-  selectDate(day: number): void {
-    if (!day) return;
-
-    const month = this.currentDate.getMonth();
-    const year = this.currentDate.getFullYear();
-    this.selectedDate = new Date(year, month, day);
-
-    // If in month view, switch to day view when clicking on a date
-    if (this.viewMode === 'month') {
-      this.viewMode = 'day';
-    }
+  selectDate(day: Dayjs): void {
+    this.selectedDate = day;
+    if (this.activeView === 'month') this.activeView = 'day';
   }
 
-  setView(mode: 'day' | 'week' | 'month'): void {
-    this.viewMode = mode;
-    if (mode === 'week') {
-      this.renderWeekView();
-    } else if (mode === 'day') {
-      this.currentDate = new Date();
-    }
+  toggleViews(): void {
+    this.viewsOpen = !this.viewsOpen;
+  }
+
+  setView(selectedView: string): void {
+    this.activeView = selectedView;
+    if (selectedView === 'week') this.renderWeekView();
+    else if (selectedView === 'day') this.currentDate = dayjs();
+  }
+
+  get activeViewLabel(): string {
+    return this.views.find(f => f.value === this.activeView)?.label ?? '';
   }
 
   renderWeekView(): void {
-    const startOfWeek = new Date(this.currentDate);
-    startOfWeek.setDate(this.currentDate.getDate() - this.currentDate.getDay()); // Start on Sunday
-
+    const startOfWeek = this.currentDate.startOf('week');
     this.weekDays = [];
     for (let i = 0; i < 7; i++) {
-      const date = new Date(startOfWeek);
-      date.setDate(startOfWeek.getDate() + i);
+      const date = startOfWeek.add(i, 'day');
       this.weekDays.push({
         date,
-        events: this.getEventsForDay(date.getDate()),
+        events: this.getEventsForDay(date),
       });
     }
   }
 
   initializeWeekView(): void {
-    this.weekStartDate = this.getStartOfWeek(new Date());
+    this.weekStartDate = this.getStartOfWeek(dayjs());
     this.updateWeekDays();
   }
 
-  getStartOfWeek(date: Date): Date {
-    const start = new Date(date);
-    const day = start.getDay(); // 0 (Sunday) to 6 (Saturday)
-    const diff = start.getDate() - day + (day === 0 ? -6 : 1); // Adjust for Monday start
-    return new Date(start.setDate(diff));
+  getStartOfWeek(date: Dayjs): Dayjs {
+    const day = date.day();
+    return date.subtract(day === 0 ? 6 : day - 1, 'day');
   }
 
   updateWeekDays(): void {
     this.weekDays = [];
-    this.weekEndDate = new Date(this.weekStartDate);
-    this.weekEndDate.setDate(this.weekStartDate.getDate() + 6);
+    this.weekEndDate = this.weekStartDate.add(6, 'day');
     for (let i = 0; i < 7; i++) {
-      const currentDate = new Date(this.weekStartDate);
-      currentDate.setDate(this.weekStartDate.getDate() + i);
-
+      const currentDate = this.weekStartDate.add(i, 'day');
       this.weekDays.push({
         date: currentDate,
-        events: this.getEventsForDay(currentDate.getDate()),
+        events: this.getEventsForDay(currentDate),
       });
     }
   }
 
+  getFormattedCurrentMonth(): string {
+    return this.currentDate.format('MMMM YYYY');
+  }
+
   changeWeek(direction: number): void {
-    this.weekStartDate.setDate(this.weekStartDate.getDate() + direction * 7);
+    this.weekStartDate = this.weekStartDate.add(direction * 7, 'day');
     this.updateWeekDays();
   }
 
-  isToday(day: number | null): boolean {
-    if (!day) return false;
-    const today = new Date();
-    return (
-      day === today.getDate() && this.currentDate.getMonth() === today.getMonth() && this.currentDate.getFullYear() === today.getFullYear()
-    );
+  isToday(day: Dayjs | null): boolean {
+    return day ? day.isSame(dayjs(), 'day') : false;
   }
 
-  getEventsForDay(day: number | null | undefined): CalendarEvent[] {
-    if (day === null || day === undefined || !this.events) return [];
-    const dateStr = dayjs(new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), day)).format('YYYY-MM-DD');
-
-    return this.events
-      .filter(event => dayjs(event.eventDate).format('YYYY-MM-DD') === dateStr)
-      .map(event => ({
-        date: dayjs(event.eventDate).format('YYYY-MM-DD'),
-        title: event.title ?? 'Untitled Event',
-      }));
+  getEventsForDay(day: Dayjs | null): IEvent[] {
+    return this.events.filter(event => dayjs(event.eventDate).isSame(day, 'day'));
   }
 
   changeDay(direction: number): void {
-    if (this.selectedDate) {
-      this.selectedDate = new Date(this.selectedDate);
-      this.selectedDate.setDate(this.selectedDate.getDate() + direction);
-    }
+    if (this.selectedDate) this.selectedDate = this.selectedDate.add(direction, 'day');
   }
 
-  getEventsForHour(hour: number, date: Date): CalendarEvent[] {
-    return (
-      this.events
-        ?.filter(event => {
-          if (!event.startTime) return false;
-
-          const eventDate = dayjs(event.startTime).toDate();
-
-          return (
-            eventDate.getFullYear() === date.getFullYear() &&
-            eventDate.getMonth() === date.getMonth() &&
-            eventDate.getDate() === date.getDate() &&
-            eventDate.getHours() === hour
-          );
-        })
-        .map(event => ({
-          date: dayjs(event.startTime).format('YYYY-MM-DD'),
-          title: event.title ?? 'Untitled Event',
-        })) ?? []
-    );
+  getDayNumber(day: dayjs.Dayjs | null): number | null {
+    return day ? day.date() : null;
   }
 
-  loadEvents(): void {
-    const savedEvents = localStorage.getItem('calendarEvents');
-    if (savedEvents) {
-      this.events = JSON.parse(savedEvents);
-    }
+  getEventsForHour(hour: number, date: dayjs.Dayjs): IEvent[] {
+    return this.events.filter(event => event.startTime?.isSame(date.hour(hour), 'hour'));
+  }
+
+  editEvent(event: IEvent): void {
+    this.router.navigate(['/event', event.id, 'edit']);
+  }
+
+  drop(event: CdkDragDrop<IEvent[]>, targetDay: dayjs.Dayjs | null): void {
+    if (!targetDay) return;
+
+    const draggedEvent: IEvent = event.item.data;
+
+    // Prevent unnecessary update
+    const oldDate = dayjs(draggedEvent.eventDate).format('YYYY-MM-DD');
+    const newDate = dayjs(targetDay).format('YYYY-MM-DD');
+    if (oldDate === newDate) return;
+
+    // Update the event's date
+    draggedEvent.eventDate = targetDay;
+
+    this.eventService.update(draggedEvent).subscribe(() => {
+      this.load(); // Refresh the events after drop
+    });
   }
 
   protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
@@ -305,17 +244,12 @@ export class EventComponent implements OnInit, OnDestroy {
 
   protected queryBackend(): Observable<EntityArrayResponseType> {
     this.isLoading = true;
-    const queryObject: any = {
-      sort: this.sortService.buildSortParam(this.sortState()),
-    };
+    const queryObject: any = { sort: this.sortService.buildSortParam(this.sortState()) };
     return this.eventService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
   }
 
   protected handleNavigation(sortState: SortState): void {
-    const queryParamsObj = {
-      sort: this.sortService.buildSortParam(sortState),
-    };
-
+    const queryParamsObj = { sort: this.sortService.buildSortParam(sortState) };
     this.ngZone.run(() => {
       this.router.navigate(['./'], {
         relativeTo: this.activatedRoute,

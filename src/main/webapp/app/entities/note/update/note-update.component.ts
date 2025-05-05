@@ -17,12 +17,12 @@ import { UserService } from 'app/entities/user/service/user.service';
 import { NoteService } from '../service/note.service';
 import { INote } from '../note.model';
 import { NoteFormGroup, NoteFormService } from './note-form.service';
-
+import { QuillModule } from 'ngx-quill';
 @Component({
   standalone: true,
   selector: 'jhi-note-update',
   templateUrl: './note-update.component.html',
-  imports: [SharedModule, FormsModule, ReactiveFormsModule],
+  imports: [SharedModule, FormsModule, ReactiveFormsModule, QuillModule],
 })
 export class NoteUpdateComponent implements OnInit {
   isSaving = false;
@@ -54,6 +54,13 @@ export class NoteUpdateComponent implements OnInit {
       }
 
       this.loadRelationshipsOptions();
+    });
+
+    this.activatedRoute.queryParamMap.subscribe(params => {
+      const title = params.get('title');
+      if (title && !this.note?.id) {
+        this.editForm.get('title')?.setValue(title);
+      }
     });
   }
 
@@ -124,11 +131,5 @@ export class NoteUpdateComponent implements OnInit {
         map((categories: ICategory[]) => this.categoryService.addCategoryToCollectionIfMissing<ICategory>(categories, this.note?.category)),
       )
       .subscribe((categories: ICategory[]) => (this.categoriesSharedCollection = categories));
-
-    this.userService
-      .query()
-      .pipe(map((res: HttpResponse<IUser[]>) => res.body ?? []))
-      .pipe(map((users: IUser[]) => this.userService.addUserToCollectionIfMissing<IUser>(users, this.note?.user)))
-      .subscribe((users: IUser[]) => (this.usersSharedCollection = users));
   }
 }

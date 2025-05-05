@@ -36,11 +36,12 @@ export class NoteComponent implements OnInit {
 
   addNote(): void {
     if (!this.newNoteTitle.trim()) return;
-    const note: NewNote = { id: null, title: this.newNoteTitle, content: '' };
-    this.noteService.create(note).subscribe(() => {
-      this.newNoteTitle = '';
-      this.loadAll();
+
+    this.router.navigate(['/note/new'], {
+      queryParams: { title: this.newNoteTitle },
     });
+
+    this.newNoteTitle = '';
   }
 
   editNote(note: INote): void {

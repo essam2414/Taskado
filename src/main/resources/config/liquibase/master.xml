@@ -40,6 +40,7 @@
     <include file="config/liquibase/changelog/20250402172251_added_entity_constraints_UserPreferences.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250424174800_added_guest_fields_to_user.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20250429212100_added_user_to_category_section.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250505200100_added_reminderid_to_task.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

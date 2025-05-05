@@ -918,3 +918,15 @@
   width: 14px;
   height: 14px;
 }
+
+.remind-me {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
