@@ -1,7 +1,10 @@
 package bham.team.web.rest;
 
 import bham.team.domain.PomodoroSession;
+import bham.team.domain.User;
 import bham.team.repository.PomodoroSessionRepository;
+import bham.team.repository.UserRepository;
+import bham.team.security.SecurityUtils;
 import bham.team.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -19,9 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
-/**
- * REST controller for managing {@link bham.team.domain.PomodoroSession}.
- */
 @RestController
 @RequestMapping("/api/pomodoro-sessions")
 @Transactional
@@ -35,18 +35,13 @@ public class PomodoroSessionResource {
     private String applicationName;
 
     private final PomodoroSessionRepository pomodoroSessionRepository;
+    private final UserRepository userRepository;
 
-    public PomodoroSessionResource(PomodoroSessionRepository pomodoroSessionRepository) {
+    public PomodoroSessionResource(PomodoroSessionRepository pomodoroSessionRepository, UserRepository userRepository) {
         this.pomodoroSessionRepository = pomodoroSessionRepository;
+        this.userRepository = userRepository;
     }
 
-    /**
-     * {@code POST  /pomodoro-sessions} : Create a new pomodoroSession.
-     *
-     * @param pomodoroSession the pomodoroSession to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new pomodoroSession, or with status {@code 400 (Bad Request)} if the pomodoroSession has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PostMapping("")
     public ResponseEntity<PomodoroSession> createPomodoroSession(@Valid @RequestBody PomodoroSession pomodoroSession)
         throws URISyntaxException {
@@ -54,22 +49,17 @@ public class PomodoroSessionResource {
         if (pomodoroSession.getId() != null) {
             throw new BadRequestAlertException("A new pomodoroSession cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User user = userRepository.findOneByLogin(login).orElseThrow();
+        pomodoroSession.setUser(user);
+
         pomodoroSession = pomodoroSessionRepository.save(pomodoroSession);
         return ResponseEntity.created(new URI("/api/pomodoro-sessions/" + pomodoroSession.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, pomodoroSession.getId().toString()))
             .body(pomodoroSession);
     }
 
-    /**
-     * {@code PUT  /pomodoro-sessions/:id} : Updates an existing pomodoroSession.
-     *
-     * @param id the id of the pomodoroSession to save.
-     * @param pomodoroSession the pomodoroSession to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated pomodoroSession,
-     * or with status {@code 400 (Bad Request)} if the pomodoroSession is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the pomodoroSession couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PutMapping("/{id}")
     public ResponseEntity<PomodoroSession> updatePomodoroSession(
         @PathVariable(value = "id", required = false) final Long id,
@@ -87,69 +77,52 @@ public class PomodoroSessionResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
+        PomodoroSession existingSession = pomodoroSessionRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (existingSession.getUser() == null || !existingSession.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to update this session", ENTITY_NAME, "unauthorized");
+        }
+
+        pomodoroSession.setUser(existingSession.getUser());
         pomodoroSession = pomodoroSessionRepository.save(pomodoroSession);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, pomodoroSession.getId().toString()))
             .body(pomodoroSession);
     }
 
-    /**
-     * {@code PATCH  /pomodoro-sessions/:id} : Partial updates given fields of an existing pomodoroSession, field will ignore if it is null
-     *
-     * @param id the id of the pomodoroSession to save.
-     * @param pomodoroSession the pomodoroSession to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated pomodoroSession,
-     * or with status {@code 400 (Bad Request)} if the pomodoroSession is not valid,
-     * or with status {@code 404 (Not Found)} if the pomodoroSession is not found,
-     * or with status {@code 500 (Internal Server Error)} if the pomodoroSession couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<PomodoroSession> partialUpdatePomodoroSession(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody PomodoroSession pomodoroSession
     ) throws URISyntaxException {
-        LOG.debug("REST request to partial update PomodoroSession partially : {}, {}", id, pomodoroSession);
+        LOG.debug("REST request to partial update PomodoroSession : {}, {}", id, pomodoroSession);
         if (pomodoroSession.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
         if (!Objects.equals(id, pomodoroSession.getId())) {
             throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
         }
-
         if (!pomodoroSessionRepository.existsById(id)) {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<PomodoroSession> result = pomodoroSessionRepository
-            .findById(pomodoroSession.getId())
-            .map(existingPomodoroSession -> {
-                if (pomodoroSession.getName() != null) {
-                    existingPomodoroSession.setName(pomodoroSession.getName());
-                }
-                if (pomodoroSession.getDuration() != null) {
-                    existingPomodoroSession.setDuration(pomodoroSession.getDuration());
-                }
-                if (pomodoroSession.getBreakDuration() != null) {
-                    existingPomodoroSession.setBreakDuration(pomodoroSession.getBreakDuration());
-                }
-                if (pomodoroSession.getLongBreakDuration() != null) {
-                    existingPomodoroSession.setLongBreakDuration(pomodoroSession.getLongBreakDuration());
-                }
-                if (pomodoroSession.getCycles() != null) {
-                    existingPomodoroSession.setCycles(pomodoroSession.getCycles());
-                }
-                if (pomodoroSession.getStartTime() != null) {
-                    existingPomodoroSession.setStartTime(pomodoroSession.getStartTime());
-                }
-                if (pomodoroSession.getEndTime() != null) {
-                    existingPomodoroSession.setEndTime(pomodoroSession.getEndTime());
-                }
-                if (pomodoroSession.getCompleted() != null) {
-                    existingPomodoroSession.setCompleted(pomodoroSession.getCompleted());
-                }
+        PomodoroSession existingSession = pomodoroSessionRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!existingSession.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to update this session", ENTITY_NAME, "unauthorized");
+        }
 
-                return existingPomodoroSession;
+        Optional<PomodoroSession> result = Optional.of(existingSession)
+            .map(session -> {
+                if (pomodoroSession.getName() != null) session.setName(pomodoroSession.getName());
+                if (pomodoroSession.getDuration() != null) session.setDuration(pomodoroSession.getDuration());
+                if (pomodoroSession.getBreakDuration() != null) session.setBreakDuration(pomodoroSession.getBreakDuration());
+                if (pomodoroSession.getLongBreakDuration() != null) session.setLongBreakDuration(pomodoroSession.getLongBreakDuration());
+                if (pomodoroSession.getCycles() != null) session.setCycles(pomodoroSession.getCycles());
+                if (pomodoroSession.getStartTime() != null) session.setStartTime(pomodoroSession.getStartTime());
+                if (pomodoroSession.getEndTime() != null) session.setEndTime(pomodoroSession.getEndTime());
+                if (pomodoroSession.getCompleted() != null) session.setCompleted(pomodoroSession.getCompleted());
+                return session;
             })
             .map(pomodoroSessionRepository::save);
 
@@ -159,40 +132,36 @@ public class PomodoroSessionResource {
         );
     }
 
-    /**
-     * {@code GET  /pomodoro-sessions} : get all the pomodoroSessions.
-     *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of pomodoroSessions in body.
-     */
     @GetMapping("")
     public List<PomodoroSession> getAllPomodoroSessions() {
         LOG.debug("REST request to get all PomodoroSessions");
-        return pomodoroSessionRepository.findAll();
+
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        User user = userRepository.findOneByLogin(login).orElseThrow();
+
+        return pomodoroSessionRepository.findAllByUser(user);
     }
 
-    /**
-     * {@code GET  /pomodoro-sessions/:id} : get the "id" pomodoroSession.
-     *
-     * @param id the id of the pomodoroSession to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the pomodoroSession, or with status {@code 404 (Not Found)}.
-     */
     @GetMapping("/{id}")
     public ResponseEntity<PomodoroSession> getPomodoroSession(@PathVariable("id") Long id) {
         LOG.debug("REST request to get PomodoroSession : {}", id);
-        Optional<PomodoroSession> pomodoroSession = pomodoroSessionRepository.findById(id);
-        return ResponseUtil.wrapOrNotFound(pomodoroSession);
+        Optional<PomodoroSession> session = pomodoroSessionRepository
+            .findById(id)
+            .filter(s -> s.getUser() != null && s.getUser().getLogin().equals(SecurityUtils.getCurrentUserLogin().orElse("")));
+        return ResponseUtil.wrapOrNotFound(session);
     }
 
-    /**
-     * {@code DELETE  /pomodoro-sessions/:id} : delete the "id" pomodoroSession.
-     *
-     * @param id the id of the pomodoroSession to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePomodoroSession(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete PomodoroSession : {}", id);
-        pomodoroSessionRepository.deleteById(id);
+
+        PomodoroSession session = pomodoroSessionRepository.findById(id).orElseThrow();
+        String login = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        if (!session.getUser().getLogin().equals(login)) {
+            throw new BadRequestAlertException("You do not have permission to delete this session", ENTITY_NAME, "unauthorized");
+        }
+
+        pomodoroSessionRepository.delete(session);
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
             .build();
