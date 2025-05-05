@@ -169,7 +169,7 @@
         </div>
       </div>
 
-      <div>
+      <div class="habit-btns">
         <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
           <fa-icon icon="ban"></fa-icon>&nbsp;<span>Cancel</span>
         </button>
@@ -182,6 +182,9 @@
           class="btn btn-primary"
         >
           <fa-icon icon="save"></fa-icon>&nbsp;<span>Save</span>
+        </button>
+        <button type="button" id="delete-habit" class="btn btn-delete" *ngIf="editForm.get('id')?.value" (click)="deleteHabit()">
+          <fa-icon icon="trash-alt"></fa-icon><span>Delete</span>
         </button>
       </div>
     </form>

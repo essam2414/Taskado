@@ -1,3 +1,25 @@
+.btn-delete {
+  color: var(--danger-color);
+  margin-left: auto;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+  font-weight: 400;
+
+  fa-icon {
+    margin-right: 4px;
+  }
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.habit-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 30px;
+}
+
 .habit-row {
   display: grid;
   grid-template-columns: 3fr repeat(7, 1fr) 2fr;
