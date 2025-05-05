@@ -14,5 +14,8 @@ public interface PomodoroSessionRepository extends JpaRepository<PomodoroSession
     @Query("select pomodoroSession from PomodoroSession pomodoroSession where pomodoroSession.user.login = ?#{authentication.name}")
     List<PomodoroSession> findByUserIsCurrentUser();
 
+    @Query("select p from PomodoroSession p where p.user.login = :login")
+    List<PomodoroSession> findAllByUserLogin(@Param("login") String login);
+  
     List<PomodoroSession> findAllByUser(bham.team.domain.User user);
 }
