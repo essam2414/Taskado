@@ -164,6 +164,23 @@ label {
 li {
   font-size: clamp(calc(0.85rem * var(--font-scale)), 1.4vw, calc(0.95rem * var(--font-scale)));
 }
+/* jhipster-needle-scss-add-main JHipster will add new css style */
+// note page styles
+.delete-note {
+  align-self: flex-end;
+  padding: 0;
+  opacity: 0;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: var(--danger-color);
+  }
+}
+
+.app-card:hover .delete-note {
+  opacity: 1;
+}
 
 /* Global Responsive Utility Classes */
 
@@ -343,5 +360,3 @@ angular-cli removes postcss-rtl processed inline css, processed rules must be ad
   -webkit-transform: rotate(-45deg);
   transform: rotate(-45deg);
 }
-
-/* jhipster-needle-scss-add-main JHipster will add new css style */
