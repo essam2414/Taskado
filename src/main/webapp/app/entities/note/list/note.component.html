@@ -17,6 +17,10 @@
         <h5 class="mb-1">{{ note.title }}</h5>
         <p class="mb-1" [innerHTML]="note.content"></p>
       </div>
+
+      <button class="btn delete-note" type="submit" (click)="delete(note); $event.stopPropagation()" data-cy="entityDeleteButton">
+        <fa-icon icon="trash-alt"></fa-icon>
+      </button>
     </div>
 
     <div class="mt-4">
